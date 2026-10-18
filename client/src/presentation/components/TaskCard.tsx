@@ -31,7 +31,7 @@ export default function TaskCard({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-ios p-4 hover:shadow-ios-lg transition-all duration-200 animate-fade-in">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
@@ -56,12 +56,13 @@ export default function TaskCard({
         </p>
       )}
 
-      <div className="flex gap-2">
+      <div className="flex gap-2" role="group" aria-label="Task actions">
         {onToggleStatus && (
           <button
             onClick={handleToggle}
             disabled={isLoading}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors"
+            className="flex-1 bg-ios-blue hover:bg-blue-700 disabled:bg-gray-400 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            aria-label={task.status === TaskStatus.COMPLETED ? 'Reopen task' : 'Complete task'}
           >
             {task.status === TaskStatus.COMPLETED ? 'Reopen' : 'Complete'}
           </button>
@@ -70,7 +71,8 @@ export default function TaskCard({
           <button
             onClick={() => onEdit(task)}
             disabled={isLoading}
-            className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors"
+            className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            aria-label="Edit task"
           >
             Edit
           </button>
@@ -79,7 +81,8 @@ export default function TaskCard({
           <button
             onClick={() => onDelete(task.id)}
             disabled={isLoading}
-            className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors"
+            className="flex-1 bg-ios-red hover:bg-red-700 disabled:bg-gray-400 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            aria-label="Delete task"
           >
             Delete
           </button>

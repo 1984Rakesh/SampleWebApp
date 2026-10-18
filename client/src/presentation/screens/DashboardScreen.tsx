@@ -4,6 +4,7 @@ import { useTaskListViewModel } from '../hooks';
 import { useUserViewModel } from '../hooks';
 import { TaskStatus } from '../../domain/models';
 import TaskCard from '../components/TaskCard';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function DashboardScreen() {
   const { user } = useAuthViewModel();
@@ -19,7 +20,7 @@ export default function DashboardScreen() {
   if (userLoading || tasksLoading) {
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8 flex items-center justify-center">
-        <div className="text-gray-600 dark:text-gray-400">Loading dashboard...</div>
+        <LoadingSpinner size="lg" text="Loading dashboard..." />
       </div>
     );
   }

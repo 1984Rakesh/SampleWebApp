@@ -4,6 +4,7 @@ import { TaskStatus, TaskPriority } from '../../domain/models';
 import type { Task } from '../../domain/models';
 import TaskCard from '../components/TaskCard';
 import TaskForm, { type TaskFormData } from '../components/TaskForm';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function TaskListScreen() {
   const { tasks, isLoading, error, getTasks, createTask, updateTask, deleteTask, toggleTaskStatus } = useTaskListViewModel();
@@ -127,9 +128,11 @@ export default function TaskListScreen() {
 
         {/* Tasks List */}
         {isLoading ? (
-          <div className="text-center py-12 text-gray-600 dark:text-gray-400">Loading tasks...</div>
+          <div className="flex items-center justify-center py-12">
+            <LoadingSpinner size="lg" text="Loading tasks..." />
+          </div>
         ) : error ? (
-          <div className="text-center py-12 text-red-600 dark:text-red-400">
+          <div className="bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded">
             Error loading tasks: {error instanceof Error ? error.message : 'Unknown error'}
           </div>
         ) : filteredTasks.length > 0 ? (
