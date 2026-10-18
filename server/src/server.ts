@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { runMigrations } from './database/migrations';
 import { seedDatabase } from './database/seed';
 import { errorMiddleware } from './middleware/errorMiddleware';
+import { requestLogger } from './middleware/requestLogger';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import taskRoutes from './routes/taskRoutes';
@@ -31,6 +32,9 @@ app.get('/', (_req, res) => {
 });
 
 // API Routes
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api', requestLogger);
+}
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);

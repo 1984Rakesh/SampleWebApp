@@ -6,9 +6,9 @@ export interface UserDTO {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
-  bio?: string;
-  created_at?: string;
+  avatar?: string | null;
+  bio?: string | null;
+  createdAt?: string;
 }
 
 export function toDomain(dto: UserDTO): User {
@@ -23,7 +23,7 @@ export function toDomain(dto: UserDTO): User {
   );
 }
 
-export function toDTO(domain: Partial<User>): Partial<UserDTO> {
+export function toDTO(domain: Partial<User>): Pick<Partial<User>, 'name' | 'bio' | 'avatar'> {
   return {
     name: domain.name,
     bio: domain.bio,

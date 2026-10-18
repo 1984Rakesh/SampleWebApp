@@ -5,8 +5,8 @@ export const userSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   email: z.string().email(),
-  avatar: z.string().optional(),
-  bio: z.string().optional(),
+  avatar: z.string().nullish().transform((value) => value ?? undefined),
+  bio: z.string().nullish().transform((value) => value ?? undefined),
   createdAt: z.string().optional(),
 });
 
