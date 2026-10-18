@@ -141,3 +141,45 @@ npm run lint
 ## 12. Project-specific transition rule
 
 Some current hooks combine React Query or concrete repositories with domain use-case functions. Treat these as composition adapters, not as permission for pure domain logic to depend on `data/`. When modifying those flows, preserve testable pure business functions and move framework/repository wiring toward the application or presentation composition boundary when practical.
+
+## 13. API and persistence boundaries
+
+- Keep SQLite columns and database row types in `snake_case`; expose public JSON fields in `camelCase`.
+- Centralize repeated database-row-to-response serialization so list, create, update, and status endpoints cannot drift into different response shapes.
+- Keep legacy field aliases, nullable transport values, and other compatibility handling inside data mappers.
+- Normalize transport values before validation, then validate with Zod before constructing domain models.
+- Preserve strict domain invariants during normalization. Do not invent missing IDs, ownership, statuses, or other required business values.
+- Keep request and response DTOs separate when their valid fields differ; do not weaken response contracts to accommodate partial mutation inputs.
+
+## 14. Server safety and HTTP behavior
+
+- Use parameterized SQL for every request-derived value. Never interpolate user input into SQL strings.
+- Protected handlers derive identity from `req.user`; do not accept user ownership from request bodies or query parameters.
+- Scope resource reads, updates, and deletes to the authenticated user before performing the operation.
+- Return errors as `{ error: string }` with an appropriate status: `400` for invalid input, `401` for authentication failure, `404` for unavailable user-scoped resources, `409` for conflicts, and `500` for unexpected failures.
+- Return `201` for successful creation and `204` with no body for successful deletion.
+- Keep global error middleware after all routes. Keep development diagnostics, including request logging, disabled in production.
+- Do not expose database errors, token contents, stack traces, secrets, or internal implementation details in API responses.
+
+## 15. React Query and client transport
+
+- Convert API DTOs to domain models inside the data/repository boundary before query or mutation results reach presentation code.
+- Include every input that affects a query result in its React Query key.
+- After successful task creation, update, deletion, or status changes, invalidate the feature-level `['tasks']` key so all filtered task queries refresh.
+- Keep authorization headers, token refresh, retry behavior, and base URL configuration in the shared network client rather than feature APIs or components.
+- Do not read authentication storage directly from screens or presentational components.
+
+## 16. Project verification commands
+
+After server changes, run:
+
+```bash
+cd server
+npm run build
+```
+
+When a change crosses client and server boundaries, run both the client commands in section 11 and the server build.
+
+- The server currently has no configured automated test suite; its `npm test` script intentionally fails. Do not report it as a verification command until a real test runner is added.
+- When test infrastructure is introduced, add focused boundary coverage for camelCase/snake_case normalization, nullable transport fields, missing required ownership, authenticated resource scoping, and consistent response serialization.
+- Run `git diff --check` before completing documentation-only or cross-layer changes.
