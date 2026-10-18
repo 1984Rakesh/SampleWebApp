@@ -231,54 +231,54 @@ Create a full-stack educational web app that demonstrates Clean Architecture pri
 
 ---
 
-## Phase 6: Data Layer Implementation
+## Phase 6: Data Layer Implementation ✅
 **Goal**: Implement data sources, API callers, mappers, and repository implementations.
 
 ### 6.1 API Layer
-- [ ] Create `AuthApi` in `client/src/data/api/AuthApi.ts`
-  - [ ] register(email, password, name)
-  - [ ] login(email, password)
-  - [ ] refreshToken(refreshToken)
-- [ ] Create `UserApi` in `client/src/data/api/UserApi.ts`
-  - [ ] getCurrentUser()
-  - [ ] updateProfile(data)
-- [ ] Create `TaskApi` in `client/src/data/api/TaskApi.ts`
-  - [ ] getTasks(filters)
-  - [ ] createTask(data)
-  - [ ] updateTask(id, data)
-  - [ ] deleteTask(id)
-  - [ ] toggleTaskStatus(id, status)
-- [ ] Create API exports in `client/src/data/api/index.ts`
+- [x] Create `AuthApi` in `client/src/data/api/AuthApi.ts`
+  - [x] register(email, password, name)
+  - [x] login(email, password)
+  - [x] refreshToken(refreshToken)
+- [x] Create `UserApi` in `client/src/data/api/UserApi.ts`
+  - [x] getCurrentUser()
+  - [x] updateProfile(data)
+- [x] Create `TaskApi` in `client/src/data/api/TaskApi.ts`
+  - [x] getTasks(filters)
+  - [x] createTask(data)
+  - [x] updateTask(id, data)
+  - [x] deleteTask(id)
+  - [x] toggleTaskStatus(id, status)
+- [x] Create API exports in `client/src/data/api/index.ts`
 
 ### 6.2 Mappers & Validation
-- [ ] Create Zod schemas in `client/src/data/mappers/schemas.ts`
-  - [ ] UserDTO schema
-  - [ ] TaskDTO schema
-  - [ ] AuthResponse schema
-- [ ] Create `UserMapper` in `client/src/data/mappers/UserMapper.ts`
-  - [ ] toDomain(dto) - transform API response to domain model
-  - [ ] toDTO(domain) - transform domain model to API request
-- [ ] Create `TaskMapper` in `client/src/data/mappers/TaskMapper.ts`
-  - [ ] toDomain(dto) - transform API response to domain model
-  - [ ] toDTO(domain) - transform domain model to API request
-- [ ] Create mapper exports in `client/src/data/mappers/index.ts`
+- [x] Create Zod schemas in `client/src/data/mappers/schemas.ts`
+  - [x] UserDTO schema
+  - [x] TaskDTO schema
+  - [x] AuthResponse schema
+- [x] Create `UserMapper` in `client/src/data/mappers/UserMapper.ts`
+  - [x] toDomain(dto) - transform API response to domain model
+  - [x] toDTO(domain) - transform domain model to API request
+- [x] Create `TaskMapper` in `client/src/data/mappers/TaskMapper.ts`
+  - [x] toDomain(dto) - transform API response to domain model
+  - [x] toDTO(domain) - transform domain model to API request
+- [x] Create mapper exports in `client/src/data/mappers/index.ts`
 
 ### 6.3 Repository Implementations
-- [ ] Create `AuthRepository` in `client/src/data/repositories/AuthRepository.ts`
-  - [ ] Use TanStack Query for auth state management
-  - [ ] Implement register, login, logout mutations
-  - [ ] Handle token storage and refresh
-- [ ] Create `UserRepository` in `client/src/data/repositories/UserRepository.ts`
-  - [ ] Use TanStack Query for user data caching
-  - [ ] Implement getCurrentUser query
-  - [ ] Implement updateProfile mutation
-- [ ] Create `TaskRepository` in `client/src/data/repositories/TaskRepository.ts`
-  - [ ] Use TanStack Query for task data caching
-  - [ ] Implement getTasks query with filters
-  - [ ] Implement createTask, updateTask, deleteTask mutations
-  - [ ] Implement toggleTaskStatus mutation
-  - [ ] Configure cache invalidation strategies
-- [ ] Create repository exports in `client/src/data/repositories/index.ts`
+- [x] Create `AuthRepository` in `client/src/data/repositories/AuthRepository.ts`
+  - [x] Use TanStack Query for auth state management
+  - [x] Implement register, login, logout mutations
+  - [x] Handle token storage and refresh
+- [x] Create `UserRepository` in `client/src/data/repositories/UserRepository.ts`
+  - [x] Use TanStack Query for user data caching
+  - [x] Implement getCurrentUser query
+  - [x] Implement updateProfile mutation
+- [x] Create `TaskRepository` in `client/src/data/repositories/TaskRepository.ts`
+  - [x] Use TanStack Query for task data caching
+  - [x] Implement getTasks query with filters
+  - [x] Implement createTask, updateTask, deleteTask mutations
+  - [x] Implement toggleTaskStatus mutation
+  - [x] Configure cache invalidation strategies
+- [x] Create repository exports in `client/src/data/repositories/index.ts`
 
 **Phase 6 Completion Criteria**:
 - [ ] All API callers use the configured Axios client
