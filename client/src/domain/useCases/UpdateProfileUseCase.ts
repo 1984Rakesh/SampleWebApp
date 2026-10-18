@@ -1,11 +1,7 @@
-import type { User } from '../models';
+import type { User, UpdateProfileInput } from '../models';
 import type { UserRepository } from '../repositories';
 
-export interface UpdateProfileInput {
-  name?: string;
-  bio?: string;
-  avatar?: string;
-}
+export type { UpdateProfileInput };
 
 export async function updateProfileUseCase(
   repository: UserRepository,
@@ -15,5 +11,8 @@ export async function updateProfileUseCase(
     throw new Error('Name cannot be empty');
   }
 
-  return repository.updateProfile(input);
+  return repository.updateProfile({
+    ...input,
+    name: input.name !== undefined ? input.name.trim() : undefined,
+  });
 }

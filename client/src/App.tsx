@@ -3,8 +3,6 @@ import { AuthProvider } from './foundation/context';
 import { ThemeProvider } from './foundation/theme';
 import { AppRouter } from './foundation/router/AppRouter';
 import { ErrorBoundary } from './presentation/components/ErrorBoundary';
-import { UiSnackbar } from './presentation/components/ui';
-import { useState } from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,22 +14,12 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
         <ThemeProvider>
           <AuthProvider>
             <AppRouter />
-            {toast && (
-              <UiSnackbar
-                open={!!toast}
-                message={toast.message}
-                type={toast.type}
-                onClose={() => setToast(null)}
-              />
-            )}
           </AuthProvider>
         </ThemeProvider>
       </ErrorBoundary>

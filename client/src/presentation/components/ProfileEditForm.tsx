@@ -1,30 +1,31 @@
-import { useState, type FormEvent } from 'react';
+import type { FormEvent } from 'react';
 import Stack from '@mui/material/Stack';
 import { UiCard, UiCardContent, UiCardHeader, UiTextField, UiButton, UiAlert } from './ui';
 
 interface ProfileEditFormProps {
-  initialName: string;
-  initialBio: string;
+  name: string;
+  bio: string;
   isSubmitting: boolean;
   errorMessage?: string;
-  onSubmit: (name: string, bio: string) => void;
+  onNameChange: (name: string) => void;
+  onBioChange: (bio: string) => void;
+  onSubmit: () => void;
   onCancel: () => void;
 }
 
 export default function ProfileEditForm({
-  initialName,
-  initialBio,
+  name,
+  bio,
   isSubmitting,
   errorMessage,
+  onNameChange,
+  onBioChange,
   onSubmit,
   onCancel,
 }: ProfileEditFormProps) {
-  const [name, setName] = useState(initialName);
-  const [bio, setBio] = useState(initialBio);
-
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    onSubmit(name, bio);
+    onSubmit();
   };
 
   return (
@@ -44,7 +45,7 @@ export default function ProfileEditForm({
               label="Name"
               type="text"
               value={name}
-              onChange={(event) => setName(event.target.value)}
+              onChange={(event) => onNameChange(event.target.value)}
               required
               disabled={isSubmitting}
             />
@@ -52,7 +53,7 @@ export default function ProfileEditForm({
               id="bio"
               label="Bio"
               value={bio}
-              onChange={(event) => setBio(event.target.value)}
+              onChange={(event) => onBioChange(event.target.value)}
               disabled={isSubmitting}
               multiline
               rows={4}

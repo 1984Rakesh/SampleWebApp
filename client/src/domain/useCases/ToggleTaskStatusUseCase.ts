@@ -1,11 +1,7 @@
-import type { Task } from '../models';
-import { TaskStatus } from '../models';
+import { TaskStatus, type Task, type ToggleTaskStatusInput } from '../models';
 import type { TaskRepository } from '../repositories';
 
-export interface ToggleTaskStatusInput {
-  id: string;
-  status: TaskStatus;
-}
+export type { ToggleTaskStatusInput };
 
 export function nextTaskStatus(current: TaskStatus): TaskStatus {
   switch (current) {
@@ -22,7 +18,7 @@ export async function toggleTaskStatusUseCase(
   repository: TaskRepository,
   input: ToggleTaskStatusInput
 ): Promise<Task> {
-  if (!input.id || input.id.length === 0) {
+  if (!input.id || input.id.trim().length === 0) {
     throw new Error('Task ID is required');
   }
 

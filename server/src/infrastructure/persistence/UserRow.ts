@@ -1,4 +1,5 @@
 import type { User, UserCredentials } from '../../domain/models/User';
+import { normalizeSqliteTimestamp } from './TaskRow';
 
 export interface UserRow {
   id: string;
@@ -22,7 +23,7 @@ export function rowToUser(row: UserRow): User {
     email: row.email,
     avatar: row.avatar,
     bio: row.bio,
-    createdAt: row.created_at,
+    createdAt: normalizeSqliteTimestamp(row.created_at),
   };
 }
 

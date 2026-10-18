@@ -1,4 +1,5 @@
 import type { AuthResult } from '../../models/Auth';
+import { normalizeEmail, normalizeUserName, validatePassword } from '../../models/User';
 import type { PasswordHasher } from '../../ports/PasswordHasher';
 import type { TokenService } from '../../ports/TokenService';
 import type { UserRepository } from '../../ports/UserRepository';
@@ -17,8 +18,16 @@ export class RegisterUserUseCase {
   ) {}
 
   async execute({ name, email, password }: RegisterUserInput): Promise<AuthResult> {
-    const passwordHash = await this.passwordHasher.hash(password);
-    const user = await this.users.create({ name, email, passwordHash });
+    const normalizedName = normalizeUserName(name);
+    const normalizedEmail = normalizeEmail(email);
+    const validPassword = validatePassword(password);
+
+    const passwordHash = await this.passwordHasher.hash(validPassword);
+    const user = await this.users.create({
+      name: normalizedName,
+      email: normalizedEmail,
+      passwordHash,
+    });
     const tokens = await this.tokenService.issueTokens({ userId: user.id, email: user.email });
     return { user, tokens };
   }

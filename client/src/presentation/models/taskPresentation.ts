@@ -1,6 +1,7 @@
 import type { Task } from '../../domain/models';
-import { TaskStatus, TaskPriority } from '../../domain/models';
+import { TaskModel, TaskStatus, TaskPriority } from '../../domain/models';
 import type { SelectOption } from './SelectOption';
+import type { TaskFormData } from './TaskFormViewState';
 import type { BadgeTone, TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
 
 const STATUS_TONES: Record<TaskStatus, BadgeTone> = {
@@ -48,8 +49,18 @@ export function withAllOption(options: SelectOption[]): SelectOption[] {
   return [{ value: '', label: 'All' }, ...options];
 }
 
+export function toTaskFormData(task?: Task): TaskFormData {
+  return {
+    title: task?.title || '',
+    description: task?.description || '',
+    priority: task?.priority || TaskPriority.MEDIUM,
+    dueDate: task?.dueDate || '',
+  };
+}
+
 export function toTaskItemViewState(task: Task): TaskItemViewState {
-  const isCompleted = task.status === TaskStatus.COMPLETED;
+  const isCompleted =
+    task instanceof TaskModel ? task.isCompleted() : task.status === TaskStatus.COMPLETED;
   return {
     id: task.id,
     title: task.title,
@@ -69,6 +80,8 @@ export function toTaskCounts(tasks: Task[]): TaskCountsViewState {
   return {
     todo: tasks.filter((task) => task.status === TaskStatus.TODO).length,
     inProgress: tasks.filter((task) => task.status === TaskStatus.IN_PROGRESS).length,
-    completed: tasks.filter((task) => task.status === TaskStatus.COMPLETED).length,
+    completed: tasks.filter((task) =>
+      task instanceof TaskModel ? task.isCompleted() : task.status === TaskStatus.COMPLETED
+    ).length,
   };
 }

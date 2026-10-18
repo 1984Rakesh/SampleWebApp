@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useTaskUseCases } from '../../foundation/composition';
-import type { Task } from '../../domain/models';
-import type { GetTasksInput } from '../../domain/useCases';
-import { getTasksUseCase, nextTaskStatus } from '../../domain/useCases';
+import type { Task, GetTasksInput } from '../../domain/models';
+import { validateTaskFilters, nextTaskStatus } from '../../domain/useCases';
 import {
   buildStatusOptions,
   buildPriorityOptions,
   withAllOption,
   toTaskStatus,
   toTaskPriority,
+  toTaskFormData,
   toTaskItemViewState,
   toTaskCounts,
 } from '../models/taskPresentation';
@@ -23,13 +23,15 @@ export function useTaskListViewModel() {
   const [priorityFilter, setPriorityFilter] = useState('');
   const [appliedFilters, setAppliedFilters] = useState<GetTasksInput>({});
   const [actionError, setActionError] = useState<string>();
+  const [showForm, setShowForm] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<string | undefined>();
 
   const tasksQuery = taskUseCases.useTasksQuery(appliedFilters);
   const tasks = tasksQuery.data as Task[] | undefined;
 
   const applyFilters = () => {
     setAppliedFilters(
-      getTasksUseCase({
+      validateTaskFilters({
         status: toTaskStatus(statusFilter),
         priority: toTaskPriority(priorityFilter),
       })
@@ -57,7 +59,23 @@ export function useTaskListViewModel() {
     }
   };
 
-  const taskById = (id: string) => tasks?.find((task) => task.id === id);
+  const openCreateForm = () => {
+    setEditingTaskId(undefined);
+    setShowForm(true);
+  };
+
+  const openEditForm = (id: string) => {
+    setEditingTaskId(id);
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingTaskId(undefined);
+  };
+
+  const editingTask = editingTaskId ? tasks?.find((task) => task.id === editingTaskId) : undefined;
+  const editingFormData = editingTask ? toTaskFormData(editingTask) : undefined;
 
   return {
     taskItems: (tasks ?? []).map(toTaskItemViewState),
@@ -72,7 +90,12 @@ export function useTaskListViewModel() {
     applyFilters,
     statusOptions: withAllOption(buildStatusOptions()),
     priorityOptions: withAllOption(buildPriorityOptions()),
-    taskById,
+    showForm,
+    editingTaskId,
+    editingFormData,
+    openCreateForm,
+    openEditForm,
+    closeForm,
     deleteTask,
     toggleTaskStatus,
     isDeleting: taskUseCases.isDeleting,

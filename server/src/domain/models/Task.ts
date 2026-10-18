@@ -31,10 +31,10 @@ export interface NewTask {
 
 export interface TaskChanges {
   title?: string;
-  description?: string;
+  description?: string | null;
   status?: TaskStatus;
   priority?: TaskPriority;
-  dueDate?: string;
+  dueDate?: string | null;
 }
 
 export interface TaskFilters {
@@ -48,4 +48,17 @@ export function normalizeTaskTitle(title: string): string {
     throw new ValidationError('Title is required');
   }
   return normalized;
+}
+
+export function normalizeOptionalText(
+  value: string | null | undefined
+): string | null | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (value === null) {
+    return null;
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
 }

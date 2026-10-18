@@ -1,6 +1,6 @@
-import type { User } from '../models';
-import type { UpdateProfileInput } from '../useCases/UpdateProfileUseCase';
+import type { User, UpdateProfileInput } from '../models';
 
 export interface UserRepository {
+  getCurrentUser(): Promise<User>;
   updateProfile(input: UpdateProfileInput): Promise<User>;
 }

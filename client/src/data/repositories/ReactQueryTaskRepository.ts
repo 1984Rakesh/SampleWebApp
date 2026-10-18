@@ -2,20 +2,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { taskApi } from '../api';
 import type { CreateTaskDTO, UpdateTaskDTO } from '../dtos';
 import { taskToDomain, toCreateTaskDTO, toUpdateTaskDTO } from '../mappers';
+import type { GetTasksInput, ToggleTaskStatusInput } from '../../domain/models';
 import type { TaskRepository } from '../../domain/repositories';
-import type { ToggleTaskStatusInput, GetTasksInput } from '../../domain/useCases';
+import { getTasksUseCase } from '../../domain/useCases';
 
 export function useTaskRepository() {
   const queryClient = useQueryClient();
 
-  const useTasksQuery = (input?: GetTasksInput) =>
-    useQuery({
-      queryKey: ['tasks', input?.status, input?.priority],
-      queryFn: async () => {
-        const dtos = await taskApi.getTasks(input);
-        return dtos.map(taskToDomain);
-      },
-    });
+  const getTasks = async (input?: GetTasksInput) => {
+    const dtos = await taskApi.getTasks(input);
+    return dtos.map(taskToDomain);
+  };
 
   const createMutation = useMutation({
     mutationFn: async (input: CreateTaskDTO) => {
@@ -57,12 +54,19 @@ export function useTaskRepository() {
   });
 
   const repository: TaskRepository = {
+    getTasks,
     createTask: (input) => createMutation.mutateAsync(toCreateTaskDTO(input)),
     updateTask: ({ id, ...updates }) =>
       updateMutation.mutateAsync({ id, input: toUpdateTaskDTO(updates) }),
     deleteTask: (id) => deleteMutation.mutateAsync(id),
     toggleTaskStatus: (input) => toggleStatusMutation.mutateAsync(input),
   };
+
+  const useTasksQuery = (input?: GetTasksInput) =>
+    useQuery({
+      queryKey: ['tasks', input?.status, input?.priority],
+      queryFn: () => getTasksUseCase(repository, input),
+    });
 
   return {
     repository,

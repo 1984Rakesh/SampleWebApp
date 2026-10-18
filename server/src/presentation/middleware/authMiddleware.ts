@@ -19,7 +19,7 @@ export function createAuthMiddleware(tokenService: TokenService): RequestHandler
       throw new UnauthorizedError('No token provided');
     }
 
-    req.user = await tokenService.verify(authHeader.substring(7));
+    req.user = await tokenService.verifyAccessToken(authHeader.substring(7));
     next();
   };
 }

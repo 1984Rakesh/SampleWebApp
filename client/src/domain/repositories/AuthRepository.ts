@@ -1,6 +1,4 @@
-import type { AuthSession } from '../models';
-import type { LoginInput } from '../useCases/LoginUseCase';
-import type { RegisterUserInput } from '../useCases/RegisterUserUseCase';
+import type { AuthSession, LoginInput, RegisterUserInput } from '../models';
 
 export interface AuthRepository {
   login(input: LoginInput): Promise<AuthSession>;

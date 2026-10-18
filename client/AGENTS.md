@@ -1,8 +1,8 @@
-# Client Rules (React)
+# Client Agent Instructions (React)
 
-These rules extend the shared rules in the repository root `AGENTS.md`.
+These instructions accompany [`client/RULES.md`](./RULES.md) and root [`AGENTS.md`](../AGENTS.md) / [`RULES.md`](../RULES.md).
 
-## 1. Layers and dependency direction
+## 1. Layer Overview & File Placement
 
 ```text
 Presentation ──→ Domain ←── Data
@@ -11,122 +11,75 @@ Foundation wires the layers together
 
 ```text
 src/
-├── domain/        # models, enums, use cases, repository contracts
-├── data/          # api/, dtos/, mappers/, repositories/
-├── presentation/  # screens/, components/, hooks/ (ViewModels), models/ (ViewState)
-└── foundation/    # context/providers, network client, router
+├── domain/
+│   ├── models/        # Entities (Task, User, AuthSession), enums, value types, validation helpers
+│   ├── repositories/  # Repository contracts (TaskRepository, UserRepository, AuthRepository)
+│   └── useCases/      # Pure business use cases (<Operation>UseCase.ts)
+├── data/
+│   ├── api/           # HTTP transport calls returning DTOs (TaskApi, UserApi, AuthApi)
+│   ├── dtos/          # Request/Response DTO interfaces and Zod schemas
+│   ├── mappers/       # DTO ↔ Domain and Error translation mappers
+│   └── repositories/  # React Query repository adapters implementing domain contracts
+├── presentation/
+│   ├── models/        # <Feature>ViewState.ts, SelectOption.ts, and domain → view mappers
+│   ├── hooks/         # ViewModels (use<Feature>ViewModel.ts)
+│   ├── components/    # Controlled UI components and reusable primitives (ui/)
+│   └── screens/       # Route-level screens composing ViewModels and components
+└── foundation/
+    ├── auth/          # Validated session persistence helpers
+    ├── composition/   # Hooks wiring domain use cases to data repositories
+    ├── context/       # Application-wide providers (AuthContext)
+    ├── network/       # Configured Axios instance and interceptors
+    ├── router/        # Route definitions and guards (AppRouter, routeGuards)
+    └── theme/         # MUI theme and color mode provider
 ```
 
-- The domain must not import React, React Query, Axios, browser APIs, UI types, DTOs, or concrete repositories.
-- Presentation must not import API clients, DTOs, mappers, or concrete repository implementations.
-- Data may depend on domain models and repository contracts while implementing persistence and transport details.
+---
 
-## 2. Layer responsibilities
+## 2. Remediation Recipes for Common Client Violations
 
-### Domain
+When reviewing or refactoring client code, apply these exact corrections:
 
-- Store entities, value objects, business rules, use cases, and repository interfaces here.
-- Put business validation in entities, value objects, or use cases—not in components, API clients, or storage code.
-- Model invalid states explicitly where practical; do not rely only on UI constraints.
+### A. Read Queries Bypassing Repository Contracts
+- **Symptom**: `TaskRepository` or `UserRepository` only defines mutations while ViewModels call `useTasksQuery` or `useCurrentUserQuery` directly without a use case or repository method.
+- **Correction**:
+  1. Define `getTasks(filters?: TaskFilters): Promise<Task[]>` on `TaskRepository` and `getCurrentUser(): Promise<User>` on `UserRepository`.
+  2. Call `repository.getTasks(...)` inside `getTasksUseCase` and `repository.getCurrentUser()` inside `getCurrentUserUseCase`.
+  3. In `foundation/composition/`, wrap the use case execution inside the React Query hook so ViewModels still get reactive query state while all data access flows through the domain use case and repository contract.
 
-### Data
+### B. Repository Contracts Importing from `domain/useCases/`
+- **Symptom**: `domain/repositories/*.ts` imports `CreateTaskInput`, `LoginInput`, etc. from `../useCases/*`.
+- **Correction**: Define command and filter types (`CreateTaskInput`, `UpdateTaskInput`, `GetTasksInput`, `ToggleTaskStatusInput`, `UpdateProfileInput`, `LoginInput`, `RegisterUserInput`) in `domain/models/` (and re-export from `domain/useCases/` if needed for backward compatibility).
 
-- Store API clients, DTOs, schemas, mappers, and repository implementations here.
-- Repositories are the only layer that should coordinate remote/local data access and cache invalidation.
-- Map DTOs to domain models at the data boundary; do not leak transport shapes into the domain or presentation.
-- Keep serialization, HTTP details, status codes, and backend field names inside this layer.
-- Keep legacy field aliases, nullable transport values, and other compatibility handling inside data mappers.
-- Normalize transport values, then validate with Zod before constructing domain models.
+### C. Raw Axios / Transport Errors Leaking into ViewModels
+- **Symptom**: Failed API calls display `"Request failed with status code 400"` or `"Request failed with status code 409"` instead of the server's `{ error: string }` message.
+- **Correction**:
+  1. In `data/api/` or `foundation/network/axiosClient.ts`, translate `AxiosError` responses by extracting `error.response?.data?.error` into an `Error` instance before rejecting.
+  2. In `data/mappers/`, translate `ZodError` issues into a readable domain error message.
 
-### Presentation
+### D. 401 Interceptor Redirecting During Login / Register
+- **Symptom**: Wrong credentials on `/login` return HTTP `401`, triggering `window.location.href = '/login'` in `axiosClient.ts` and wiping out the login error message.
+- **Correction**: In `axiosClient.ts`, bypass the 401 token-refresh logic whenever the request URL matches `/auth/login`, `/auth/register`, or `/auth/refresh`. When a refresh fails on a protected route, call `clearSession()` (clearing both tokens and stored user).
 
-- Store screens, components, ViewModels/hooks, and presentation models here.
-- Screens compose ViewModels and components; avoid business logic in screens.
-- ViewModels own UI state, UI validation state, actions, loading/error state, and domain-to-view mapping.
-- Components render props and emit user events. They must not call APIs, repositories, or use cases directly.
-- Presentation models contain UI-friendly primitives and labels, not domain entities or enums unless the component genuinely renders a domain concept.
+### E. Domain Entities (`Task`, `User`) Leaking into Screens or Components
+- **Symptom**: `TaskListScreen` imports `Task` from `domain/models` to store `editingTask`, or `DashboardScreen` reads `user.name` directly from a domain `User` object.
+- **Correction**:
+  1. Store only primitive IDs (`editingTaskId: string | null`) or presentation state in ViewModels/Screens, and resolve the initial `TaskFormData` inside `useTaskFormViewModel` or `useTaskListViewModel`.
+  2. Expose display-ready `ViewState` (`UserProfileViewState`, `DashboardViewState`, `TaskItemViewState`) from ViewModels.
 
-### Foundation
+### F. Local Form State in Screens Instead of ViewModels
+- **Symptom**: `LoginScreen`, `RegisterScreen`, or `ProfileEditForm` manages field state and validation rules with inline `useState` instead of a ViewModel.
+- **Correction**: Move field state, field validation, and submission handling into `useAuthViewModel` / `useUserViewModel` (or form-specific ViewModels) and pass controlled props to the form components.
 
-- Store application startup, dependency wiring, providers, routing, and shared infrastructure (network client) here.
+### G. Stale User State Between `AuthContext` and React Query
+- **Symptom**: Updating the profile updates React Query's `['user']` cache, but `Navbar` and `DashboardScreen` still show the old name from `AuthContext` / `localStorage`.
+- **Correction**: Sync `AuthContext` (and `localStorage` session user) whenever the `['user']` query data updates or `updateProfile` succeeds, and validate `localStorage` user data through `userToDomain` on load.
 
-## 3. Boundary mapping
+---
 
-- Data mapper: DTO ↔ domain model.
-- ViewModel/presenter: domain model ↔ presentation model/ViewState.
-- Validate string values from controls before converting them to domain enums or value objects.
-- Provide display-ready values from the ViewModel, including headings, button labels, formatted text, and select options.
-- Generate option lists from the authoritative domain values in the ViewModel; components only render the supplied options.
+## 3. Verification
 
-Example presentation contract:
-
-```ts
-export interface SelectOption {
-  value: string;
-  label: string;
-}
-```
-
-## 4. ViewModels
-
-- Name ViewModel hooks `use<Feature>ViewModel` and keep them in `presentation/hooks/`.
-- Expose only what the view needs: ViewState, actions, and derived UI flags.
-- Delegate business operations to use cases; do not duplicate business rules in ViewModels.
-- Convert presentation values to validated domain inputs before invoking a use case.
-- Convert domain outputs into display-ready ViewState before exposing them to components.
-- Convert failures into presentation-friendly error state.
-- Do not expose repositories, mutations, query clients, or raw DTOs to components.
-
-## 5. Components and forms
-
-- Prefer controlled components that receive values, errors, options, loading state, and callbacks through props.
-- Keep reusable components domain-independent when they only need primitive display values.
-- Do not import a domain enum merely to populate a select element; receive `SelectOption[]` from the ViewModel.
-- Keep validation logic outside components. Components may render validation messages supplied by the ViewModel.
-- Components display errors but do not classify infrastructure or domain failures.
-- Extract focused subcomponents when a render function becomes difficult to scan, but do not create abstractions that only hide simple markup.
-- Keep accessibility associations (`label`/`htmlFor`), disabled states, and semantic form elements intact during refactors.
-
-## 6. Repositories and external systems
-
-- Define repository contracts toward the domain side and implement them in `data/repositories/`.
-- Access APIs, storage, and caches only through repository implementations or dedicated infrastructure adapters.
-- Do not call APIs directly from screens, components, or ViewModels.
-- Keep retry, cache, transport, and persistence behavior out of domain entities and pure use cases.
-
-## 7. State initialization
-
-- Initialize local state from inputs deliberately.
-- Avoid effects whose only purpose is copying props into state.
-- When a form should fully reset for another entity, prefer an explicit reset action or a stable React `key` that remounts the form boundary.
-- Keep server state in React Query and transient view state in the ViewModel/component boundary.
-
-## 8. React Query and client transport
-
-- Convert API DTOs to domain models inside the data/repository boundary before query or mutation results reach presentation code.
-- Include every input that affects a query result in its React Query key.
-- After successful task creation, update, deletion, or status changes, invalidate the feature-level `['tasks']` key so all filtered task queries refresh.
-- Keep authorization headers, token refresh, retry behavior, and base URL configuration in the shared network client (`foundation/network`) rather than feature APIs or components.
-- Do not read authentication storage directly from screens or presentational components.
-
-## 9. Project-specific transition rule
-
-Some current hooks combine React Query or concrete repositories with domain use-case functions. Treat these as composition adapters, not as permission for pure domain logic to depend on `data/`. When modifying those flows, preserve testable pure business functions and move framework/repository wiring toward the application or presentation composition boundary when practical.
-
-## 10. Naming and file placement
-
-- Components and screens: PascalCase with a default export.
-- ViewModel hooks: `use<Feature>ViewModel.ts`.
-- Presentation models: `<Feature>ViewState.ts` in `presentation/models/`.
-- DTOs and schemas belong in `data/dtos/`; mappers belong in `data/mappers/`.
-
-## 11. Testing and verification
-
-- Test domain rules and pure use cases without React or network mocks.
-- Test mappers at the data boundary with representative DTOs.
-- Test ViewModels for state transitions and domain/view conversion.
-- Test components through observable rendering and user events rather than implementation details.
-- After client changes, run:
+After any client change, always run:
 
 ```bash
 cd client

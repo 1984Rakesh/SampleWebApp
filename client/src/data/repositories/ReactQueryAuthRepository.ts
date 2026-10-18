@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../api';
-import { authResponseToDomain } from '../mappers';
+import { authResponseToDomain, toLoginRequestDTO, toRegisterRequestDTO } from '../mappers';
+import type { LoginInput, RegisterUserInput } from '../../domain/models';
 import type { AuthRepository } from '../../domain/repositories';
-import type { LoginInput, RegisterUserInput } from '../../domain/useCases';
 
 export function useAuthRepository() {
   const queryClient = useQueryClient();
 
   const loginMutation = useMutation({
     mutationFn: async (input: LoginInput) => {
-      const response = await authApi.login(input);
+      const response = await authApi.login(toLoginRequestDTO(input));
       return authResponseToDomain(response);
     },
     onSuccess: (session) => {
@@ -19,7 +19,7 @@ export function useAuthRepository() {
 
   const registerMutation = useMutation({
     mutationFn: async (input: RegisterUserInput) => {
-      const response = await authApi.register(input);
+      const response = await authApi.register(toRegisterRequestDTO(input));
       return authResponseToDomain(response);
     },
     onSuccess: (session) => {

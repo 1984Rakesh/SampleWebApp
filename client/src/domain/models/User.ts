@@ -1,3 +1,5 @@
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export interface User {
   id: string;
   name: string;
@@ -5,6 +7,16 @@ export interface User {
   avatar?: string;
   bio?: string;
   createdAt?: string;
+}
+
+export interface UpdateProfileInput {
+  name?: string;
+  bio?: string;
+  avatar?: string;
+}
+
+export function isValidEmail(email: string): boolean {
+  return EMAIL_REGEX.test(email.trim());
 }
 
 export class UserModel implements User {
@@ -20,14 +32,9 @@ export class UserModel implements User {
   isValid(): boolean {
     return (
       this.id.length > 0 &&
-      this.name.length > 0 &&
-      this.email.length > 0 &&
-      this.isValidEmail()
+      this.name.trim().length > 0 &&
+      this.email.trim().length > 0 &&
+      isValidEmail(this.email)
     );
-  }
-
-  private isValidEmail(): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(this.email);
   }
 }

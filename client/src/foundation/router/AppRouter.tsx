@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import { ProtectedRoute, PublicRoute } from './routeGuards';
-import Navbar from './Navbar';
+import Navbar from '../../presentation/components/Navbar';
 
 // Placeholder screens - will be implemented in Phase 9
 const LoginScreen = React.lazy(() => import('../../presentation/screens/LoginScreen'));

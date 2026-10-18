@@ -1,25 +1,23 @@
-import type { AuthSession } from '../models';
+import { isValidEmail, type AuthSession, type RegisterUserInput } from '../models';
 import type { AuthRepository } from '../repositories';
 
-export interface RegisterUserInput {
-  name: string;
-  email: string;
-  password: string;
-}
+export type { RegisterUserInput };
 
 export async function registerUserUseCase(
   repository: AuthRepository,
   input: RegisterUserInput
 ): Promise<AuthSession> {
-  if (!input.name || input.name.trim().length === 0) {
+  const name = input.name?.trim() ?? '';
+  if (!name) {
     throw new Error('Name is required');
   }
 
-  if (!input.email || input.email.trim().length === 0) {
+  const email = input.email?.trim() ?? '';
+  if (!email) {
     throw new Error('Email is required');
   }
 
-  if (!isValidEmail(input.email)) {
+  if (!isValidEmail(email)) {
     throw new Error('Invalid email format');
   }
 
@@ -27,10 +25,5 @@ export async function registerUserUseCase(
     throw new Error('Password must be at least 6 characters');
   }
 
-  return repository.register(input);
-}
-
-function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  return repository.register({ name, email, password: input.password });
 }

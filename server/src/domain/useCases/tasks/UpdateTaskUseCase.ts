@@ -1,5 +1,10 @@
 import { NotFoundError } from '../../errors';
-import { normalizeTaskTitle, type Task, type TaskChanges } from '../../models/Task';
+import {
+  normalizeOptionalText,
+  normalizeTaskTitle,
+  type Task,
+  type TaskChanges,
+} from '../../models/Task';
 import type { TaskRepository } from '../../ports/TaskRepository';
 
 export interface UpdateTaskInput {
@@ -15,6 +20,8 @@ export class UpdateTaskUseCase {
     const normalized: TaskChanges = {
       ...changes,
       title: changes.title === undefined ? undefined : normalizeTaskTitle(changes.title),
+      description: normalizeOptionalText(changes.description),
+      dueDate: normalizeOptionalText(changes.dueDate),
     };
 
     const task = await this.tasks.update(id, userId, normalized);

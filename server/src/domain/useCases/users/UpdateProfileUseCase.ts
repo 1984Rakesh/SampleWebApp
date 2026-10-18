@@ -1,5 +1,6 @@
-import { NotFoundError, ValidationError } from '../../errors';
-import type { User, UserProfileChanges } from '../../models/User';
+import { NotFoundError } from '../../errors';
+import { normalizeOptionalText } from '../../models/Task';
+import { normalizeUserName, type User, type UserProfileChanges } from '../../models/User';
 import type { UserRepository } from '../../ports/UserRepository';
 
 export interface UpdateProfileInput {
@@ -11,12 +12,13 @@ export class UpdateProfileUseCase {
   constructor(private readonly users: UserRepository) {}
 
   async execute({ userId, changes }: UpdateProfileInput): Promise<User> {
-    const name = changes.name?.trim();
-    if (name === '') {
-      throw new ValidationError('Name cannot be empty');
-    }
+    const normalized: UserProfileChanges = {
+      name: changes.name === undefined ? undefined : normalizeUserName(changes.name),
+      bio: normalizeOptionalText(changes.bio),
+      avatar: normalizeOptionalText(changes.avatar),
+    };
 
-    const user = await this.users.updateProfile(userId, { ...changes, name });
+    const user = await this.users.updateProfile(userId, normalized);
     if (!user) {
       throw new NotFoundError('User not found');
     }

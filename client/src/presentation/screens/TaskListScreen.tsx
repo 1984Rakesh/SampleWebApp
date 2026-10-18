@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { useTaskListViewModel, useTaskFormViewModel } from '../hooks';
-import type { Task } from '../../domain/models';
+import type { TaskFormData } from '../models/TaskFormViewState';
 import {
   TaskFilters,
   TaskForm,
@@ -12,12 +11,13 @@ import {
 import { UiAlert } from '../components/ui';
 
 interface TaskFormSectionProps {
-  editingTask?: Task;
+  editingTaskId?: string;
+  initialData?: TaskFormData;
   onSaved: () => void;
   onCancel: () => void;
 }
 
-function TaskFormSection({ editingTask, onSaved, onCancel }: TaskFormSectionProps) {
+function TaskFormSection({ editingTaskId, initialData, onSaved, onCancel }: TaskFormSectionProps) {
   const {
     title,
     submitLabel,
@@ -29,7 +29,7 @@ function TaskFormSection({ editingTask, onSaved, onCancel }: TaskFormSectionProp
     canSubmit,
     submit,
     isSubmitting,
-  } = useTaskFormViewModel(editingTask);
+  } = useTaskFormViewModel(editingTaskId, initialData);
 
   const handleFormSubmit = async () => {
     if (await submit()) {
@@ -67,37 +67,20 @@ export default function TaskListScreen() {
     applyFilters,
     statusOptions,
     priorityOptions,
-    taskById,
+    showForm,
+    editingTaskId,
+    editingFormData,
+    openCreateForm,
+    openEditForm,
+    closeForm,
     deleteTask,
     toggleTaskStatus,
   } = useTaskListViewModel();
-  const [showForm, setShowForm] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | undefined>();
-
-  const handleCreate = () => {
-    setEditingTask(undefined);
-    setShowForm(true);
-  };
-
-  const handleEdit = (id: string) => {
-    setEditingTask(taskById(id));
-    setShowForm(true);
-  };
-
-  const handleSaved = () => {
-    setShowForm(false);
-    setEditingTask(undefined);
-  };
-
-  const handleCancel = () => {
-    setShowForm(false);
-    setEditingTask(undefined);
-  };
 
   return (
     <Box minHeight="100vh" bgcolor="background.default" px={{ xs: 1.5, sm: 2, md: 4 }} py={{ xs: 2, md: 4 }} overflow="hidden">
       <Container maxWidth="xl" disableGutters>
-        <TaskListHeader onCreate={handleCreate} />
+        <TaskListHeader onCreate={openCreateForm} />
         <TaskFilters
           status={statusFilter}
           priority={priorityFilter}
@@ -117,10 +100,11 @@ export default function TaskListScreen() {
         {showForm && (
           <Box mb={3}>
             <TaskFormSection
-              key={editingTask?.id ?? 'new'}
-              editingTask={editingTask}
-              onSaved={handleSaved}
-              onCancel={handleCancel}
+              key={editingTaskId ?? 'new'}
+              editingTaskId={editingTaskId}
+              initialData={editingFormData}
+              onSaved={closeForm}
+              onCancel={closeForm}
             />
           </Box>
         )}
@@ -129,7 +113,7 @@ export default function TaskListScreen() {
           tasks={taskItems}
           isLoading={isLoading}
           errorMessage={errorMessage}
-          onEdit={handleEdit}
+          onEdit={openEditForm}
           onDelete={deleteTask}
           onToggleStatus={toggleTaskStatus}
         />

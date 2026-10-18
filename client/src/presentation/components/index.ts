@@ -9,3 +9,4 @@ export { default as UserProfileCard } from './UserProfileCard';
 export { default as ProfileEditForm } from './ProfileEditForm';
 export { default as ComparisonPanel } from './ComparisonPanel';
 export { default as LayerMap } from './LayerMap';
+export { default as Navbar } from './Navbar';

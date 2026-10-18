@@ -1,20 +1,18 @@
-import type { AuthSession } from '../models';
+import { isValidEmail, type AuthSession, type LoginInput } from '../models';
 import type { AuthRepository } from '../repositories';
 
-export interface LoginInput {
-  email: string;
-  password: string;
-}
+export type { LoginInput };
 
 export async function loginUseCase(
   repository: AuthRepository,
   input: LoginInput
 ): Promise<AuthSession> {
-  if (!input.email || input.email.trim().length === 0) {
+  const email = input.email?.trim() ?? '';
+  if (!email) {
     throw new Error('Email is required');
   }
 
-  if (!isValidEmail(input.email)) {
+  if (!isValidEmail(email)) {
     throw new Error('Invalid email format');
   }
 
@@ -22,10 +20,5 @@ export async function loginUseCase(
     throw new Error('Password is required');
   }
 
-  return repository.login(input);
-}
-
-function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  return repository.login({ email, password: input.password });
 }

@@ -1,22 +1,16 @@
-import type { Task, TaskStatus, TaskPriority } from '../models';
+import { normalizeTaskTitle, type Task, type UpdateTaskInput } from '../models';
 import type { TaskRepository } from '../repositories';
 
-export interface UpdateTaskInput {
-  id: string;
-  title?: string;
-  description?: string;
-  status?: TaskStatus;
-  priority?: TaskPriority;
-  dueDate?: string;
-}
+export type { UpdateTaskInput };
 
 export async function updateTaskUseCase(
   repository: TaskRepository,
   input: UpdateTaskInput
 ): Promise<Task> {
-  if (!input.id || input.id.length === 0) {
+  if (!input.id || input.id.trim().length === 0) {
     throw new Error('Task ID is required');
   }
 
-  return repository.updateTask(input);
+  const title = input.title !== undefined ? normalizeTaskTitle(input.title) : undefined;
+  return repository.updateTask({ ...input, title });
 }

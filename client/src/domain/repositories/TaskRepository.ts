@@ -1,9 +1,13 @@
-import type { Task } from '../models';
-import type { CreateTaskInput } from '../useCases/CreateTaskUseCase';
-import type { UpdateTaskInput } from '../useCases/UpdateTaskUseCase';
-import type { ToggleTaskStatusInput } from '../useCases/ToggleTaskStatusUseCase';
+import type {
+  Task,
+  GetTasksInput,
+  CreateTaskInput,
+  UpdateTaskInput,
+  ToggleTaskStatusInput,
+} from '../models';
 
 export interface TaskRepository {
+  getTasks(input?: GetTasksInput): Promise<Task[]>;
   createTask(input: CreateTaskInput): Promise<Task>;
   updateTask(input: UpdateTaskInput): Promise<Task>;
   deleteTask(id: string): Promise<void>;

@@ -1,13 +1,14 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { User, AuthSession } from '../../domain/models';
-import { loadSession, saveSession, clearSession } from '../auth/sessionStorage';
+import { loadSession, saveSession, saveUser, clearSession } from '../auth/sessionStorage';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   setSession: (session: AuthSession) => void;
+  updateUser: (user: User) => void;
   signOut: () => void;
 }
 
@@ -15,21 +16,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check for existing session on mount
-    const session = loadSession();
-    if (session) {
-      setUser(session.user);
-    }
-    setIsLoading(false);
-  }, []);
+  const [user, setUser] = useState<User | null>(() => loadSession()?.user ?? null);
+  const isLoading = false;
 
   const setSession = (session: AuthSession) => {
     saveSession(session);
     setUser(session.user);
+  };
+
+  const updateUser = (updatedUser: User) => {
+    saveUser(updatedUser);
+    setUser(updatedUser);
   };
 
   const signOut = () => {
@@ -45,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         isAuthenticated: !!user,
         setSession,
+        updateUser,
         signOut,
       }}
     >

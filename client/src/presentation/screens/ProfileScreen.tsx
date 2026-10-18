@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -8,22 +7,20 @@ import ProfileEditForm from '../components/ProfileEditForm';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function ProfileScreen() {
-  const { profile, isLoading, updateProfile, isUpdating, updateErrorMessage } = useUserViewModel();
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleSave = async (name: string, bio: string) => {
-    if (await updateProfile({ name, bio })) {
-      setIsEditing(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-  };
+  const {
+    profile,
+    isLoading,
+    isEditing,
+    editName,
+    editBio,
+    setEditName,
+    setEditBio,
+    startEditing,
+    cancelEditing,
+    saveProfile,
+    isUpdating,
+    updateErrorMessage,
+  } = useUserViewModel();
 
   if (isLoading) {
     return (
@@ -50,15 +47,17 @@ export default function ProfileScreen() {
 
         {isEditing ? (
           <ProfileEditForm
-            initialName={profile.name}
-            initialBio={profile.bio ?? ''}
+            name={editName}
+            bio={editBio}
             isSubmitting={isUpdating}
             errorMessage={updateErrorMessage}
-            onSubmit={handleSave}
-            onCancel={handleCancel}
+            onNameChange={setEditName}
+            onBioChange={setEditBio}
+            onSubmit={saveProfile}
+            onCancel={cancelEditing}
           />
         ) : (
-          <UserProfileCard profile={profile} onEdit={handleEdit} isLoading={isUpdating} />
+          <UserProfileCard profile={profile} onEdit={startEditing} isLoading={isUpdating} />
         )}
       </Container>
     </Box>

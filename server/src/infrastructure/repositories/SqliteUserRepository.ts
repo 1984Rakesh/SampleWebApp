@@ -52,14 +52,19 @@ export class SqliteUserRepository implements UserRepository {
       .prepare(
         `UPDATE users
          SET name = COALESCE(?, name),
-             bio = COALESCE(?, bio),
-             avatar = COALESCE(?, avatar)
+             bio = CASE WHEN ? = 1 THEN ? ELSE bio END,
+             avatar = CASE WHEN ? = 1 THEN ? ELSE avatar END
          WHERE id = ?
          RETURNING ${USER_COLUMNS}`
       )
-      .get(changes.name ?? null, changes.bio ?? null, changes.avatar ?? null, id) as
-      | UserRow
-      | undefined;
+      .get(
+        changes.name ?? null,
+        changes.bio !== undefined ? 1 : 0,
+        changes.bio ?? null,
+        changes.avatar !== undefined ? 1 : 0,
+        changes.avatar ?? null,
+        id
+      ) as UserRow | undefined;
     return row ? rowToUser(row) : null;
   }
 }

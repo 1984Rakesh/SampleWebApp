@@ -1,4 +1,6 @@
 import type { AuthSession, User } from '../../domain/models';
+import type { UserDTO } from '../../data/dtos';
+import { userToDomain } from '../../data/mappers';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
@@ -14,8 +16,11 @@ export function loadSession(): AuthSession | null {
   }
 
   try {
-    return { accessToken, refreshToken, user: JSON.parse(storedUser) as User };
+    const parsedUser = JSON.parse(storedUser) as UserDTO;
+    const user = userToDomain(parsedUser);
+    return { accessToken, refreshToken, user };
   } catch {
+    clearSession();
     return null;
   }
 }
@@ -24,6 +29,10 @@ export function saveSession(session: AuthSession): void {
   localStorage.setItem(ACCESS_TOKEN_KEY, session.accessToken);
   localStorage.setItem(REFRESH_TOKEN_KEY, session.refreshToken);
   localStorage.setItem(USER_KEY, JSON.stringify(session.user));
+}
+
+export function saveUser(user: User): void {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
 export function clearSession(): void {
@@ -45,6 +54,5 @@ export function saveAccessToken(accessToken: string): void {
 }
 
 export function clearTokens(): void {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  clearSession();
 }

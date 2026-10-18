@@ -3,10 +3,30 @@ import {
   getAccessToken,
   getRefreshToken,
   saveAccessToken,
-  clearTokens,
+  clearSession,
 } from '../auth/sessionStorage';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+
+const AUTH_ENDPOINTS = ['/auth/login', '/auth/register', '/auth/refresh'];
+
+function isAuthEndpoint(url?: string): boolean {
+  if (!url) return false;
+  return AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+}
+
+function toTranslatedError(error: AxiosError): Error {
+  const data = error.response?.data;
+  if (
+    data &&
+    typeof data === 'object' &&
+    'error' in data &&
+    typeof (data as { error?: unknown }).error === 'string'
+  ) {
+    return new Error((data as { error: string }).error);
+  }
+  return error;
+}
 
 // Create axios instance
 const axiosClient = axios.create({
@@ -27,33 +47,39 @@ axiosClient.interceptors.request.use(
     return config;
   },
   (error: AxiosError) => {
-    return Promise.reject(error);
+    return Promise.reject(toTranslatedError(error));
   }
 );
 
-// Response interceptor for token refresh and error handling
+// Response interceptor for token refresh and error translation
 axiosClient.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined;
 
-    // Handle 401 errors (unauthorized)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Handle 401 errors on protected routes (skip login/register/refresh endpoints)
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isAuthEndpoint(originalRequest.url)
+    ) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = getRefreshToken();
         if (!refreshToken) {
-          // No refresh token, redirect to login
-          clearTokens();
+          clearSession();
           window.location.href = '/login';
-          return Promise.reject(error);
+          return Promise.reject(toTranslatedError(error));
         }
 
         // Attempt to refresh token
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+        const response = await axios.post<{ accessToken: string }>(`${API_BASE_URL}/auth/refresh`, {
           refreshToken,
         });
 
@@ -66,14 +92,15 @@ axiosClient.interceptors.response.use(
         }
         return axiosClient(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, clear tokens and redirect to login
-        clearTokens();
+        clearSession();
         window.location.href = '/login';
-        return Promise.reject(refreshError);
+        return Promise.reject(
+          refreshError instanceof AxiosError ? toTranslatedError(refreshError) : refreshError
+        );
       }
     }
 
-    return Promise.reject(error);
+    return Promise.reject(toTranslatedError(error));
   }
 );
 

@@ -45,7 +45,7 @@ export function createContainer(config: AppConfig): Container {
   const authController = createAuthController({
     registerUser: new RegisterUserUseCase(userRepository, passwordHasher, tokenService),
     login: new LoginUseCase(userRepository, passwordHasher, tokenService),
-    refreshAccessToken: new RefreshAccessTokenUseCase(tokenService),
+    refreshAccessToken: new RefreshAccessTokenUseCase(tokenService, userRepository),
   });
 
   const userController = createUserController({

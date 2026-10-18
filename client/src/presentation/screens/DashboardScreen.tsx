@@ -17,7 +17,7 @@ import TaskCard from '../components/TaskCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function DashboardScreen() {
-  const { user } = useAuthViewModel();
+  const { userName } = useAuthViewModel();
   const { profile, isLoading: userLoading } = useUserViewModel();
   const { taskItems, counts, isLoading: tasksLoading, deleteTask, toggleTaskStatus } = useTaskListViewModel();
 
@@ -47,7 +47,7 @@ export default function DashboardScreen() {
       <Container maxWidth="lg">
         <Box mb={4}>
           <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
-            Welcome back, {user?.name || profile?.name || 'User'}!
+            Welcome back, {profile?.name || userName || 'User'}!
           </Typography>
           <Typography color="text.secondary">
             Here's an overview of your tasks and progress.

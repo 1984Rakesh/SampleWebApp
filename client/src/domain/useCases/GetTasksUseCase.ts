@@ -1,11 +1,9 @@
-import { TaskStatus, TaskPriority } from '../models';
+import { TaskStatus, TaskPriority, type GetTasksInput, type Task } from '../models';
+import type { TaskRepository } from '../repositories';
 
-export interface GetTasksInput {
-  status?: TaskStatus;
-  priority?: TaskPriority;
-}
+export type { GetTasksInput };
 
-export function getTasksUseCase(input?: GetTasksInput): GetTasksInput {
+export function validateTaskFilters(input?: GetTasksInput): GetTasksInput {
   if (input?.status && !Object.values(TaskStatus).includes(input.status)) {
     throw new Error('Invalid task status filter');
   }
@@ -15,4 +13,11 @@ export function getTasksUseCase(input?: GetTasksInput): GetTasksInput {
   }
 
   return { status: input?.status, priority: input?.priority };
+}
+
+export async function getTasksUseCase(
+  repository: TaskRepository,
+  input?: GetTasksInput
+): Promise<Task[]> {
+  return repository.getTasks(validateTaskFilters(input));
 }

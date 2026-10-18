@@ -1,6 +1,7 @@
 import {
   DEFAULT_TASK_PRIORITY,
   DEFAULT_TASK_STATUS,
+  normalizeOptionalText,
   normalizeTaskTitle,
   type Task,
   type TaskPriority,
@@ -10,9 +11,9 @@ import type { TaskRepository } from '../../ports/TaskRepository';
 export interface CreateTaskInput {
   userId: string;
   title: string;
-  description?: string;
+  description?: string | null;
   priority?: TaskPriority;
-  dueDate?: string;
+  dueDate?: string | null;
 }
 
 export class CreateTaskUseCase {
@@ -21,10 +22,10 @@ export class CreateTaskUseCase {
   execute({ userId, title, description, priority, dueDate }: CreateTaskInput): Promise<Task> {
     return this.tasks.create(userId, {
       title: normalizeTaskTitle(title),
-      description: description || null,
+      description: normalizeOptionalText(description) ?? null,
       status: DEFAULT_TASK_STATUS,
       priority: priority ?? DEFAULT_TASK_PRIORITY,
-      dueDate: dueDate || null,
+      dueDate: normalizeOptionalText(dueDate) ?? null,
     });
   }
 }

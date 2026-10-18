@@ -52,9 +52,9 @@ export class SqliteTaskRepository implements TaskRepository {
       .prepare(
         `UPDATE tasks
          SET title = COALESCE(?, title),
-             description = COALESCE(?, description),
+             description = CASE WHEN ? = 1 THEN ? ELSE description END,
              priority = COALESCE(?, priority),
-             due_date = COALESCE(?, due_date),
+             due_date = CASE WHEN ? = 1 THEN ? ELSE due_date END,
              status = COALESCE(?, status),
              updated_at = CURRENT_TIMESTAMP
          WHERE id = ? AND user_id = ?
@@ -62,8 +62,10 @@ export class SqliteTaskRepository implements TaskRepository {
       )
       .get(
         changes.title ?? null,
+        changes.description !== undefined ? 1 : 0,
         changes.description ?? null,
         changes.priority ?? null,
+        changes.dueDate !== undefined ? 1 : 0,
         changes.dueDate ?? null,
         changes.status ?? null,
         id,

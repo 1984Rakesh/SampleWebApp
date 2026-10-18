@@ -1,21 +1,12 @@
 import { useState } from 'react';
-import { useAuth } from '../../foundation/context';
 import { useTaskUseCases } from '../../foundation/composition';
-import type { Task } from '../../domain/models';
-import { TaskPriority } from '../../domain/models';
 import type { TaskFormData, TaskFormFieldErrors } from '../models/TaskFormViewState';
-import { buildPriorityOptions, toTaskPriority } from '../models/taskPresentation';
+import { buildPriorityOptions, toTaskFormData, toTaskPriority } from '../models/taskPresentation';
 
-export function useTaskFormViewModel(task?: Task) {
-  const { user } = useAuth();
+export function useTaskFormViewModel(editingTaskId?: string, initialData?: TaskFormData) {
   const taskUseCases = useTaskUseCases();
 
-  const [formData, setFormData] = useState<TaskFormData>({
-    title: task?.title || '',
-    description: task?.description || '',
-    priority: task?.priority || TaskPriority.MEDIUM,
-    dueDate: task?.dueDate || '',
-  });
+  const [formData, setFormData] = useState<TaskFormData>(() => initialData ?? toTaskFormData());
   const [fieldErrors, setFieldErrors] = useState<TaskFormFieldErrors>({});
   const [submitError, setSubmitError] = useState<string>();
 
@@ -41,13 +32,12 @@ export function useTaskFormViewModel(task?: Task) {
     }
 
     try {
-      if (task) {
-        await taskUseCases.updateTask({ id: task.id, ...formData, priority });
+      if (editingTaskId) {
+        await taskUseCases.updateTask({ id: editingTaskId, ...formData, priority });
       } else {
         await taskUseCases.createTask({
           ...formData,
           priority,
-          userId: user?.id ?? '',
         });
       }
       return true;
@@ -72,8 +62,8 @@ export function useTaskFormViewModel(task?: Task) {
   };
 
   return {
-    title: task ? 'Edit Task' : 'Create Task',
-    submitLabel: task ? 'Update' : 'Create',
+    title: editingTaskId ? 'Edit Task' : 'Create Task',
+    submitLabel: editingTaskId ? 'Update' : 'Create',
     formData,
     priorityOptions,
     fieldErrors,

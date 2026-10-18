@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import type { FormEvent } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
@@ -7,14 +7,21 @@ import { useAuthViewModel } from '../hooks';
 import { UiPage, UiCard, UiCardContent, UiCardHeader, UiTextField, UiButton, UiAlert } from '../components/ui';
 
 export default function RegisterScreen() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { register, isSubmitting, errorMessage } = useAuthViewModel();
+  const {
+    name,
+    email,
+    password,
+    setName,
+    setEmail,
+    setPassword,
+    register,
+    isSubmitting,
+    errorMessage,
+  } = useAuthViewModel();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    await register(name, email, password);
+    await register();
   };
 
   return (

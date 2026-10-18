@@ -1,25 +1,30 @@
 import { z } from 'zod';
 import { TaskStatus, TaskPriority } from '../../domain/models';
 
+const optionalNullableString = z
+  .string()
+  .nullish()
+  .transform((value) => value ?? undefined);
+
 export const userSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   email: z.string().email(),
-  avatar: z.string().nullish().transform((value) => value ?? undefined),
-  bio: z.string().nullish().transform((value) => value ?? undefined),
-  createdAt: z.string().optional(),
+  avatar: optionalNullableString,
+  bio: optionalNullableString,
+  createdAt: optionalNullableString,
 });
 
 export const taskSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
-  description: z.string().optional(),
+  description: optionalNullableString,
   status: z.nativeEnum(TaskStatus),
   priority: z.nativeEnum(TaskPriority),
-  dueDate: z.string().optional(),
+  dueDate: optionalNullableString,
   userId: z.string().min(1),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
+  createdAt: optionalNullableString,
+  updatedAt: optionalNullableString,
 });
 
 export const authResponseSchema = z.object({

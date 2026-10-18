@@ -1,5 +1,6 @@
 import { UnauthorizedError } from '../../errors';
 import type { AuthResult } from '../../models/Auth';
+import { normalizeEmail } from '../../models/User';
 import type { PasswordHasher } from '../../ports/PasswordHasher';
 import type { TokenService } from '../../ports/TokenService';
 import type { UserRepository } from '../../ports/UserRepository';
@@ -17,7 +18,8 @@ export class LoginUseCase {
   ) {}
 
   async execute({ email, password }: LoginInput): Promise<AuthResult> {
-    const credentials = await this.users.findCredentialsByEmail(email);
+    const normalizedEmail = normalizeEmail(email);
+    const credentials = await this.users.findCredentialsByEmail(normalizedEmail);
     const isValid =
       credentials !== null && (await this.passwordHasher.verify(password, credentials.passwordHash));
 
