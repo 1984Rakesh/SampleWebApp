@@ -1,0 +1,25 @@
+import type { Task } from '../models';
+import type { TaskPriority } from '../models';
+
+export interface CreateTaskInput {
+  title: string;
+  description?: string;
+  priority?: TaskPriority;
+  dueDate?: string;
+  userId: string;
+}
+
+export async function createTaskUseCase(
+  input: CreateTaskInput
+): Promise<Task> {
+  if (!input.title || input.title.trim().length === 0) {
+    throw new Error('Title is required');
+  }
+
+  if (!input.userId || input.userId.length === 0) {
+    throw new Error('User ID is required');
+  }
+
+  // This would normally call the repository/API
+  throw new Error('Repository not implemented');
+}
