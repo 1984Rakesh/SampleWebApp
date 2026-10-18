@@ -3,6 +3,8 @@ export { loginUseCase, type LoginInput, type LoginOutput } from './LoginUseCase'
 export { getCurrentUserUseCase } from './GetCurrentUserUseCase';
 export { getTasksUseCase, type GetTasksInput } from './GetTasksUseCase';
 export { createTaskUseCase, type CreateTaskInput } from './CreateTaskUseCase';
+export { useCreateTaskUseCase, type CreateTaskFormInput } from './useCreateTaskUseCase';
 export { updateTaskUseCase, type UpdateTaskInput } from './UpdateTaskUseCase';
+export { useUpdateTaskUseCase, type UpdateTaskFormInput } from './useUpdateTaskUseCase';
 export { toggleTaskStatusUseCase, type ToggleTaskStatusInput } from './ToggleTaskStatusUseCase';
 export { deleteTaskUseCase, type DeleteTaskInput } from './DeleteTaskUseCase';

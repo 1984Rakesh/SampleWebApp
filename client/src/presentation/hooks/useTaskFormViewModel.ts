@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { useTaskRepository } from '../../data/repositories';
+import { useAuth } from '../../foundation/context';
+import { useCreateTaskUseCase, useUpdateTaskUseCase } from '../../domain/useCases';
 import type { Task } from '../../domain/models';
 import { TaskPriority } from '../../domain/models';
 import type { TaskFormData } from '../components/TaskForm';
 
 export function useTaskFormViewModel(task?: Task) {
-  const { useCreateTaskMutation, useUpdateTaskMutation } = useTaskRepository();
+  const { user } = useAuth();
+  const createTask = useCreateTaskUseCase(user?.id ?? '');
+  const updateTask = useUpdateTaskUseCase();
+
   const [formData, setFormData] = useState<TaskFormData>({
     title: task?.title || '',
     description: task?.description || '',
@@ -13,9 +17,6 @@ export function useTaskFormViewModel(task?: Task) {
     dueDate: task?.dueDate || '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const createMutation = useCreateTaskMutation();
-  const updateMutation = useUpdateTaskMutation();
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -35,15 +36,13 @@ export function useTaskFormViewModel(task?: Task) {
 
     try {
       if (task) {
-        // Update existing task
-        const result = await updateMutation.mutateAsync({
+        const result = await updateTask.mutateAsync({
           id: task.id,
-          input: formData,
+          ...formData,
         });
         return result;
       } else {
-        // Create new task
-        const result = await createMutation.mutateAsync(formData);
+        const result = await createTask.mutateAsync(formData);
         return result;
       }
     } catch (error) {
@@ -54,7 +53,6 @@ export function useTaskFormViewModel(task?: Task) {
 
   const updateField = (field: keyof TaskFormData, value: string | TaskPriority) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when field is updated
     if (errors[field]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -69,8 +67,8 @@ export function useTaskFormViewModel(task?: Task) {
     updateField,
     errors,
     handleSubmit,
-    isSubmitting: createMutation.isPending || updateMutation.isPending,
-    isSuccess: createMutation.isSuccess || updateMutation.isSuccess,
-    error: errors.submit || createMutation.error || updateMutation.error,
+    isSubmitting: createTask.isPending || updateTask.isPending,
+    isSuccess: createTask.isSuccess || updateTask.isSuccess,
+    error: errors.submit || createTask.error || updateTask.error,
   };
 }

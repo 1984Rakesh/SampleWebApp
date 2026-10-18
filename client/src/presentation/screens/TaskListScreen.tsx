@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTaskListViewModel } from '../hooks';
+import { useTaskListViewModel, useTaskFormViewModel } from '../hooks';
 import { TaskStatus, TaskPriority } from '../../domain/models';
 import type { Task } from '../../domain/models';
 import {
@@ -7,11 +7,41 @@ import {
   TaskForm,
   TaskListContent,
   TaskListHeader,
-  type TaskFormData,
 } from '../components';
 
+interface TaskFormSectionProps {
+  editingTask?: Task;
+  onSaved: () => void;
+  onCancel: () => void;
+}
+
+function TaskFormSection({ editingTask, onSaved, onCancel }: TaskFormSectionProps) {
+  const { formData, updateField, errors, handleSubmit, isSubmitting } = useTaskFormViewModel(editingTask);
+
+  const handleFormSubmit = async () => {
+    try {
+      await handleSubmit();
+      onSaved();
+    } catch (error) {
+      console.error('Failed to save task:', error);
+    }
+  };
+
+  return (
+    <TaskForm
+      task={editingTask}
+      formData={formData}
+      errors={errors}
+      updateField={updateField}
+      onSubmit={handleFormSubmit}
+      onCancel={onCancel}
+      isLoading={isSubmitting}
+    />
+  );
+}
+
 export default function TaskListScreen() {
-  const { tasks, isLoading, error, getTasks, createTask, updateTask, deleteTask, toggleTaskStatus } = useTaskListViewModel();
+  const { tasks, isLoading, error, getTasks, deleteTask, toggleTaskStatus } = useTaskListViewModel();
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>();
   const [statusFilter, setStatusFilter] = useState<TaskStatus | ''>('');
@@ -34,19 +64,10 @@ export default function TaskListScreen() {
     setShowForm(true);
   };
 
-  const handleSubmit = async (formData: TaskFormData) => {
-    try {
-      if (editingTask) {
-        await updateTask(editingTask.id, formData);
-      } else {
-        await createTask(formData);
-      }
-      setShowForm(false);
-      setEditingTask(undefined);
-      getTasks();
-    } catch (error) {
-      console.error('Failed to save task:', error);
-    }
+  const handleSaved = () => {
+    setShowForm(false);
+    setEditingTask(undefined);
+    getTasks();
   };
 
   const handleCancel = () => {
@@ -74,9 +95,10 @@ export default function TaskListScreen() {
 
         {showForm && (
           <div className="mb-6">
-            <TaskForm
-              task={editingTask}
-              onSubmit={handleSubmit}
+            <TaskFormSection
+              key={editingTask?.id ?? 'new'}
+              editingTask={editingTask}
+              onSaved={handleSaved}
               onCancel={handleCancel}
             />
           </div>

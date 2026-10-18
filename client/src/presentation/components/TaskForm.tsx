@@ -1,13 +1,5 @@
-import { useState, useEffect } from 'react';
 import type { Task } from '../../domain/models';
 import { TaskPriority } from '../../domain/models';
-
-interface TaskFormProps {
-  task?: Task;
-  onSubmit: (data: TaskFormData) => void;
-  onCancel?: () => void;
-  isLoading?: boolean;
-}
 
 export interface TaskFormData {
   title: string;
@@ -16,31 +8,28 @@ export interface TaskFormData {
   dueDate?: string;
 }
 
-export default function TaskForm({ task, onSubmit, onCancel, isLoading = false }: TaskFormProps) {
-  const [title, setTitle] = useState(task?.title || '');
-  const [description, setDescription] = useState(task?.description || '');
-  const [priority, setPriority] = useState<TaskPriority>(task?.priority || TaskPriority.MEDIUM);
-  const [dueDate, setDueDate] = useState(task?.dueDate || '');
+interface TaskFormProps {
+  task?: Task;
+  formData: TaskFormData;
+  errors: Record<string, string>;
+  onSubmit: () => void;
+  onCancel?: () => void;
+  isLoading?: boolean;
+  updateField: (field: keyof TaskFormData, value: string | TaskPriority) => void;
+}
 
-  useEffect(() => {
-    if (task) {
-      setTitle(task.title);
-      setDescription(task.description || '');
-      setPriority(task.priority);
-      setDueDate(task.dueDate || '');
-    }
-  }, [task]);
-
+export default function TaskForm({
+  task,
+  formData,
+  errors,
+  onSubmit,
+  onCancel,
+  isLoading = false,
+  updateField,
+}: TaskFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
-
-    onSubmit({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      priority,
-      dueDate: dueDate || undefined,
-    });
+    onSubmit();
   };
 
   return (
@@ -57,12 +46,14 @@ export default function TaskForm({ task, onSubmit, onCancel, isLoading = false }
           <input
             type="text"
             id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={formData.title}
+            onChange={(e) => updateField('title', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-            required
             disabled={isLoading}
           />
+          {errors.title && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>
+          )}
         </div>
 
         <div>
@@ -71,8 +62,8 @@ export default function TaskForm({ task, onSubmit, onCancel, isLoading = false }
           </label>
           <textarea
             id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={formData.description || ''}
+            onChange={(e) => updateField('description', e.target.value)}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             disabled={isLoading}
@@ -85,8 +76,8 @@ export default function TaskForm({ task, onSubmit, onCancel, isLoading = false }
           </label>
           <select
             id="priority"
-            value={priority}
-            onChange={(e) => setPriority(e.target.value as TaskPriority)}
+            value={formData.priority}
+            onChange={(e) => updateField('priority', e.target.value as TaskPriority)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             disabled={isLoading}
           >
@@ -103,8 +94,8 @@ export default function TaskForm({ task, onSubmit, onCancel, isLoading = false }
           <input
             type="date"
             id="dueDate"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+            value={formData.dueDate || ''}
+            onChange={(e) => updateField('dueDate', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             disabled={isLoading}
           />
@@ -114,7 +105,7 @@ export default function TaskForm({ task, onSubmit, onCancel, isLoading = false }
       <div className="flex gap-2 mt-6">
         <button
           type="submit"
-          disabled={isLoading || !title.trim()}
+          disabled={isLoading || !formData.title.trim()}
           className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
         >
           {isLoading ? 'Saving...' : task ? 'Update' : 'Create'}
