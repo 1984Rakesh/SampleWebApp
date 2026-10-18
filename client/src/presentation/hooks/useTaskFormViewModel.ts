@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../foundation/context';
-import { useTaskRepository } from '../../data/repositories';
-import { createTaskUseCase, updateTaskUseCase } from '../../domain/useCases';
+import { useTaskUseCases } from '../../foundation/composition';
 import type { Task } from '../../domain/models';
 import { TaskPriority } from '../../domain/models';
 import type { TaskFormData, TaskFormFieldErrors } from '../models/TaskFormViewState';
@@ -9,7 +8,7 @@ import { buildPriorityOptions, toTaskPriority } from '../models/taskPresentation
 
 export function useTaskFormViewModel(task?: Task) {
   const { user } = useAuth();
-  const { repository, isCreating, isUpdating } = useTaskRepository();
+  const taskUseCases = useTaskUseCases();
 
   const [formData, setFormData] = useState<TaskFormData>({
     title: task?.title || '',
@@ -22,7 +21,7 @@ export function useTaskFormViewModel(task?: Task) {
 
   const priorityOptions = buildPriorityOptions();
   const canSubmit = formData.title.trim().length > 0;
-  const isSubmitting = isCreating || isUpdating;
+  const isSubmitting = taskUseCases.isCreating || taskUseCases.isUpdating;
 
   const submit = async (): Promise<boolean> => {
     const errors: TaskFormFieldErrors = {};
@@ -43,9 +42,9 @@ export function useTaskFormViewModel(task?: Task) {
 
     try {
       if (task) {
-        await updateTaskUseCase(repository, { id: task.id, ...formData, priority });
+        await taskUseCases.updateTask({ id: task.id, ...formData, priority });
       } else {
-        await createTaskUseCase(repository, {
+        await taskUseCases.createTask({
           ...formData,
           priority,
           userId: user?.id ?? '',

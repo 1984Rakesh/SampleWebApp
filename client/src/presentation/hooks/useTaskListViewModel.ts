@@ -1,13 +1,8 @@
 import { useState } from 'react';
-import { useTaskRepository } from '../../data/repositories';
+import { useTaskUseCases } from '../../foundation/composition';
 import type { Task } from '../../domain/models';
 import type { GetTasksInput } from '../../domain/useCases';
-import {
-  getTasksUseCase,
-  deleteTaskUseCase,
-  toggleTaskStatusUseCase,
-  nextTaskStatus,
-} from '../../domain/useCases';
+import { getTasksUseCase, nextTaskStatus } from '../../domain/useCases';
 import {
   buildStatusOptions,
   buildPriorityOptions,
@@ -22,14 +17,14 @@ const toErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
 export function useTaskListViewModel() {
-  const { repository, useTasksQuery, isDeleting, isToggling } = useTaskRepository();
+  const taskUseCases = useTaskUseCases();
 
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [appliedFilters, setAppliedFilters] = useState<GetTasksInput>({});
   const [actionError, setActionError] = useState<string>();
 
-  const tasksQuery = useTasksQuery(appliedFilters);
+  const tasksQuery = taskUseCases.useTasksQuery(appliedFilters);
   const tasks = tasksQuery.data as Task[] | undefined;
 
   const applyFilters = () => {
@@ -43,7 +38,7 @@ export function useTaskListViewModel() {
 
   const deleteTask = async (id: string) => {
     try {
-      await deleteTaskUseCase(repository, { id });
+      await taskUseCases.deleteTask({ id });
     } catch (error) {
       setActionError(toErrorMessage(error, 'Failed to delete task'));
     }
@@ -56,7 +51,7 @@ export function useTaskListViewModel() {
       return;
     }
     try {
-      await toggleTaskStatusUseCase(repository, { id, status: nextTaskStatus(task.status) });
+      await taskUseCases.toggleTaskStatus({ id, status: nextTaskStatus(task.status) });
     } catch (error) {
       setActionError(toErrorMessage(error, 'Failed to update task status'));
     }
@@ -80,7 +75,7 @@ export function useTaskListViewModel() {
     taskById,
     deleteTask,
     toggleTaskStatus,
-    isDeleting,
-    isToggling,
+    isDeleting: taskUseCases.isDeleting,
+    isToggling: taskUseCases.isToggling,
   };
 }
