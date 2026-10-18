@@ -8,11 +8,11 @@ interface TaskListHeaderProps {
 
 export default function TaskListHeader({ onCreate }: TaskListHeaderProps) {
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-      <Typography variant="h4" component="h1" fontWeight={700}>
+    <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={3}>
+      <Typography variant="h4" component="h1" fontWeight={600}>
         Tasks
       </Typography>
-      <UiButton variant="contained" onClick={onCreate}>
+      <UiButton variant="contained" onClick={onCreate} sx={{ flexShrink: 0 }}>
         Create Task
       </UiButton>
     </Box>

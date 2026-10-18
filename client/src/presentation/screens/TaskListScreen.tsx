@@ -95,8 +95,8 @@ export default function TaskListScreen() {
   };
 
   return (
-    <Box minHeight="100vh" bgcolor="background.default" p={{ xs: 2, md: 4 }}>
-      <Container maxWidth="xl">
+    <Box minHeight="100vh" bgcolor="background.default" px={{ xs: 1.5, sm: 2, md: 4 }} py={{ xs: 2, md: 4 }} overflow="hidden">
+      <Container maxWidth="xl" disableGutters>
         <TaskListHeader onCreate={handleCreate} />
         <TaskFilters
           status={statusFilter}

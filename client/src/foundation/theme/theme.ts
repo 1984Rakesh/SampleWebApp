@@ -27,10 +27,13 @@ const commonOptions: ThemeOptions = {
     },
     MuiCard: {
       styleOverrides: {
-        root: {
-          borderRadius: 16,
-          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
-        },
+        root: ({ theme }) => ({
+          borderRadius: 12,
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 8px 24px rgba(0, 0, 0, 0.16)'
+            : '0 2px 12px rgba(15, 23, 42, 0.08)',
+        }),
       },
     },
     MuiOutlinedInput: {
@@ -68,13 +71,14 @@ export function createAppTheme(mode: ThemeMode) {
         main: mode === 'light' ? '#16a34a' : '#4ade80',
       },
       background: {
-        default: mode === 'light' ? '#f8fafc' : '#0f172a',
-        paper: mode === 'light' ? '#ffffff' : '#1e293b',
+        default: mode === 'light' ? '#f8fafc' : '#0B0F19',
+        paper: mode === 'light' ? '#ffffff' : '#111827',
       },
       text: {
         primary: mode === 'light' ? '#1e293b' : '#f1f5f9',
         secondary: mode === 'light' ? '#64748b' : '#94a3b8',
       },
+      divider: mode === 'light' ? 'rgba(15, 23, 42, 0.1)' : 'rgba(255, 255, 255, 0.08)',
     },
   });
 }
