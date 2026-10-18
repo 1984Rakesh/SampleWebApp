@@ -1,6 +1,32 @@
 import { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 
+type TaskRow = {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  priority: string;
+  due_date: string | null;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+};
+
+function toTaskResponse(task: TaskRow) {
+  return {
+    id: task.id,
+    title: task.title,
+    description: task.description,
+    status: task.status,
+    priority: task.priority,
+    dueDate: task.due_date,
+    userId: task.user_id,
+    createdAt: task.created_at,
+    updatedAt: task.updated_at,
+  };
+}
+
 export async function getTasks(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user?.userId;
@@ -29,21 +55,9 @@ export async function getTasks(req: Request, res: Response): Promise<void> {
 
     query += ' ORDER BY created_at DESC';
 
-    const tasks = db.prepare(query).all(...params) as any[];
+    const tasks = db.prepare(query).all(...params) as TaskRow[];
 
-    res.json(
-      tasks.map((task) => ({
-        id: task.id,
-        title: task.title,
-        description: task.description,
-        status: task.status,
-        priority: task.priority,
-        dueDate: task.due_date,
-        userId: task.user_id,
-        createdAt: task.created_at,
-        updatedAt: task.updated_at,
-      }))
-    );
+    res.json(tasks.map(toTaskResponse));
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch tasks' });
   }
@@ -75,19 +89,9 @@ export async function createTask(req: Request, res: Response): Promise<void> {
 
     insertTask.run(taskId, title, description || null, priority || 'MEDIUM', dueDate || null, userId);
 
-    const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId) as any;
+    const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId) as TaskRow;
 
-    res.status(201).json({
-      id: task.id,
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      priority: task.priority,
-      dueDate: task.due_date,
-      userId: task.user_id,
-      createdAt: task.created_at,
-      updatedAt: task.updated_at,
-    });
+    res.status(201).json(toTaskResponse(task));
   } catch (error) {
     res.status(500).json({ error: 'Failed to create task' });
   }
@@ -128,19 +132,9 @@ export async function updateTask(req: Request, res: Response): Promise<void> {
 
     updateTask.run(title, description, priority, dueDate, status, id);
 
-    const updatedTask = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as any;
+    const updatedTask = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as TaskRow;
 
-    res.json({
-      id: updatedTask.id,
-      title: updatedTask.title,
-      description: updatedTask.description,
-      status: updatedTask.status,
-      priority: updatedTask.priority,
-      dueDate: updatedTask.due_date,
-      userId: updatedTask.user_id,
-      createdAt: updatedTask.created_at,
-      updatedAt: updatedTask.updated_at,
-    });
+    res.json(toTaskResponse(updatedTask));
   } catch (error) {
     res.status(500).json({ error: 'Failed to update task' });
   }
@@ -204,19 +198,9 @@ export async function toggleStatus(req: Request, res: Response): Promise<void> {
 
     db.prepare('UPDATE tasks SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(status, id);
 
-    const updatedTask = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as any;
+    const updatedTask = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as TaskRow;
 
-    res.json({
-      id: updatedTask.id,
-      title: updatedTask.title,
-      description: updatedTask.description,
-      status: updatedTask.status,
-      priority: updatedTask.priority,
-      dueDate: updatedTask.due_date,
-      userId: updatedTask.user_id,
-      createdAt: updatedTask.created_at,
-      updatedAt: updatedTask.updated_at,
-    });
+    res.json(toTaskResponse(updatedTask));
   } catch (error) {
     res.status(500).json({ error: 'Failed to toggle task status' });
   }

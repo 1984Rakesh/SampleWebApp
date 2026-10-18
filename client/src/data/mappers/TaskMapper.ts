@@ -5,18 +5,32 @@ import { TaskModel } from '../../domain/models';
 export interface TaskDTO {
   id: string;
   title: string;
-  description?: string;
+  description?: string | null;
   status: string;
   priority: string;
-  dueDate?: string;
-  userId: string;
+  dueDate?: string | null;
+  userId?: string;
   createdAt?: string;
   updatedAt?: string;
+  due_date?: string | null;
+  user_id?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export function toDomain(dto: TaskDTO): Task {
-  // Server already returns camelCase fields; validate directly.
-  const validated = taskSchema.parse(dto);
+  // Normalize current and legacy transport fields before domain validation.
+  const validated = taskSchema.parse({
+    id: dto.id,
+    title: dto.title,
+    description: dto.description ?? undefined,
+    status: dto.status,
+    priority: dto.priority,
+    dueDate: dto.dueDate ?? dto.due_date ?? undefined,
+    userId: dto.userId ?? dto.user_id,
+    createdAt: dto.createdAt ?? dto.created_at,
+    updatedAt: dto.updatedAt ?? dto.updated_at,
+  });
   return new TaskModel(
     validated.id,
     validated.title,
