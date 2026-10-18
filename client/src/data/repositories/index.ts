@@ -1,3 +1,3 @@
-export { useAuthRepository } from './AuthRepository';
-export { useUserRepository } from './UserRepository';
-export { useTaskRepository } from './TaskRepository';
+export { useAuthRepository } from './ReactQueryAuthRepository';
+export { useUserRepository } from './ReactQueryUserRepository';
+export { useTaskRepository } from './ReactQueryTaskRepository';

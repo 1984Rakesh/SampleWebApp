@@ -1,13 +1,11 @@
-import type { Task } from '../../domain/models';
-import { TaskStatus } from '../../domain/models';
-import StatusBadge from './StatusBadge';
-import PriorityBadge from './PriorityBadge';
+import type { TaskItemViewState } from '../models/TaskListViewState';
+import Badge from './Badge';
 
 interface TaskCardProps {
-  task: Task;
-  onEdit?: (task: Task) => void;
+  task: TaskItemViewState;
+  onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
-  onToggleStatus?: (id: string, status: TaskStatus) => void;
+  onToggleStatus?: (id: string) => void;
   isLoading?: boolean;
 }
 
@@ -18,18 +16,6 @@ export default function TaskCard({
   onToggleStatus,
   isLoading = false,
 }: TaskCardProps) {
-  const handleToggle = () => {
-    if (onToggleStatus) {
-      const nextStatus =
-        task.status === TaskStatus.COMPLETED
-          ? TaskStatus.TODO
-          : task.status === TaskStatus.TODO
-          ? TaskStatus.IN_PROGRESS
-          : TaskStatus.COMPLETED;
-      onToggleStatus(task.id, nextStatus);
-    }
-  };
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-ios p-4 hover:shadow-ios-lg transition-all duration-200 animate-fade-in">
       <div className="flex items-start justify-between mb-3">
@@ -46,30 +32,30 @@ export default function TaskCard({
       </div>
 
       <div className="flex items-center gap-2 mb-3">
-        <StatusBadge status={task.status} />
-        <PriorityBadge priority={task.priority} />
+        <Badge label={task.statusLabel} tone={task.statusTone} />
+        <Badge label={task.priorityLabel} tone={task.priorityTone} />
       </div>
 
-      {task.dueDate && (
+      {task.dueDateLabel && (
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-          Due: {new Date(task.dueDate).toLocaleDateString()}
+          Due: {task.dueDateLabel}
         </p>
       )}
 
       <div className="flex gap-2" role="group" aria-label="Task actions">
         {onToggleStatus && (
           <button
-            onClick={handleToggle}
+            onClick={() => onToggleStatus(task.id)}
             disabled={isLoading}
             className="flex-1 bg-ios-blue hover:bg-blue-700 disabled:bg-gray-400 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            aria-label={task.status === TaskStatus.COMPLETED ? 'Reopen task' : 'Complete task'}
+            aria-label={task.toggleAriaLabel}
           >
-            {task.status === TaskStatus.COMPLETED ? 'Reopen' : 'Complete'}
+            {task.toggleLabel}
           </button>
         )}
         {onEdit && (
           <button
-            onClick={() => onEdit(task)}
+            onClick={() => onEdit(task.id)}
             disabled={isLoading}
             className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             aria-label="Edit task"

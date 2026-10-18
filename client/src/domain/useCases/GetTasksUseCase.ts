@@ -1,4 +1,3 @@
-import type { Task } from '../models';
 import { TaskStatus, TaskPriority } from '../models';
 
 export interface GetTasksInput {
@@ -6,9 +5,14 @@ export interface GetTasksInput {
   priority?: TaskPriority;
 }
 
-export async function getTasksUseCase(
-  _input?: GetTasksInput
-): Promise<Task[]> {
-  // This would normally call the repository/API
-  throw new Error('Repository not implemented');
+export function getTasksUseCase(input?: GetTasksInput): GetTasksInput {
+  if (input?.status && !Object.values(TaskStatus).includes(input.status)) {
+    throw new Error('Invalid task status filter');
+  }
+
+  if (input?.priority && !Object.values(TaskPriority).includes(input.priority)) {
+    throw new Error('Invalid task priority filter');
+  }
+
+  return { status: input?.status, priority: input?.priority };
 }

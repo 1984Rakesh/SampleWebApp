@@ -1,15 +1,8 @@
-import { userSchema } from './schemas';
+import { userSchema } from '../dtos';
+import type { UserDTO, UpdateUserDTO } from '../dtos';
 import type { User } from '../../domain/models';
 import { UserModel } from '../../domain/models';
-
-export interface UserDTO {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string | null;
-  bio?: string | null;
-  createdAt?: string;
-}
+import type { UpdateProfileInput } from '../../domain/useCases';
 
 export function toDomain(dto: UserDTO): User {
   const validated = userSchema.parse(dto);
@@ -23,10 +16,10 @@ export function toDomain(dto: UserDTO): User {
   );
 }
 
-export function toDTO(domain: Partial<User>): Pick<Partial<User>, 'name' | 'bio' | 'avatar'> {
+export function toUpdateUserDTO(input: UpdateProfileInput): UpdateUserDTO {
   return {
-    name: domain.name,
-    bio: domain.bio,
-    avatar: domain.avatar,
+    name: input.name,
+    bio: input.bio,
+    avatar: input.avatar,
   };
 }

@@ -1,5 +1,4 @@
-export { default as StatusBadge } from './StatusBadge';
-export { default as PriorityBadge } from './PriorityBadge';
+export { default as Badge } from './Badge';
 export { default as CodeBlock } from './CodeBlock';
 export { default as TaskCard } from './TaskCard';
 export { default as TaskFilters } from './TaskFilters';
@@ -7,5 +6,6 @@ export { default as TaskForm } from './TaskForm';
 export { default as TaskListContent } from './TaskListContent';
 export { default as TaskListHeader } from './TaskListHeader';
 export { default as UserProfileCard } from './UserProfileCard';
+export { default as ProfileEditForm } from './ProfileEditForm';
 export { default as ComparisonPanel } from './ComparisonPanel';
 export { default as LayerMap } from './LayerMap';

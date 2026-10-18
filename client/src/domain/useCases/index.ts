@@ -1,10 +1,8 @@
-export { registerUserUseCase, type RegisterUserInput, type RegisterUserOutput } from './RegisterUserUseCase';
-export { loginUseCase, type LoginInput, type LoginOutput } from './LoginUseCase';
-export { getCurrentUserUseCase } from './GetCurrentUserUseCase';
+export { registerUserUseCase, type RegisterUserInput } from './RegisterUserUseCase';
+export { loginUseCase, type LoginInput } from './LoginUseCase';
 export { getTasksUseCase, type GetTasksInput } from './GetTasksUseCase';
 export { createTaskUseCase, type CreateTaskInput } from './CreateTaskUseCase';
-export { useCreateTaskUseCase, type CreateTaskFormInput } from './useCreateTaskUseCase';
 export { updateTaskUseCase, type UpdateTaskInput } from './UpdateTaskUseCase';
-export { useUpdateTaskUseCase, type UpdateTaskFormInput } from './useUpdateTaskUseCase';
-export { toggleTaskStatusUseCase, type ToggleTaskStatusInput } from './ToggleTaskStatusUseCase';
+export { toggleTaskStatusUseCase, nextTaskStatus, type ToggleTaskStatusInput } from './ToggleTaskStatusUseCase';
 export { deleteTaskUseCase, type DeleteTaskInput } from './DeleteTaskUseCase';
+export { updateProfileUseCase, type UpdateProfileInput } from './UpdateProfileUseCase';

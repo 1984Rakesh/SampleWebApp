@@ -1,12 +1,12 @@
-import type { User } from '../../domain/models';
+import type { UserProfileViewState } from '../models/UserProfileViewState';
 
 interface UserProfileCardProps {
-  user: User;
+  profile: UserProfileViewState;
   onEdit?: () => void;
   isLoading?: boolean;
 }
 
-export default function UserProfileCard({ user, onEdit, isLoading = false }: UserProfileCardProps) {
+export default function UserProfileCard({ profile, onEdit, isLoading = false }: UserProfileCardProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
       <div className="flex items-center justify-between mb-4">
@@ -23,24 +23,24 @@ export default function UserProfileCard({ user, onEdit, isLoading = false }: Use
       </div>
 
       <div className="flex items-start gap-4">
-        {user.avatar && (
+        {profile.avatarUrl && (
           <img
-            src={user.avatar}
-            alt={user.name}
+            src={profile.avatarUrl}
+            alt={profile.name}
             className="w-20 h-20 rounded-full object-cover"
           />
         )}
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-            {user.name}
+            {profile.name}
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">{user.email}</p>
-          {user.bio && (
-            <p className="text-gray-700 dark:text-gray-300 text-sm mt-2">{user.bio}</p>
+          <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">{profile.email}</p>
+          {profile.bio && (
+            <p className="text-gray-700 dark:text-gray-300 text-sm mt-2">{profile.bio}</p>
           )}
-          {user.createdAt && (
+          {profile.joinedLabel && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Joined: {new Date(user.createdAt).toLocaleDateString()}
+              Joined: {profile.joinedLabel}
             </p>
           )}
         </div>

@@ -1,4 +1,5 @@
-import type { TaskStatus, TaskPriority } from '../models';
+import type { Task, TaskStatus, TaskPriority } from '../models';
+import type { TaskRepository } from '../repositories';
 
 export interface UpdateTaskInput {
   id: string;
@@ -10,11 +11,12 @@ export interface UpdateTaskInput {
 }
 
 export async function updateTaskUseCase(
+  repository: TaskRepository,
   input: UpdateTaskInput
-): Promise<UpdateTaskInput> {
+): Promise<Task> {
   if (!input.id || input.id.length === 0) {
     throw new Error('Task ID is required');
   }
 
-  return input;
+  return repository.updateTask(input);
 }

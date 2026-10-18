@@ -1,71 +1,86 @@
+import { useState } from 'react';
 import { useTaskRepository } from '../../data/repositories';
-import type { TaskStatus } from '../../domain/models';
-import type { GetTasksInput } from '../../domain/useCases';
 import type { Task } from '../../domain/models';
+import type { GetTasksInput } from '../../domain/useCases';
+import {
+  getTasksUseCase,
+  deleteTaskUseCase,
+  toggleTaskStatusUseCase,
+  nextTaskStatus,
+} from '../../domain/useCases';
+import {
+  buildStatusOptions,
+  buildPriorityOptions,
+  withAllOption,
+  toTaskStatus,
+  toTaskPriority,
+  toTaskItemViewState,
+  toTaskCounts,
+} from '../models/taskPresentation';
+
+const toErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
 
 export function useTaskListViewModel() {
-  const { useGetTasksQuery, useCreateTaskMutation, useUpdateTaskMutation, useDeleteTaskMutation, useToggleTaskStatusMutation } = useTaskRepository();
+  const { repository, useTasksQuery, isDeleting, isToggling } = useTaskRepository();
 
-  const tasksQuery = useGetTasksQuery();
-  const createMutation = useCreateTaskMutation();
-  const updateMutation = useUpdateTaskMutation();
-  const deleteMutation = useDeleteTaskMutation();
-  const toggleStatusMutation = useToggleTaskStatusMutation();
+  const [statusFilter, setStatusFilter] = useState('');
+  const [priorityFilter, setPriorityFilter] = useState('');
+  const [appliedFilters, setAppliedFilters] = useState<GetTasksInput>({});
+  const [actionError, setActionError] = useState<string>();
 
-  const getTasks = (_input?: GetTasksInput) => {
-    tasksQuery.refetch();
-  };
+  const tasksQuery = useTasksQuery(appliedFilters);
+  const tasks = tasksQuery.data as Task[] | undefined;
 
-  const createTask = async (input: { title: string; description?: string; priority?: string; dueDate?: string }) => {
-    try {
-      const result = await createMutation.mutateAsync(input);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const updateTask = async (id: string, input: { title?: string; description?: string; priority?: string; dueDate?: string; status?: TaskStatus }) => {
-    try {
-      const result = await updateMutation.mutateAsync({ id, input });
-      return result;
-    } catch (error) {
-      throw error;
-    }
+  const applyFilters = () => {
+    setAppliedFilters(
+      getTasksUseCase({
+        status: toTaskStatus(statusFilter),
+        priority: toTaskPriority(priorityFilter),
+      })
+    );
   };
 
   const deleteTask = async (id: string) => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteTaskUseCase(repository, { id });
     } catch (error) {
-      throw error;
+      setActionError(toErrorMessage(error, 'Failed to delete task'));
     }
   };
 
-  const toggleTaskStatus = async (id: string, status: TaskStatus) => {
+  const toggleTaskStatus = async (id: string) => {
+    const task = tasks?.find((candidate) => candidate.id === id);
+    if (!task) {
+      setActionError('Task not found');
+      return;
+    }
     try {
-      await toggleStatusMutation.mutateAsync({ id, status });
+      await toggleTaskStatusUseCase(repository, { id, status: nextTaskStatus(task.status) });
     } catch (error) {
-      throw error;
+      setActionError(toErrorMessage(error, 'Failed to update task status'));
     }
   };
+
+  const taskById = (id: string) => tasks?.find((task) => task.id === id);
 
   return {
-    tasks: tasksQuery.data as Task[] | undefined,
+    taskItems: (tasks ?? []).map(toTaskItemViewState),
+    counts: toTaskCounts(tasks ?? []),
     isLoading: tasksQuery.isLoading,
-    error: tasksQuery.error,
-    getTasks,
-    createTask,
-    updateTask,
+    errorMessage: tasksQuery.error ? toErrorMessage(tasksQuery.error, 'Failed to load tasks') : undefined,
+    actionError,
+    statusFilter,
+    priorityFilter,
+    setStatusFilter,
+    setPriorityFilter,
+    applyFilters,
+    statusOptions: withAllOption(buildStatusOptions()),
+    priorityOptions: withAllOption(buildPriorityOptions()),
+    taskById,
     deleteTask,
     toggleTaskStatus,
-    isCreating: createMutation.isPending,
-    isUpdating: updateMutation.isPending,
-    isDeleting: deleteMutation.isPending,
-    isToggling: toggleStatusMutation.isPending,
-    createError: createMutation.error,
-    updateError: updateMutation.error,
-    deleteError: deleteMutation.error,
-    toggleError: toggleStatusMutation.error,
+    isDeleting,
+    isToggling,
   };
 }

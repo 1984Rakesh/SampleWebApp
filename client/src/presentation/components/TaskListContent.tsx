@@ -1,21 +1,20 @@
-import type { Task } from '../../domain/models';
-import { TaskStatus } from '../../domain/models';
+import type { TaskItemViewState } from '../models/TaskListViewState';
 import LoadingSpinner from './LoadingSpinner';
 import TaskCard from './TaskCard';
 
 interface TaskListContentProps {
-  tasks: Task[];
+  tasks: TaskItemViewState[];
   isLoading: boolean;
-  error: unknown;
-  onEdit: (task: Task) => void;
+  errorMessage?: string;
+  onEdit: (id: string) => void;
   onDelete: (id: string) => void;
-  onToggleStatus: (id: string, status: TaskStatus) => void;
+  onToggleStatus: (id: string) => void;
 }
 
 export default function TaskListContent({
   tasks,
   isLoading,
-  error,
+  errorMessage,
   onEdit,
   onDelete,
   onToggleStatus,
@@ -28,10 +27,10 @@ export default function TaskListContent({
     );
   }
 
-  if (error) {
+  if (errorMessage) {
     return (
       <div className="bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded">
-        Error loading tasks: {error instanceof Error ? error.message : 'Unknown error'}
+        Error loading tasks: {errorMessage}
       </div>
     );
   }

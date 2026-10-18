@@ -1,4 +1,5 @@
-import type { TaskPriority } from '../models';
+import type { Task, TaskPriority } from '../models';
+import type { TaskRepository } from '../repositories';
 
 export interface CreateTaskInput {
   title: string;
@@ -9,8 +10,9 @@ export interface CreateTaskInput {
 }
 
 export async function createTaskUseCase(
+  repository: TaskRepository,
   input: CreateTaskInput
-): Promise<CreateTaskInput> {
+): Promise<Task> {
   if (!input.title || input.title.trim().length === 0) {
     throw new Error('Title is required');
   }
@@ -19,5 +21,5 @@ export async function createTaskUseCase(
     throw new Error('User ID is required');
   }
 
-  return input;
+  return repository.createTask(input);
 }

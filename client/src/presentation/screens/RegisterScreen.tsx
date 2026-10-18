@@ -1,25 +1,16 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuthViewModel } from '../hooks';
 
 export default function RegisterScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { register, isLoading } = useAuthViewModel();
-  const navigate = useNavigate();
+  const { register, isSubmitting, errorMessage } = useAuthViewModel();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
-    try {
-      await register(name, email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
-    }
+    await register(name, email, password);
   };
 
   return (
@@ -29,9 +20,9 @@ export default function RegisterScreen() {
           Create Account
         </h1>
 
-        {error && (
+        {errorMessage && (
           <div className="bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
-            {error}
+            {errorMessage}
           </div>
         )}
 
@@ -47,7 +38,7 @@ export default function RegisterScreen() {
               onChange={(e) => setName(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               required
-              disabled={isLoading}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -62,7 +53,7 @@ export default function RegisterScreen() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               required
-              disabled={isLoading}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -77,16 +68,16 @@ export default function RegisterScreen() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               required
-              disabled={isLoading}
+              disabled={isSubmitting}
             />
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isSubmitting}
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-md font-medium transition-colors"
           >
-            {isLoading ? 'Creating account...' : 'Sign Up'}
+            {isSubmitting ? 'Creating account...' : 'Sign Up'}
           </button>
         </form>
 

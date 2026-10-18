@@ -1,23 +1,15 @@
 import { useState } from 'react';
 import { useAuth } from '../../foundation/context';
-import { useCreateTaskUseCase, useUpdateTaskUseCase } from '../../domain/useCases';
+import { useTaskRepository } from '../../data/repositories';
+import { createTaskUseCase, updateTaskUseCase } from '../../domain/useCases';
 import type { Task } from '../../domain/models';
 import { TaskPriority } from '../../domain/models';
-import type { TaskFormData } from '../models/TaskFormViewState';
-
-const formatOptionLabel = (value: string) =>
-  value
-    .toLowerCase()
-    .replaceAll('_', ' ')
-    .replace(/\b\w/g, (character) => character.toUpperCase());
-
-const getTaskPriority = (value: string) =>
-  Object.values(TaskPriority).find((priority) => priority === value);
+import type { TaskFormData, TaskFormFieldErrors } from '../models/TaskFormViewState';
+import { buildPriorityOptions, toTaskPriority } from '../models/taskPresentation';
 
 export function useTaskFormViewModel(task?: Task) {
   const { user } = useAuth();
-  const createTask = useCreateTaskUseCase(user?.id ?? '');
-  const updateTask = useUpdateTaskUseCase();
+  const { repository, isCreating, isUpdating } = useTaskRepository();
 
   const [formData, setFormData] = useState<TaskFormData>({
     title: task?.title || '',
@@ -25,61 +17,58 @@ export function useTaskFormViewModel(task?: Task) {
     priority: task?.priority || TaskPriority.MEDIUM,
     dueDate: task?.dueDate || '',
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const priorityOptions = Object.values(TaskPriority).map((priority) => ({
-    value: priority,
-    label: formatOptionLabel(priority),
-  }));
+  const [fieldErrors, setFieldErrors] = useState<TaskFormFieldErrors>({});
+  const [submitError, setSubmitError] = useState<string>();
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
+  const priorityOptions = buildPriorityOptions();
+  const canSubmit = formData.title.trim().length > 0;
+  const isSubmitting = isCreating || isUpdating;
 
+  const submit = async (): Promise<boolean> => {
+    const errors: TaskFormFieldErrors = {};
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
-    }
-    if (!getTaskPriority(formData.priority)) {
-      newErrors.priority = 'Select a valid priority';
+      errors.title = 'Title is required';
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (): Promise<Task | void> => {
-    if (!validate()) {
-      return;
+    const priority = toTaskPriority(formData.priority);
+    if (!priority) {
+      errors.priority = 'Select a valid priority';
     }
 
-    const priority = getTaskPriority(formData.priority);
-    if (!priority) return;
-
-    const taskData = { ...formData, priority };
+    setFieldErrors(errors);
+    setSubmitError(undefined);
+    if (Object.keys(errors).length > 0 || !priority) {
+      return false;
+    }
 
     try {
       if (task) {
-        const result = await updateTask.mutateAsync({
-          id: task.id,
-          ...taskData,
-        });
-        return result;
+        await updateTaskUseCase(repository, { id: task.id, ...formData, priority });
       } else {
-        const result = await createTask.mutateAsync(taskData);
-        return result;
+        await createTaskUseCase(repository, {
+          ...formData,
+          priority,
+          userId: user?.id ?? '',
+        });
       }
+      return true;
     } catch (error) {
-      setErrors({ submit: error instanceof Error ? error.message : 'Failed to save task' });
-      throw error;
+      setSubmitError(error instanceof Error ? error.message : 'Failed to save task');
+      return false;
     }
   };
 
   const updateField = (field: keyof TaskFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
       });
+    }
+    if (submitError) {
+      setSubmitError(undefined);
     }
   };
 
@@ -88,11 +77,11 @@ export function useTaskFormViewModel(task?: Task) {
     submitLabel: task ? 'Update' : 'Create',
     formData,
     priorityOptions,
+    fieldErrors,
+    submitError,
+    canSubmit,
     updateField,
-    errors,
-    handleSubmit,
-    isSubmitting: createTask.isPending || updateTask.isPending,
-    isSuccess: createTask.isSuccess || updateTask.isSuccess,
-    error: errors.submit || createTask.error || updateTask.error,
+    submit,
+    isSubmitting,
   };
 }

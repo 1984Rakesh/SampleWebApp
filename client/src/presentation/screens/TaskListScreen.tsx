@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTaskListViewModel, useTaskFormViewModel } from '../hooks';
-import { TaskStatus, TaskPriority } from '../../domain/models';
 import type { Task } from '../../domain/models';
 import {
   TaskFilters,
@@ -22,17 +21,16 @@ function TaskFormSection({ editingTask, onSaved, onCancel }: TaskFormSectionProp
     formData,
     priorityOptions,
     updateField,
-    errors,
-    handleSubmit,
+    fieldErrors,
+    submitError,
+    canSubmit,
+    submit,
     isSubmitting,
   } = useTaskFormViewModel(editingTask);
 
   const handleFormSubmit = async () => {
-    try {
-      await handleSubmit();
+    if (await submit()) {
       onSaved();
-    } catch (error) {
-      console.error('Failed to save task:', error);
     }
   };
 
@@ -42,7 +40,9 @@ function TaskFormSection({ editingTask, onSaved, onCancel }: TaskFormSectionProp
       submitLabel={submitLabel}
       formData={formData}
       priorityOptions={priorityOptions}
-      errors={errors}
+      errors={fieldErrors}
+      submitError={submitError}
+      submitDisabled={!canSubmit}
       updateField={updateField}
       onSubmit={handleFormSubmit}
       onCancel={onCancel}
@@ -52,45 +52,44 @@ function TaskFormSection({ editingTask, onSaved, onCancel }: TaskFormSectionProp
 }
 
 export default function TaskListScreen() {
-  const { tasks, isLoading, error, getTasks, deleteTask, toggleTaskStatus } = useTaskListViewModel();
+  const {
+    taskItems,
+    isLoading,
+    errorMessage,
+    actionError,
+    statusFilter,
+    priorityFilter,
+    setStatusFilter,
+    setPriorityFilter,
+    applyFilters,
+    statusOptions,
+    priorityOptions,
+    taskById,
+    deleteTask,
+    toggleTaskStatus,
+  } = useTaskListViewModel();
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>();
-  const [statusFilter, setStatusFilter] = useState<TaskStatus | ''>('');
-  const [priorityFilter, setPriorityFilter] = useState<TaskPriority | ''>('');
-
-  const handleFilter = () => {
-    getTasks({
-      status: statusFilter || undefined,
-      priority: priorityFilter || undefined,
-    });
-  };
 
   const handleCreate = () => {
     setEditingTask(undefined);
     setShowForm(true);
   };
 
-  const handleEdit = (task: Task) => {
-    setEditingTask(task);
+  const handleEdit = (id: string) => {
+    setEditingTask(taskById(id));
     setShowForm(true);
   };
 
   const handleSaved = () => {
     setShowForm(false);
     setEditingTask(undefined);
-    getTasks();
   };
 
   const handleCancel = () => {
     setShowForm(false);
     setEditingTask(undefined);
   };
-
-  const filteredTasks = tasks?.filter((task) => {
-    if (statusFilter && task.status !== statusFilter) return false;
-    if (priorityFilter && task.priority !== priorityFilter) return false;
-    return true;
-  }) || [];
 
   return (
     <main className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
@@ -99,10 +98,18 @@ export default function TaskListScreen() {
         <TaskFilters
           status={statusFilter}
           priority={priorityFilter}
+          statusOptions={statusOptions}
+          priorityOptions={priorityOptions}
           onStatusChange={setStatusFilter}
           onPriorityChange={setPriorityFilter}
-          onApply={handleFilter}
+          onApply={applyFilters}
         />
+
+        {actionError && (
+          <div className="bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-6">
+            {actionError}
+          </div>
+        )}
 
         {showForm && (
           <div className="mb-6">
@@ -116,9 +123,9 @@ export default function TaskListScreen() {
         )}
 
         <TaskListContent
-          tasks={filteredTasks}
+          tasks={taskItems}
           isLoading={isLoading}
-          error={error}
+          errorMessage={errorMessage}
           onEdit={handleEdit}
           onDelete={deleteTask}
           onToggleStatus={toggleTaskStatus}

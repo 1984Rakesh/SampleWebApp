@@ -1,4 +1,10 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
+import {
+  getAccessToken,
+  getRefreshToken,
+  saveAccessToken,
+  clearTokens,
+} from '../auth/sessionStorage';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
@@ -14,7 +20,7 @@ const axiosClient = axios.create({
 // Request interceptor to add JWT token
 axiosClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('accessToken');
+    const token = getAccessToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -38,11 +44,10 @@ axiosClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = getRefreshToken();
         if (!refreshToken) {
           // No refresh token, redirect to login
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+          clearTokens();
           window.location.href = '/login';
           return Promise.reject(error);
         }
@@ -53,7 +58,7 @@ axiosClient.interceptors.response.use(
         });
 
         const { accessToken } = response.data;
-        localStorage.setItem('accessToken', accessToken);
+        saveAccessToken(accessToken);
 
         // Retry original request with new token
         if (originalRequest.headers) {
@@ -62,8 +67,7 @@ axiosClient.interceptors.response.use(
         return axiosClient(originalRequest);
       } catch (refreshError) {
         // Refresh failed, clear tokens and redirect to login
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        clearTokens();
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }

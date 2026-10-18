@@ -2,20 +2,15 @@ import { Link } from 'react-router-dom';
 import { useAuthViewModel } from '../hooks';
 import { useTaskListViewModel } from '../hooks';
 import { useUserViewModel } from '../hooks';
-import { TaskStatus } from '../../domain/models';
 import TaskCard from '../components/TaskCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function DashboardScreen() {
   const { user } = useAuthViewModel();
-  const { user: profileUser, isLoading: userLoading } = useUserViewModel();
-  const { tasks, isLoading: tasksLoading, deleteTask, toggleTaskStatus } = useTaskListViewModel();
+  const { profile, isLoading: userLoading } = useUserViewModel();
+  const { taskItems, counts, isLoading: tasksLoading, deleteTask, toggleTaskStatus } = useTaskListViewModel();
 
-  const completedTasks = tasks?.filter((t) => t.status === TaskStatus.COMPLETED).length || 0;
-  const inProgressTasks = tasks?.filter((t) => t.status === TaskStatus.IN_PROGRESS).length || 0;
-  const todoTasks = tasks?.filter((t) => t.status === TaskStatus.TODO).length || 0;
-
-  const recentTasks = tasks?.slice(0, 3) || [];
+  const recentTasks = taskItems.slice(0, 3);
 
   if (userLoading || tasksLoading) {
     return (
@@ -31,7 +26,7 @@ export default function DashboardScreen() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Welcome back, {user?.name || profileUser?.name || 'User'}!
+            Welcome back, {user?.name || profile?.name || 'User'}!
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Here's an overview of your tasks and progress.
@@ -44,7 +39,7 @@ export default function DashboardScreen() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Completed</p>
-                <p className="text-3xl font-bold text-green-600 dark:text-green-400">{completedTasks}</p>
+                <p className="text-3xl font-bold text-green-600 dark:text-green-400">{counts.completed}</p>
               </div>
               <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
                 <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +53,7 @@ export default function DashboardScreen() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">In Progress</p>
-                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{inProgressTasks}</p>
+                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{counts.inProgress}</p>
               </div>
               <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
                 <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +67,7 @@ export default function DashboardScreen() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">To Do</p>
-                <p className="text-3xl font-bold text-gray-600 dark:text-gray-400">{todoTasks}</p>
+                <p className="text-3xl font-bold text-gray-600 dark:text-gray-400">{counts.todo}</p>
               </div>
               <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-full">
                 <svg className="w-8 h-8 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

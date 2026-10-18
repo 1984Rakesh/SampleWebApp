@@ -1,28 +1,35 @@
+import { useState } from 'react';
 import { useUserRepository } from '../../data/repositories';
-import type { UpdateUserInput } from '../../data/api';
-import type { User } from '../../domain/models';
+import { updateProfileUseCase } from '../../domain/useCases';
+import type { UpdateProfileInput } from '../../domain/useCases';
+import { toUserProfileViewState } from '../models/userPresentation';
+
+const toErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
 
 export function useUserViewModel() {
-  const { useGetCurrentUserQuery, useUpdateProfileMutation } = useUserRepository();
+  const { repository, useCurrentUserQuery, isUpdating } = useUserRepository();
+  const [updateErrorMessage, setUpdateErrorMessage] = useState<string>();
 
-  const userQuery = useGetCurrentUserQuery();
-  const updateMutation = useUpdateProfileMutation();
+  const userQuery = useCurrentUserQuery();
 
-  const updateProfile = async (input: UpdateUserInput) => {
+  const updateProfile = async (input: UpdateProfileInput): Promise<boolean> => {
+    setUpdateErrorMessage(undefined);
     try {
-      const result = await updateMutation.mutateAsync(input);
-      return result;
+      await updateProfileUseCase(repository, input);
+      return true;
     } catch (error) {
-      throw error;
+      setUpdateErrorMessage(toErrorMessage(error, 'Failed to update profile'));
+      return false;
     }
   };
 
   return {
-    user: userQuery.data as User | undefined,
+    profile: userQuery.data ? toUserProfileViewState(userQuery.data) : undefined,
     isLoading: userQuery.isLoading,
-    error: userQuery.error,
+    errorMessage: userQuery.error ? toErrorMessage(userQuery.error, 'Failed to load profile') : undefined,
     updateProfile,
-    isUpdating: updateMutation.isPending,
-    updateError: updateMutation.error,
+    isUpdating,
+    updateErrorMessage,
   };
 }

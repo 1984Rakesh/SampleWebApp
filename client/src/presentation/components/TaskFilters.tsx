@@ -1,20 +1,27 @@
-import { TaskPriority, TaskStatus } from '../../domain/models';
+import type { SelectOption } from '../models/SelectOption';
 
 interface TaskFiltersProps {
-  status: TaskStatus | '';
-  priority: TaskPriority | '';
-  onStatusChange: (status: TaskStatus | '') => void;
-  onPriorityChange: (priority: TaskPriority | '') => void;
+  status: string;
+  priority: string;
+  statusOptions: SelectOption[];
+  priorityOptions: SelectOption[];
+  onStatusChange: (status: string) => void;
+  onPriorityChange: (priority: string) => void;
   onApply: () => void;
 }
 
 export default function TaskFilters({
   status,
   priority,
+  statusOptions,
+  priorityOptions,
   onStatusChange,
   onPriorityChange,
   onApply,
 }: TaskFiltersProps) {
+  const selectClassName =
+    'px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white';
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
       <div className="flex flex-wrap gap-4">
@@ -25,13 +32,14 @@ export default function TaskFilters({
           <select
             id="statusFilter"
             value={status}
-            onChange={(e) => onStatusChange(e.target.value as TaskStatus | '')}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            onChange={(e) => onStatusChange(e.target.value)}
+            className={selectClassName}
           >
-            <option value="">All</option>
-            <option value={TaskStatus.TODO}>To Do</option>
-            <option value={TaskStatus.IN_PROGRESS}>In Progress</option>
-            <option value={TaskStatus.COMPLETED}>Completed</option>
+            {statusOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -42,13 +50,14 @@ export default function TaskFilters({
           <select
             id="priorityFilter"
             value={priority}
-            onChange={(e) => onPriorityChange(e.target.value as TaskPriority | '')}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            onChange={(e) => onPriorityChange(e.target.value)}
+            className={selectClassName}
           >
-            <option value="">All</option>
-            <option value={TaskPriority.LOW}>Low</option>
-            <option value={TaskPriority.MEDIUM}>Medium</option>
-            <option value={TaskPriority.HIGH}>High</option>
+            {priorityOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 

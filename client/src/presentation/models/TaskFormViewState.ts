@@ -1,3 +1,5 @@
+import type { SelectOption } from './SelectOption';
+
 export interface TaskFormData {
   title: string;
   description: string;
@@ -5,7 +7,15 @@ export interface TaskFormData {
   dueDate: string;
 }
 
-export interface SelectOption {
-  value: string;
-  label: string;
+export type TaskFormFieldErrors = Partial<Record<keyof TaskFormData, string>>;
+
+export interface TaskFormViewState {
+  title: string;
+  submitLabel: string;
+  formData: TaskFormData;
+  priorityOptions: SelectOption[];
+  fieldErrors: TaskFormFieldErrors;
+  submitError?: string;
+  canSubmit: boolean;
+  isSubmitting: boolean;
 }

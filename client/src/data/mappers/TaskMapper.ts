@@ -1,22 +1,8 @@
-import { taskSchema } from './schemas';
+import { taskSchema } from '../dtos';
+import type { TaskDTO, CreateTaskDTO, UpdateTaskDTO } from '../dtos';
 import type { Task } from '../../domain/models';
 import { TaskModel } from '../../domain/models';
-
-export interface TaskDTO {
-  id: string;
-  title: string;
-  description?: string | null;
-  status: string;
-  priority: string;
-  dueDate?: string | null;
-  userId?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  due_date?: string | null;
-  user_id?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import type { CreateTaskInput, UpdateTaskInput } from '../../domain/useCases';
 
 export function toDomain(dto: TaskDTO): Task {
   // Normalize current and legacy transport fields before domain validation.
@@ -44,12 +30,21 @@ export function toDomain(dto: TaskDTO): Task {
   );
 }
 
-export function toDTO(domain: Partial<Task>): Partial<TaskDTO> {
+export function toCreateTaskDTO(input: CreateTaskInput): CreateTaskDTO {
   return {
-    title: domain.title,
-    description: domain.description,
-    priority: domain.priority,
-    dueDate: domain.dueDate,
-    status: domain.status,
+    title: input.title,
+    description: input.description,
+    priority: input.priority,
+    dueDate: input.dueDate,
+  };
+}
+
+export function toUpdateTaskDTO(input: Omit<UpdateTaskInput, 'id'>): UpdateTaskDTO {
+  return {
+    title: input.title,
+    description: input.description,
+    status: input.status,
+    priority: input.priority,
+    dueDate: input.dueDate,
   };
 }

@@ -1,51 +1,61 @@
+import { useState } from 'react';
 import { useAuth } from '../../foundation/context';
 import { useAuthRepository } from '../../data/repositories';
+import { loginUseCase, registerUserUseCase } from '../../domain/useCases';
 import { useNavigate } from 'react-router-dom';
 
+const toErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
+
 export function useAuthViewModel() {
-  const { user, isLoading, isAuthenticated, login, register, logout } = useAuth();
-  const { useLoginMutation, useRegisterMutation, useLogoutMutation } = useAuthRepository();
+  const { user, isLoading, isAuthenticated, setSession, signOut } = useAuth();
+  const { repository, isLoggingIn, isRegistering } = useAuthRepository();
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string>();
 
-  const loginMutation = useLoginMutation();
-  const registerMutation = useRegisterMutation();
-  const logoutMutation = useLogoutMutation();
-
-  const handleLogin = async (email: string, password: string) => {
+  const handleLogin = async (email: string, password: string): Promise<boolean> => {
+    setErrorMessage(undefined);
     try {
-      const result = await loginMutation.mutateAsync({ email, password });
-      login(email, password); // Also update AuthContext
+      const session = await loginUseCase(repository, { email, password });
+      setSession(session);
       navigate('/dashboard');
-      return result;
+      return true;
     } catch (error) {
-      throw error;
+      setErrorMessage(toErrorMessage(error, 'Login failed'));
+      return false;
     }
   };
 
-  const handleRegister = async (name: string, email: string, password: string) => {
+  const handleRegister = async (
+    name: string,
+    email: string,
+    password: string
+  ): Promise<boolean> => {
+    setErrorMessage(undefined);
     try {
-      const result = await registerMutation.mutateAsync({ name, email, password });
-      register(name, email, password); // Also update AuthContext
+      const session = await registerUserUseCase(repository, { name, email, password });
+      setSession(session);
       navigate('/dashboard');
-      return result;
+      return true;
     } catch (error) {
-      throw error;
+      setErrorMessage(toErrorMessage(error, 'Registration failed'));
+      return false;
     }
   };
 
   const handleLogout = () => {
-    logoutMutation.mutate();
-    logout(); // Also update AuthContext
+    signOut();
     navigate('/login');
   };
 
   return {
     user,
-    isLoading: isLoading || loginMutation.isPending || registerMutation.isPending,
+    isLoading,
+    isSubmitting: isLoggingIn || isRegistering,
     isAuthenticated,
+    errorMessage,
     login: handleLogin,
     register: handleRegister,
     logout: handleLogout,
-    error: loginMutation.error || registerMutation.error,
   };
 }

@@ -1,4 +1,5 @@
-import type { User } from '../models';
+import type { AuthSession } from '../models';
+import type { AuthRepository } from '../repositories';
 
 export interface RegisterUserInput {
   name: string;
@@ -6,15 +7,10 @@ export interface RegisterUserInput {
   password: string;
 }
 
-export interface RegisterUserOutput {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
-}
-
 export async function registerUserUseCase(
+  repository: AuthRepository,
   input: RegisterUserInput
-): Promise<RegisterUserOutput> {
+): Promise<AuthSession> {
   if (!input.name || input.name.trim().length === 0) {
     throw new Error('Name is required');
   }
@@ -31,9 +27,7 @@ export async function registerUserUseCase(
     throw new Error('Password must be at least 6 characters');
   }
 
-  // This would normally call the repository/API
-  // For now, we'll define the interface
-  throw new Error('Repository not implemented');
+  return repository.register(input);
 }
 
 function isValidEmail(email: string): boolean {

@@ -1,19 +1,15 @@
-import type { User } from '../models';
+import type { AuthSession } from '../models';
+import type { AuthRepository } from '../repositories';
 
 export interface LoginInput {
   email: string;
   password: string;
 }
 
-export interface LoginOutput {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
-}
-
 export async function loginUseCase(
+  repository: AuthRepository,
   input: LoginInput
-): Promise<LoginOutput> {
+): Promise<AuthSession> {
   if (!input.email || input.email.trim().length === 0) {
     throw new Error('Email is required');
   }
@@ -26,8 +22,7 @@ export async function loginUseCase(
     throw new Error('Password is required');
   }
 
-  // This would normally call the repository/API
-  throw new Error('Repository not implemented');
+  return repository.login(input);
 }
 
 function isValidEmail(email: string): boolean {

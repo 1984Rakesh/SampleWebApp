@@ -1,49 +1,19 @@
 import { useState } from 'react';
+import { comparisonData } from '../models/comparisonData';
 
-export interface ComparisonLayer {
-  name: string;
-  concepts: string[];
-}
-
-export interface ComparisonConcept {
-  name: string;
-  typescript: string;
-  swift: string;
-  explanation: string;
-}
+const firstConceptOf = (layerName: string) =>
+  Object.keys(comparisonData[layerName]?.concepts ?? {})[0] ?? '';
 
 export function useComparisonViewModel() {
   const [selectedLayer, setSelectedLayer] = useState<string>('Foundation');
   const [selectedConcept, setSelectedConcept] = useState<string>('');
 
-  const layers: ComparisonLayer[] = [
-    {
-      name: 'Foundation',
-      concepts: ['Axios Client', 'AuthContext', 'ThemeContext', 'React Router', 'Route Guards'],
-    },
-    {
-      name: 'Domain',
-      concepts: ['Models', 'Use Cases', 'Enums', 'Validation'],
-    },
-    {
-      name: 'Data',
-      concepts: ['API Layer', 'Zod Schemas', 'Mappers', 'TanStack Query'],
-    },
-    {
-      name: 'Presentation',
-      concepts: ['Components', 'Hooks', 'Screens', 'Router Integration'],
-    },
-  ];
-
-  const getConceptsForLayer = (layerName: string): string[] => {
-    return layers.find((l) => l.name === layerName)?.concepts || [];
-  };
+  const conceptNames = Object.keys(comparisonData[selectedLayer]?.concepts ?? {});
+  const selectedConceptData = comparisonData[selectedLayer]?.concepts?.[selectedConcept];
 
   const selectLayer = (layerName: string) => {
     setSelectedLayer(layerName);
-    // Reset concept selection when layer changes
-    const concepts = getConceptsForLayer(layerName);
-    setSelectedConcept(concepts[0] || '');
+    setSelectedConcept(firstConceptOf(layerName));
   };
 
   const selectConcept = (conceptName: string) => {
@@ -53,9 +23,9 @@ export function useComparisonViewModel() {
   return {
     selectedLayer,
     selectedConcept,
-    layers,
+    conceptNames,
+    selectedConceptData,
     selectLayer,
     selectConcept,
-    getConceptsForLayer,
   };
 }

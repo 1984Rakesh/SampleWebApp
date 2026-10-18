@@ -1,15 +1,18 @@
 import type { FormEvent, ReactNode } from 'react';
-import type { SelectOption, TaskFormData } from '../models/TaskFormViewState';
+import type { SelectOption } from '../models/SelectOption';
+import type { TaskFormData, TaskFormFieldErrors } from '../models/TaskFormViewState';
 
 interface TaskFormProps {
   title: string;
   submitLabel: string;
   formData: TaskFormData;
   priorityOptions: SelectOption[];
-  errors: Record<string, string>;
+  errors: TaskFormFieldErrors;
+  submitError?: string;
   onSubmit: () => void;
   onCancel?: () => void;
   isLoading?: boolean;
+  submitDisabled?: boolean;
   updateField: (field: keyof TaskFormData, value: string) => void;
 }
 
@@ -73,9 +76,11 @@ export default function TaskForm({
   formData,
   priorityOptions,
   errors,
+  submitError,
   onSubmit,
   onCancel,
   isLoading = false,
+  submitDisabled = false,
   updateField,
 }: TaskFormProps) {
   const handleSubmit = (event: FormEvent) => {
@@ -86,6 +91,12 @@ export default function TaskForm({
   return (
     <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{title}</h2>
+
+      {submitError && (
+        <div className="bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
+          {submitError}
+        </div>
+      )}
 
       <div className="space-y-4">
         <FormField label="Title" htmlFor="title" error={errors.title} required>
@@ -140,7 +151,7 @@ export default function TaskForm({
 
       <FormActions
         submitLabel={submitLabel}
-        submitDisabled={!formData.title.trim()}
+        submitDisabled={submitDisabled}
         isLoading={isLoading}
         onCancel={onCancel}
       />

@@ -2,12 +2,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth, useTheme } from '../context';
 
 export default function Navbar() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, signOut, isAuthenticated } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    signOut();
     navigate('/login');
   };
 
