@@ -1,6 +1,5 @@
 import type { FormEvent } from 'react';
-import Stack from '@mui/material/Stack';
-import { UiCard, UiCardContent, UiCardHeader, UiTextField, UiButton, UiAlert } from './ui';
+import { UiCard, UiCardContent, UiCardHeader, UiTextField, UiButton, UiAlert, UiStack } from './ui';
 
 interface ProfileEditFormProps {
   name: string;
@@ -33,19 +32,18 @@ export default function ProfileEditForm({
       <UiCardHeader title="Edit Profile" />
       <UiCardContent>
         {errorMessage && (
-          <UiAlert severity="error" sx={{ mb: 2 }}>
+          <UiAlert type="error" gutterBottom>
             {errorMessage}
           </UiAlert>
         )}
 
         <form onSubmit={handleSubmit}>
-          <Stack spacing={2}>
+          <UiStack spacing={2}>
             <UiTextField
               id="name"
               label="Name"
-              type="text"
               value={name}
-              onChange={(event) => onNameChange(event.target.value)}
+              onChange={onNameChange}
               required
               disabled={isSubmitting}
             />
@@ -53,15 +51,15 @@ export default function ProfileEditForm({
               id="bio"
               label="Bio"
               value={bio}
-              onChange={(event) => onBioChange(event.target.value)}
+              onChange={onBioChange}
               disabled={isSubmitting}
               multiline
               rows={4}
             />
-            <Stack direction="row" spacing={2}>
+            <UiStack direction="row" spacing={2}>
               <UiButton
                 type="submit"
-                variant="contained"
+                variant="solid"
                 fullWidth
                 isLoading={isSubmitting}
                 disabled={isSubmitting}
@@ -69,16 +67,15 @@ export default function ProfileEditForm({
                 Save
               </UiButton>
               <UiButton
-                type="button"
-                variant="outlined"
+                variant="outline"
                 fullWidth
                 onClick={onCancel}
                 disabled={isSubmitting}
               >
                 Cancel
               </UiButton>
-            </Stack>
-          </Stack>
+            </UiStack>
+          </UiStack>
         </form>
       </UiCardContent>
     </UiCard>

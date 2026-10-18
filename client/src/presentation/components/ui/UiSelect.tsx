@@ -3,7 +3,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import type { SelectChangeEvent, SelectProps } from '@mui/material/Select';
+import type { SelectChangeEvent } from '@mui/material/Select';
 import type { SelectOption } from '../../models/SelectOption';
 
 interface UiSelectProps {
@@ -15,7 +15,7 @@ interface UiSelectProps {
   disabled?: boolean;
   error?: boolean;
   helperText?: string;
-  size?: SelectProps['size'];
+  size?: 'sm' | 'md';
 }
 
 export default function UiSelect({
@@ -27,7 +27,7 @@ export default function UiSelect({
   disabled = false,
   error = false,
   helperText,
-  size,
+  size = 'md',
 }: UiSelectProps) {
   const selectId = id ?? label.toLowerCase().replace(/\s+/g, '-');
   const labelId = `${selectId}-label`;
@@ -37,7 +37,7 @@ export default function UiSelect({
   };
 
   return (
-    <FormControl fullWidth error={error} disabled={disabled} size={size}>
+    <FormControl fullWidth error={error} disabled={disabled} size={size === 'sm' ? 'small' : 'medium'}>
       <InputLabel id={labelId}>{label}</InputLabel>
       <Select
         labelId={labelId}

@@ -1,8 +1,4 @@
-import Box from '@mui/material/Box';
-import ButtonBase from '@mui/material/ButtonBase';
-import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
-import { UiCard, UiCardContent, UiCardHeader } from './ui';
+import { UiCard, UiCardContent, UiCardHeader, UiChip, UiFlex, UiPressable, UiText } from './ui';
 
 interface Layer {
   name: string;
@@ -48,52 +44,42 @@ export default function LayerMap({ onLayerClick, selectedLayer }: LayerMapProps)
     <UiCard>
       <UiCardHeader title="Clean Architecture Layers" />
       <UiCardContent>
-        <Box display="flex" flexDirection="column" gap={1.5}>
+        <UiFlex column gap={1.5}>
           {layers.map((layer) => (
-            <ButtonBase
+            <UiPressable
               key={layer.name}
               onClick={() => onLayerClick?.(layer.name)}
-              sx={{
-                width: '100%',
-                textAlign: 'left',
-                borderRadius: 2,
-                p: 1,
-                display: 'block',
-                outline:
-                  selectedLayer === layer.name ? '2px solid' : 'none',
-                outlineColor: 'primary.main',
-                outlineOffset: 2,
-              }}
+              selected={selectedLayer === layer.name}
             >
-              <Box sx={{ bgcolor: layer.color, borderRadius: 1, p: 1.5, mb: 1 }}>
-                <Typography variant="subtitle1" fontWeight={600} color="#fff">
+              <UiFlex column bgColor={layer.color} rounded p={1.5} mb={1}>
+                <UiText variant="subtitle1" weight="semibold" tone="light">
                   {layer.name}
-                </Typography>
-                <Typography variant="body2" color="rgba(255,255,255,0.9)">
+                </UiText>
+                <UiText variant="body2" tone="lightMuted">
                   {layer.description}
-                </Typography>
-              </Box>
-              <Box display="flex" flexWrap="wrap" gap={0.5}>
+                </UiText>
+              </UiFlex>
+              <UiFlex wrap gap={0.5}>
                 {layer.concepts.map((concept) => (
-                  <Chip key={concept} label={concept} size="small" variant="outlined" />
+                  <UiChip key={concept} label={concept} variant="outline" />
                 ))}
-              </Box>
-            </ButtonBase>
+              </UiFlex>
+            </UiPressable>
           ))}
-        </Box>
+        </UiFlex>
 
-        <Box mt={3} pt={3} borderTop={1} borderColor="divider">
-          <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+        <UiFlex column dividerTop>
+          <UiText variant="subtitle2" weight="semibold" gutterBottom>
             Data Flow
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
+          </UiText>
+          <UiText variant="body2" tone="muted">
             → User interacts with Presentation layer
             <br />→ Presentation layer calls Domain use cases
             <br />→ Use cases call Data repositories
             <br />→ Repositories call APIs and transform data
             <br />→ Foundation provides infrastructure services
-          </Typography>
-        </Box>
+          </UiText>
+        </UiFlex>
       </UiCardContent>
     </UiCard>
   );

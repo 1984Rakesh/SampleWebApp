@@ -1,8 +1,4 @@
-import Box from '@mui/material/Box';
-import Avatar from '@mui/material/Avatar';
-import Typography from '@mui/material/Typography';
-import { UiCard, UiCardContent, UiCardHeader } from './ui';
-import { UiButton } from './ui';
+import { UiCard, UiCardContent, UiCardHeader, UiButton, UiAvatar, UiFlex, UiText } from './ui';
 import type { UserProfileViewState } from '../models/UserProfileViewState';
 
 interface UserProfileCardProps {
@@ -18,36 +14,36 @@ export default function UserProfileCard({ profile, onEdit, isLoading = false }: 
         title="Profile"
         action={
           onEdit ? (
-            <UiButton variant="contained" onClick={onEdit} disabled={isLoading}>
+            <UiButton variant="solid" onClick={onEdit} disabled={isLoading}>
               Edit
             </UiButton>
           ) : null
         }
       />
       <UiCardContent>
-        <Box display="flex" alignItems="flex-start" gap={2}>
+        <UiFlex align="start" gap={2}>
           {profile.avatarUrl && (
-            <Avatar src={profile.avatarUrl} alt={profile.name} sx={{ width: 80, height: 80 }} />
+            <UiAvatar src={profile.avatarUrl} alt={profile.name} size="lg" />
           )}
-          <Box flex={1}>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
+          <UiFlex column grow>
+            <UiText variant="h6" weight="semibold" gutterBottom>
               {profile.name}
-            </Typography>
-            <Typography color="text.secondary" variant="body2" gutterBottom>
+            </UiText>
+            <UiText tone="muted" variant="body2" gutterBottom>
               {profile.email}
-            </Typography>
+            </UiText>
             {profile.bio && (
-              <Typography color="text.primary" variant="body2" sx={{ mt: 2 }}>
+              <UiText variant="body2" mt={2}>
                 {profile.bio}
-              </Typography>
+              </UiText>
             )}
             {profile.joinedLabel && (
-              <Typography color="text.secondary" variant="caption" sx={{ mt: 2, display: 'block' }}>
+              <UiText tone="muted" variant="caption" mt={2}>
                 Joined: {profile.joinedLabel}
-              </Typography>
+              </UiText>
             )}
-          </Box>
-        </Box>
+          </UiFlex>
+        </UiFlex>
       </UiCardContent>
     </UiCard>
   );

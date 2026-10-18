@@ -1,7 +1,10 @@
 import Box from '@mui/material/Box';
-import type { BoxProps } from '@mui/material/Box';
 
-export default function UiPage(props: BoxProps) {
+interface UiPageProps {
+  children: React.ReactNode;
+}
+
+export default function UiPage({ children }: UiPageProps) {
   return (
     <Box
       minHeight="100vh"
@@ -10,7 +13,8 @@ export default function UiPage(props: BoxProps) {
       justifyContent="center"
       bgcolor="background.default"
       p={2}
-      {...props}
-    />
+    >
+      {children}
+    </Box>
   );
 }

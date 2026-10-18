@@ -1,5 +1,3 @@
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
 import { useTaskListViewModel, useTaskFormViewModel } from '../hooks';
 import type { TaskFormData } from '../models/TaskFormViewState';
 import {
@@ -8,7 +6,7 @@ import {
   TaskListContent,
   TaskListHeader,
 } from '../components';
-import { UiAlert } from '../components/ui';
+import { UiAlert, UiFlex, UiScreen } from '../components/ui';
 
 interface TaskFormSectionProps {
   editingTaskId?: string;
@@ -78,27 +76,27 @@ export default function TaskListScreen() {
   } = useTaskListViewModel();
 
   return (
-    <Box minHeight="100vh" bgcolor="background.default" px={{ xs: 1.5, sm: 2, md: 4 }} py={{ xs: 2, md: 4 }} overflow="hidden">
-      <Container maxWidth="xl" disableGutters>
-        <TaskListHeader onCreate={openCreateForm} />
-        <TaskFilters
-          status={statusFilter}
-          priority={priorityFilter}
-          statusOptions={statusOptions}
-          priorityOptions={priorityOptions}
-          onStatusChange={setStatusFilter}
-          onPriorityChange={setPriorityFilter}
-          onApply={applyFilters}
-        />
+    <UiScreen maxWidth="xl">
+      <TaskListHeader onCreate={openCreateForm} />
+      <TaskFilters
+        status={statusFilter}
+        priority={priorityFilter}
+        statusOptions={statusOptions}
+        priorityOptions={priorityOptions}
+        onStatusChange={setStatusFilter}
+        onPriorityChange={setPriorityFilter}
+        onApply={applyFilters}
+      />
 
-        {actionError && (
-          <UiAlert severity="error" sx={{ mb: 2 }}>
-            {actionError}
-          </UiAlert>
-        )}
+      {actionError && (
+        <UiAlert type="error" gutterBottom>
+          {actionError}
+        </UiAlert>
+      )}
 
-        {showForm && (
-          <Box mb={3}>
+      {showForm && (
+        <UiFlex mb={3}>
+          <UiFlex grow>
             <TaskFormSection
               key={editingTaskId ?? 'new'}
               editingTaskId={editingTaskId}
@@ -106,18 +104,18 @@ export default function TaskListScreen() {
               onSaved={closeForm}
               onCancel={closeForm}
             />
-          </Box>
-        )}
+          </UiFlex>
+        </UiFlex>
+      )}
 
-        <TaskListContent
-          tasks={taskItems}
-          isLoading={isLoading}
-          errorMessage={errorMessage}
-          onEdit={openEditForm}
-          onDelete={deleteTask}
-          onToggleStatus={toggleTaskStatus}
-        />
-      </Container>
-    </Box>
+      <TaskListContent
+        tasks={taskItems}
+        isLoading={isLoading}
+        errorMessage={errorMessage}
+        onEdit={openEditForm}
+        onDelete={deleteTask}
+        onToggleStatus={toggleTaskStatus}
+      />
+    </UiScreen>
   );
 }

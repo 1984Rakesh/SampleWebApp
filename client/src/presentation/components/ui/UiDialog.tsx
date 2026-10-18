@@ -3,17 +3,26 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import type { DialogProps } from '@mui/material/Dialog';
 
-interface UiDialogProps extends Omit<DialogProps, 'children'> {
+interface UiDialogProps {
+  open: boolean;
+  onClose: () => void;
   title: string;
   description?: React.ReactNode;
   actions?: React.ReactNode;
+  maxWidth?: 'xs' | 'sm' | 'md';
 }
 
-export default function UiDialog({ title, description, actions, ...props }: UiDialogProps) {
+export default function UiDialog({
+  open,
+  onClose,
+  title,
+  description,
+  actions,
+  maxWidth = 'xs',
+}: UiDialogProps) {
   return (
-    <Dialog {...props}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth={maxWidth}>
       <DialogTitle>{title}</DialogTitle>
       {description && (
         <DialogContent>

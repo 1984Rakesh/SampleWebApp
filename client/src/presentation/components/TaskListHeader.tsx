@@ -1,6 +1,4 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import { UiButton } from './ui';
+import { UiButton, UiFlex, UiText } from './ui';
 
 interface TaskListHeaderProps {
   onCreate: () => void;
@@ -8,13 +6,13 @@ interface TaskListHeaderProps {
 
 export default function TaskListHeader({ onCreate }: TaskListHeaderProps) {
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={3}>
-      <Typography variant="h4" component="h1" fontWeight={600}>
+    <UiFlex justify="space-between" align="center" gap={2} mb={3}>
+      <UiText variant="h4" as="h1" weight="semibold">
         Tasks
-      </Typography>
-      <UiButton variant="contained" onClick={onCreate} sx={{ flexShrink: 0 }}>
+      </UiText>
+      <UiButton variant="solid" onClick={onCreate} noShrink>
         Create Task
       </UiButton>
-    </Box>
+    </UiFlex>
   );
 }

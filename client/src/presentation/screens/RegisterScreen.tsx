@@ -1,10 +1,17 @@
 import type { FormEvent } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
 import { useAuthViewModel } from '../hooks';
-import { UiPage, UiCard, UiCardContent, UiCardHeader, UiTextField, UiButton, UiAlert } from '../components/ui';
+import {
+  UiAlert,
+  UiButton,
+  UiCard,
+  UiCardContent,
+  UiCardHeader,
+  UiLink,
+  UiPage,
+  UiStack,
+  UiText,
+  UiTextField,
+} from '../components/ui';
 
 export default function RegisterScreen() {
   const {
@@ -26,23 +33,22 @@ export default function RegisterScreen() {
 
   return (
     <UiPage>
-      <UiCard sx={{ maxWidth: 448, width: '100%' }}>
-        <UiCardHeader title="Create Account" titleTypographyProps={{ textAlign: 'center', variant: 'h5' }} />
+      <UiCard maxWidth={448}>
+        <UiCardHeader title="Create Account" centered />
         <UiCardContent>
           {errorMessage && (
-            <UiAlert severity="error" sx={{ mb: 2 }}>
+            <UiAlert type="error" gutterBottom>
               {errorMessage}
             </UiAlert>
           )}
 
           <form onSubmit={handleSubmit}>
-            <Stack spacing={2}>
+            <UiStack spacing={2}>
               <UiTextField
                 id="name"
                 label="Name"
-                type="text"
                 value={name}
-                onChange={(event) => setName(event.target.value)}
+                onChange={setName}
                 required
                 disabled={isSubmitting}
                 autoComplete="name"
@@ -52,7 +58,7 @@ export default function RegisterScreen() {
                 label="Email"
                 type="email"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={setEmail}
                 required
                 disabled={isSubmitting}
                 autoComplete="email"
@@ -62,29 +68,26 @@ export default function RegisterScreen() {
                 label="Password"
                 type="password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={setPassword}
                 required
                 disabled={isSubmitting}
                 autoComplete="new-password"
               />
               <UiButton
                 type="submit"
-                variant="contained"
+                variant="solid"
                 fullWidth
                 isLoading={isSubmitting}
                 disabled={isSubmitting}
               >
                 Sign Up
               </UiButton>
-            </Stack>
+            </UiStack>
           </form>
 
-          <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ mt: 2 }}>
-            Already have an account?{' '}
-            <Link component={RouterLink} to="/login" underline="hover">
-              Sign in
-            </Link>
-          </Typography>
+          <UiText variant="body2" tone="muted" align="center" mt={2}>
+            Already have an account? <UiLink to="/login">Sign in</UiLink>
+          </UiText>
         </UiCardContent>
       </UiCard>
     </UiPage>

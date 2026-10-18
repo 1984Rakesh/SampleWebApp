@@ -1,6 +1,5 @@
 import type { FormEvent } from 'react';
-import Stack from '@mui/material/Stack';
-import { UiCard, UiCardContent, UiCardHeader, UiTextField, UiSelect, UiButton, UiAlert } from './ui';
+import { UiCard, UiCardContent, UiCardHeader, UiTextField, UiSelect, UiButton, UiAlert, UiStack } from './ui';
 import type { SelectOption } from '../models/SelectOption';
 import type { TaskFormData, TaskFormFieldErrors } from '../models/TaskFormViewState';
 
@@ -41,18 +40,18 @@ export default function TaskForm({
       <UiCardHeader title={title} />
       <UiCardContent>
         {submitError && (
-          <UiAlert severity="error" sx={{ mb: 2 }}>
+          <UiAlert type="error" gutterBottom>
             {submitError}
           </UiAlert>
         )}
 
         <form onSubmit={handleSubmit}>
-          <Stack spacing={2}>
+          <UiStack spacing={2}>
             <UiTextField
               id="title"
               label="Title"
               value={formData.title}
-              onChange={(event) => updateField('title', event.target.value)}
+              onChange={(value) => updateField('title', value)}
               error={!!errors.title}
               helperText={errors.title}
               disabled={isLoading}
@@ -62,7 +61,7 @@ export default function TaskForm({
               id="description"
               label="Description"
               value={formData.description}
-              onChange={(event) => updateField('description', event.target.value)}
+              onChange={(value) => updateField('description', value)}
               disabled={isLoading}
               multiline
               rows={3}
@@ -82,14 +81,13 @@ export default function TaskForm({
               label="Due Date"
               type="date"
               value={formData.dueDate}
-              onChange={(event) => updateField('dueDate', event.target.value)}
+              onChange={(value) => updateField('dueDate', value)}
               disabled={isLoading}
-              InputLabelProps={{ shrink: true }}
             />
-            <Stack direction="row" spacing={2}>
+            <UiStack direction="row" spacing={2}>
               <UiButton
                 type="submit"
-                variant="contained"
+                variant="solid"
                 fullWidth
                 isLoading={isLoading}
                 disabled={submitDisabled || isLoading}
@@ -98,8 +96,7 @@ export default function TaskForm({
               </UiButton>
               {onCancel && (
                 <UiButton
-                  type="button"
-                  variant="outlined"
+                  variant="outline"
                   fullWidth
                   onClick={onCancel}
                   disabled={isLoading}
@@ -107,8 +104,8 @@ export default function TaskForm({
                   Cancel
                 </UiButton>
               )}
-            </Stack>
-          </Stack>
+            </UiStack>
+          </UiStack>
         </form>
       </UiCardContent>
     </UiCard>

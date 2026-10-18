@@ -1,7 +1,4 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import { UiCard, UiCardContent, UiChip, UiButton } from './ui';
+import { UiCard, UiCardContent, UiChip, UiButton, UiFlex, UiStack, UiText } from './ui';
 import type { TaskItemViewState } from '../models/TaskListViewState';
 
 interface TaskCardProps {
@@ -22,44 +19,44 @@ export default function TaskCard({
   return (
     <UiCard>
       <UiCardContent>
-        <Typography variant="h6" fontWeight={600} gutterBottom>
+        <UiText variant="h6" weight="semibold" gutterBottom>
           {task.title}
-        </Typography>
+        </UiText>
 
         {task.description && (
-          <Typography color="text.secondary" variant="body2" gutterBottom>
+          <UiText tone="muted" variant="body2" gutterBottom>
             {task.description}
-          </Typography>
+          </UiText>
         )}
 
-        <Stack direction="row" spacing={1} mb={2}>
+        <UiStack direction="row" spacing={1} mb={2}>
           <UiChip label={task.statusLabel} tone={task.statusTone} />
           <UiChip label={task.priorityLabel} tone={task.priorityTone} />
-        </Stack>
+        </UiStack>
 
         {task.dueDateLabel && (
-          <Typography color="text.secondary" variant="caption" display="block" gutterBottom>
+          <UiText tone="muted" variant="caption" gutterBottom>
             Due: {task.dueDateLabel}
-          </Typography>
+          </UiText>
         )}
 
-        <Box display="flex" gap={1} mt={2} role="group" aria-label="Task actions">
+        <UiFlex gap={1} mt={2} role="group" ariaLabel="Task actions">
           {onToggleStatus && (
             <UiButton
-              variant="contained"
-              size="small"
+              variant="solid"
+              size="sm"
               fullWidth
               disabled={isLoading}
               onClick={() => onToggleStatus(task.id)}
-              aria-label={task.toggleAriaLabel}
+              ariaLabel={task.toggleAriaLabel}
             >
               {task.toggleLabel}
             </UiButton>
           )}
           {onEdit && (
             <UiButton
-              variant="outlined"
-              size="small"
+              variant="outline"
+              size="sm"
               fullWidth
               disabled={isLoading}
               onClick={() => onEdit(task.id)}
@@ -69,9 +66,9 @@ export default function TaskCard({
           )}
           {onDelete && (
             <UiButton
-              variant="outlined"
-              color="error"
-              size="small"
+              variant="outline"
+              tone="danger"
+              size="sm"
               fullWidth
               disabled={isLoading}
               onClick={() => onDelete(task.id)}
@@ -79,7 +76,7 @@ export default function TaskCard({
               Delete
             </UiButton>
           )}
-        </Box>
+        </UiFlex>
       </UiCardContent>
     </UiCard>
   );

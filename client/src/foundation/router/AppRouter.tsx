@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Box from '@mui/material/Box';
 import { ProtectedRoute, PublicRoute } from './routeGuards';
+import { UiPage, UiText } from '../../presentation/components/ui';
 import Navbar from '../../presentation/components/Navbar';
 
 // Placeholder screens - will be implemented in Phase 9
@@ -26,9 +26,9 @@ export function AppRouter() {
     <BrowserRouter>
       <React.Suspense
         fallback={
-          <Box display="flex" alignItems="center" justifyContent="center" minHeight="100vh">
-            Loading...
-          </Box>
+          <UiPage>
+            <UiText tone="muted">Loading...</UiText>
+          </UiPage>
         }
       >
         <Routes>

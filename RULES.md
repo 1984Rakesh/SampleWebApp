@@ -33,6 +33,7 @@ Application / Foundation composition wires the layers together
   - Never leak database column names (`snake_case`), SQL types, or driver errors into `domain/` or `presentation/`.
   - Never leak HTTP DTOs, Axios responses/errors, or Zod schemas into `domain/` or UI components.
   - Never leak domain entities or domain enums directly into presentational components or screens when a `ViewState` / `SelectOption` contract belongs at the boundary.
+  - Never leak the component library's prop surface (MUI `*Props`, `sx`, `component`, library-specific enums like `variant="contained"` or `severity`) through wrapper components—`presentation/components/ui/` is the only module allowed to import `@mui/*`, and its props must be narrow and semantic (`tone`, `variant: 'solid' | 'outline' | 'text'`, `type`, `gutterBottom`, `size: 'sm' | 'md'`).
 - **Normalize, Then Validate**:
   - Normalize transport and persistence values (trimming strings, resolving legacy field aliases, coalescing `null`/`undefined`, normalizing timestamps to ISO-8601) before validating and constructing domain models.
   - Preserve strict domain invariants during normalization; never fabricate missing IDs, ownership (`userId`), statuses, or required fields.

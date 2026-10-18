@@ -1,6 +1,19 @@
 import Container from '@mui/material/Container';
-import type { ContainerProps } from '@mui/material/Container';
 
-export default function UiContainer(props: ContainerProps) {
-  return <Container maxWidth="lg" {...props} />;
+interface UiContainerProps {
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
+  disableGutters?: boolean;
+  children: React.ReactNode;
+}
+
+export default function UiContainer({
+  maxWidth = 'lg',
+  disableGutters = false,
+  children,
+}: UiContainerProps) {
+  return (
+    <Container maxWidth={maxWidth} disableGutters={disableGutters}>
+      {children}
+    </Container>
+  );
 }

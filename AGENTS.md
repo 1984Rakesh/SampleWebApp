@@ -48,6 +48,7 @@ Before completing any task, verify every item below:
 - [ ] **Complete Read & Write Contracts**: Do read operations (`getTasks`, `getCurrentUser`) go through repository contracts and use cases rather than bypassing them? (Must be **Yes**).
 - [ ] **Boundary Error Translation**: Are Axios/HTTP `{ error: string }` payloads, SQLite constraint errors, and JWT failures translated into domain/application errors at the adapter boundary? (Must be **Yes**).
 - [ ] **No Domain Leaks in UI**: Do React screens or components hold domain entities (`Task`, `User`) or import domain enums directly instead of using `ViewState` and `SelectOption[]`? (Must be **No**).
+- [ ] **Sealed UI Primitives**: Do screens or components import `@mui/*`, use `sx`, or consume wrapper props typed as MUI `*Props`? (Must be **No**; `@mui/*` may only be imported inside `client/src/presentation/components/ui/` and `client/src/foundation/theme/`).
 - [ ] **Clearable Optional Fields**: Can nullable fields (`description`, `dueDate`, `bio`, `avatar`) be cleared with `null` or `""` on update without being ignored by `COALESCE` or stripped to `undefined`? (Must be **Yes**).
 
 ## 5. Verification Commands

@@ -1,8 +1,5 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { UiPage } from './ui';
-import { UiCard, UiCardContent, UiCardHeader } from './ui';
-import { UiButton } from './ui';
-import Typography from '@mui/material/Typography';
+import { UiPage, UiCard, UiCardContent, UiCardHeader, UiButton, UiText } from './ui';
 
 interface Props {
   children: ReactNode;
@@ -36,13 +33,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <UiPage>
-          <UiCard sx={{ maxWidth: 448, width: '100%' }}>
+          <UiCard maxWidth={448}>
             <UiCardHeader title="Something went wrong" />
             <UiCardContent>
-              <Typography color="text.secondary" sx={{ mb: 3 }}>
+              <UiText tone="muted" mb={3}>
                 {this.state.error?.message || 'An unexpected error occurred'}
-              </Typography>
-              <UiButton variant="contained" fullWidth onClick={() => window.location.reload()}>
+              </UiText>
+              <UiButton variant="solid" fullWidth onClick={() => window.location.reload()}>
                 Reload Page
               </UiButton>
             </UiCardContent>

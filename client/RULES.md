@@ -16,8 +16,8 @@ Foundation wires Domain, Data, and Presentation together
 | :--- | :--- | :--- | :--- |
 | **Domain** | `src/domain/` | `src/domain/models`, `src/domain/repositories` | `react`, `@tanstack/react-query`, `axios`, `zod`, `@mui/*`, `localStorage`, `window`, `src/data/*`, `src/presentation/*`, `src/foundation/*` |
 | **Data** | `src/data/` | `src/domain/*`, `src/data/*`, `src/foundation/network/*` | `src/presentation/*` |
-| **Presentation** | `src/presentation/` | `src/presentation/*`, `src/domain/*` (ViewModels/mappers only), `src/foundation/*` (hooks/providers) | `src/data/*`, `axios`, `zod`, `@tanstack/react-query`, `localStorage` |
-| **Foundation** | `src/foundation/` | `src/domain/*`, `src/data/*`, `src/presentation/*` (router screens/shell) | Direct business rule implementations |
+| **Presentation** | `src/presentation/` | `src/presentation/*`, `src/domain/*` (ViewModels/mappers only), `src/foundation/*` (hooks/providers) | `src/data/*`, `axios`, `zod`, `@tanstack/react-query`, `localStorage`, `@mui/*` (allowed only inside `src/presentation/components/ui/`) |
+| **Foundation** | `src/foundation/` | `src/domain/*`, `src/data/*`, `src/presentation/*` (router screens/shell) | Direct business rule implementations, `@mui/*` (allowed only inside `src/foundation/theme/`) |
 
 ---
 
@@ -71,6 +71,11 @@ Foundation wires Domain, Data, and Presentation together
    - Presentation mappers (`taskPresentation.ts`, `userPresentation.ts`) should use domain entity methods (`task.isCompleted()`, `task.isOverdue()`) where available rather than re-implementing domain rules.
 5. **UI Components Stay in `src/presentation/components/`**:
    - Navigation bars (`Navbar`), dialogs, cards, and layout chrome belong in `src/presentation/components/`, not in `src/foundation/`.
+6. **Sealed `ui/` Primitives Are the Only Component-Library Boundary**:
+   - `@mui/*` (including `@mui/icons-material`) may only be imported inside `src/presentation/components/ui/` and `src/foundation/theme/`. Screens and components must compose `Ui*` primitives exclusively.
+   - `ui/` wrapper props must be narrow and semantic: closed unions (`variant: 'solid' | 'outline' | 'text'`, `tone`, `size: 'sm' | 'md'`, `type`), layout-intent props (`gutterBottom`, `maxWidth`, `fullWidth`, `spaced`, `compact`), and value-based callbacks (`onChange: (value: string) => void`).
+   - `ui/` wrappers must never accept `sx`, `component`, MUI `*Props` types, or forward `{...props}` spread to the underlying MUI component. Wrappers may use `sx`/MUI props **internally** only.
+   - When a screen needs a primitive that does not exist yet, add a new `ui/` primitive with a semantic API (e.g., `UiStack`, `UiIconButton`, `UiTable*`, `UiResponsive`, `UiScreen`, `UiIcon` name registry) rather than importing MUI at the call site.
 
 ---
 

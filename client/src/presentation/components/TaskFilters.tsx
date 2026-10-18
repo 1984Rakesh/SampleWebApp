@@ -1,6 +1,4 @@
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import { UiCard, UiCardContent, UiSelect, UiButton } from './ui';
+import { UiCard, UiCardContent, UiSelect, UiButton, UiStack, UiFlex } from './ui';
 import type { SelectOption } from '../models/SelectOption';
 
 interface TaskFiltersProps {
@@ -23,41 +21,38 @@ export default function TaskFilters({
   onApply,
 }: TaskFiltersProps) {
   return (
-    <UiCard sx={{ mb: 3, borderRadius: 2 }}>
-      <UiCardContent sx={{ p: { xs: 2, sm: 2.5 }, '&:last-child': { pb: { xs: 2, sm: 2.5 } } }}>
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1.5}
-          alignItems={{ xs: 'stretch', sm: 'center' }}
-        >
-          <Box flex={1} width="100%">
+    <UiCard spaced>
+      <UiCardContent compact>
+        <UiStack rowFrom="sm" spacing={1.5} align="center">
+          <UiFlex grow>
             <UiSelect
               id="statusFilter"
               label="Status"
               value={status}
               options={statusOptions}
               onChange={onStatusChange}
-              size="small"
+              size="sm"
             />
-          </Box>
-          <Box flex={1} width="100%">
+          </UiFlex>
+          <UiFlex grow>
             <UiSelect
               id="priorityFilter"
               label="Priority"
               value={priority}
               options={priorityOptions}
               onChange={onPriorityChange}
-              size="small"
+              size="sm"
             />
-          </Box>
+          </UiFlex>
           <UiButton
-            variant="contained"
+            variant="solid"
             onClick={onApply}
-            sx={{ minWidth: 140, width: { xs: '100%', sm: 'auto' }, minHeight: 40 }}
+            minWidth={140}
+            fullWidthBelow="sm"
           >
             Apply Filters
           </UiButton>
-        </Stack>
+        </UiStack>
       </UiCardContent>
     </UiCard>
   );

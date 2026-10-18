@@ -1,24 +1,20 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import AppBar from '@mui/material/AppBar';
-import Avatar from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
-import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import LogoutIcon from '@mui/icons-material/Logout';
-import MenuIcon from '@mui/icons-material/Menu';
 import { useColorMode } from '../../foundation/theme';
 import { useAuthViewModel } from '../hooks';
+import {
+  UiAppBar,
+  UiAvatar,
+  UiButton,
+  UiDivider,
+  UiDrawer,
+  UiFlex,
+  UiIcon,
+  UiIconButton,
+  UiNavList,
+  UiResponsive,
+  UiText,
+  UiToolbar,
+} from './ui';
 
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -43,120 +39,91 @@ export default function Navbar() {
 
   return (
     <>
-      <AppBar
-        position="static"
-        color="transparent"
-        elevation={0}
-        sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}
-      >
-        <Toolbar sx={{ gap: { xs: 0.5, sm: 1 }, minWidth: 0 }}>
-          <IconButton
+      <UiAppBar>
+        <UiToolbar>
+          <UiIconButton
+            icon="menu"
+            ariaLabel="Open navigation"
             onClick={() => setDrawerOpen(true)}
-            color="inherit"
-            aria-label="Open navigation"
-            sx={{ display: { xs: 'inline-flex', md: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
+            hideFrom="md"
+          />
 
-          <Typography
-            variant="h6"
-            component={Link}
-            to="/dashboard"
-            sx={{
-              flexGrow: 0,
-              mr: { xs: 'auto', md: 3 },
-              minWidth: 0,
-              textDecoration: 'none',
-              color: 'primary.main',
-              fontWeight: 700,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Clean Architecture</Box>
-            <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>CA</Box>
-          </Typography>
-
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 0.5, flexGrow: 1 }}>
-            {navLinks.map((link) => (
-              <Button
-                key={link.to}
-                component={Link}
-                to={link.to}
-                color="inherit"
-                sx={{ textTransform: 'none', fontWeight: 500 }}
-              >
-                {link.label}
-              </Button>
-            ))}
-          </Box>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.25, sm: 1 } }}>
-            <Tooltip title={mode === 'light' ? 'Use dark theme' : 'Use light theme'}>
-              <IconButton onClick={toggleMode} color="inherit" aria-label="Toggle theme">
-                {mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={userName ?? 'User'}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>
-                {userName?.trim().charAt(0).toUpperCase() || 'U'}
-              </Avatar>
-            </Tooltip>
-            <Typography
-              variant="body2"
-              color="text.secondary"
+          <UiFlex grow align="center" minWidth0>
+            <UiText
+              variant="h6"
+              to="/dashboard"
+              tone="accent"
+              weight="bold"
               noWrap
-              sx={{ display: { xs: 'none', lg: 'block' }, maxWidth: 160 }}
             >
-              {userName}
-            </Typography>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleLogout}
-              startIcon={<LogoutIcon />}
-              sx={{ display: { xs: 'none', md: 'inline-flex' } }}
-            >
-              Logout
-            </Button>
-          </Box>
-        </Toolbar>
-      </AppBar>
+              <UiResponsive display="inline" hideBelow="sm">Clean Architecture</UiResponsive>
+              <UiResponsive display="inline" hideFrom="sm">CA</UiResponsive>
+            </UiText>
 
-      <Drawer
-        anchor="left"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        ModalProps={{ keepMounted: true }}
-        PaperProps={{ sx: { width: 280, maxWidth: '85vw', bgcolor: 'background.paper' } }}
-      >
-        <Box p={2.5}>
-          <Typography variant="h6" fontWeight={600}>Navigation</Typography>
-          <Typography variant="body2" color="text.secondary" noWrap>{userName}</Typography>
-        </Box>
-        <Divider />
-        <List sx={{ py: 1 }}>
-          {navLinks.map((link) => (
-            <ListItemButton
-              key={link.to}
-              component={Link}
-              to={link.to}
-              onClick={() => setDrawerOpen(false)}
-            >
-              <ListItemText primary={link.label} />
-            </ListItemButton>
-          ))}
-        </List>
-        <Box sx={{ mt: 'auto' }}>
-          <Divider />
-          <List>
-            <ListItemButton onClick={handleLogout} sx={{ color: 'error.main' }}>
-              <LogoutIcon sx={{ mr: 2 }} />
-              <ListItemText primary="Logout" />
-            </ListItemButton>
-          </List>
-        </Box>
-      </Drawer>
+            <UiResponsive display="flex" hideBelow="md">
+              <UiFlex grow gap={0.5} ml={3}>
+                {navLinks.map((link) => (
+                  <UiButton key={link.to} to={link.to}>
+                    {link.label}
+                  </UiButton>
+                ))}
+              </UiFlex>
+            </UiResponsive>
+          </UiFlex>
+
+          <UiFlex align="center" gap={1}>
+            <UiIconButton
+              icon={mode === 'light' ? 'theme-dark' : 'theme-light'}
+              ariaLabel="Toggle theme"
+              tooltip={mode === 'light' ? 'Use dark theme' : 'Use light theme'}
+              onClick={toggleMode}
+            />
+            <UiAvatar
+              label={userName?.trim().charAt(0).toUpperCase() || 'U'}
+              size="sm"
+              tone="primary"
+              variant="solid"
+              tooltip={userName ?? 'User'}
+            />
+            <UiResponsive hideBelow="lg">
+              <UiText variant="body2" tone="muted" noWrap maxWidth={160}>
+                {userName}
+              </UiText>
+            </UiResponsive>
+            <UiResponsive display="inline-flex" hideBelow="md">
+              <UiButton
+                variant="solid"
+                tone="danger"
+                onClick={handleLogout}
+                startIcon={<UiIcon name="logout" />}
+              >
+                Logout
+              </UiButton>
+            </UiResponsive>
+          </UiFlex>
+        </UiToolbar>
+      </UiAppBar>
+
+      <UiDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+        <UiFlex column p={2.5}>
+          <UiText variant="h6" weight="semibold">Navigation</UiText>
+          <UiText variant="body2" tone="muted" noWrap>{userName}</UiText>
+        </UiFlex>
+        <UiDivider />
+        <UiNavList
+          items={navLinks.map((link) => ({
+            label: link.label,
+            to: link.to,
+            onClick: () => setDrawerOpen(false),
+          }))}
+        />
+        <UiFlex column mt="auto">
+          <UiDivider />
+          <UiNavList
+            items={[{ label: 'Logout', icon: 'logout', tone: 'danger', onClick: handleLogout }]}
+          />
+        </UiFlex>
+      </UiDrawer>
     </>
   );
 }

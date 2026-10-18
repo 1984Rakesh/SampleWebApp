@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import Typography from '@mui/material/Typography';
 import CodeBlock from './CodeBlock';
-import { UiCard, UiCardContent, UiCardHeader } from './ui';
+import { UiCard, UiCardContent, UiCardHeader, UiText, UiToggleGroup } from './ui';
+
+const viewOptions = [
+  { value: 'typescript', label: 'TypeScript (Web)' },
+  { value: 'swift', label: 'Swift (iOS)' },
+];
 
 interface ComparisonPanelProps {
   layerName: string;
@@ -22,32 +24,23 @@ export default function ComparisonPanel({
 }: ComparisonPanelProps) {
   const [activeView, setActiveView] = useState<'typescript' | 'swift'>('typescript');
 
-  const handleChange = (_event: React.MouseEvent<HTMLElement>, value: 'typescript' | 'swift' | null) => {
-    if (value) {
-      setActiveView(value);
-    }
-  };
-
   return (
     <UiCard>
-      <UiCardHeader title={conceptName} subheader={`Layer: ${layerName}`} />
+      <UiCardHeader title={conceptName} subtitle={`Layer: ${layerName}`} />
       <UiCardContent>
         {explanation && (
-          <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
+          <UiText tone="muted" variant="body2" gutterBottom>
             {explanation}
-          </Typography>
+          </UiText>
         )}
 
-        <ToggleButtonGroup
+        <UiToggleGroup
           value={activeView}
-          exclusive
+          options={viewOptions}
+          onChange={(value) => setActiveView(value as 'typescript' | 'swift')}
           fullWidth
-          onChange={handleChange}
-          sx={{ mb: 2 }}
-        >
-          <ToggleButton value="typescript">TypeScript (Web)</ToggleButton>
-          <ToggleButton value="swift">Swift (iOS)</ToggleButton>
-        </ToggleButtonGroup>
+          gutterBottom
+        />
 
         {activeView === 'typescript' ? (
           <CodeBlock code={typescriptCode} language="typescript" title="TypeScript Implementation" />

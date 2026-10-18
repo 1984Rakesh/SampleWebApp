@@ -1,7 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import { UiPage, UiText } from '../../presentation/components/ui';
 import { useAuth } from '../context';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -10,15 +9,9 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <Box
-        minHeight="100vh"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        bgcolor="background.default"
-      >
-        <Typography color="text.secondary">Loading...</Typography>
-      </Box>
+      <UiPage>
+        <UiText tone="muted">Loading...</UiText>
+      </UiPage>
     );
   }
 
@@ -34,15 +27,9 @@ export function PublicRoute({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <Box
-        minHeight="100vh"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        bgcolor="background.default"
-      >
-        <Typography color="text.secondary">Loading...</Typography>
-      </Box>
+      <UiPage>
+        <UiText tone="muted">Loading...</UiText>
+      </UiPage>
     );
   }
 

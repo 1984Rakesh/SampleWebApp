@@ -75,6 +75,14 @@ When reviewing or refactoring client code, apply these exact corrections:
 - **Symptom**: Updating the profile updates React Query's `['user']` cache, but `Navbar` and `DashboardScreen` still show the old name from `AuthContext` / `localStorage`.
 - **Correction**: Sync `AuthContext` (and `localStorage` session user) whenever the `['user']` query data updates or `updateProfile` succeeds, and validate `localStorage` user data through `userToDomain` on load.
 
+### H. Component-Library Props Leaking Through `ui/` Wrappers
+- **Symptom**: `ui/` wrappers extend MUI prop types (`ButtonProps`, `TextFieldProps`, `sx`) or screens/components import `@mui/*` directly.
+- **Correction**:
+  1. Give the wrapper a narrow semantic prop API (`variant: 'solid' | 'outline' | 'text'`, `tone`, `size: 'sm' | 'md'`, `gutterBottom`, `onChange: (value: string) => void`)—never `sx`, `component`, or `{...props}` passthrough.
+  2. Migrate call sites onto the semantic props; replace one-off `sx` tweaks with layout-intent props or `UiStack`/`UiFlex`/`UiResponsive` composition.
+  3. For missing primitives, add a new `ui/` component with a sealed API (see `UiTable*`, `UiDrawer`/`UiNavList`, `UiIcon` name registry for patterns) instead of importing MUI at the call site.
+  4. Verify `grep -r "from '@mui" src` only hits `components/ui/` and `foundation/theme/`.
+
 ---
 
 ## 3. Verification
@@ -85,4 +93,8 @@ After any client change, always run:
 cd client
 npm run build
 npm run lint
+
+# Confirm no MUI imports or `sx` outside the ui/ boundary
+grep -rn "from '@mui" src --exclude-dir=ui | grep -v foundation/theme
+grep -rn "sx=" src/presentation --exclude-dir=ui
 ```

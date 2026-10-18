@@ -1,12 +1,17 @@
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid2';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import { useComparisonViewModel } from '../hooks';
 import LayerMap from '../components/LayerMap';
 import ComparisonPanel from '../components/ComparisonPanel';
-import { UiCard, UiCardContent, UiCardHeader } from '../components/ui';
+import {
+  UiButton,
+  UiCard,
+  UiCardContent,
+  UiCardHeader,
+  UiFlex,
+  UiGrid,
+  UiGridItem,
+  UiScreen,
+  UiText,
+} from '../components/ui';
 
 export default function ComparisonScreen() {
   const {
@@ -19,71 +24,69 @@ export default function ComparisonScreen() {
   } = useComparisonViewModel();
 
   return (
-    <Box minHeight="100vh" bgcolor="background.default" p={{ xs: 2, md: 4 }}>
-      <Container maxWidth="lg">
-        <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
-          iOS vs Web Architecture Comparison
-        </Typography>
+    <UiScreen maxWidth="lg">
+      <UiText variant="h4" as="h1" weight="bold" gutterBottom>
+        iOS vs Web Architecture Comparison
+      </UiText>
 
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12, lg: 4 }}>
-            <LayerMap onLayerClick={selectLayer} selectedLayer={selectedLayer} />
-          </Grid>
+      <UiGrid spacing={3}>
+        <UiGridItem lg={4}>
+          <LayerMap onLayerClick={selectLayer} selectedLayer={selectedLayer} />
+        </UiGridItem>
 
-          <Grid size={{ xs: 12, lg: 8 }}>
-            <UiCard sx={{ mb: 3 }}>
-              <UiCardHeader title="Select Concept" />
+        <UiGridItem lg={8}>
+          <UiCard spaced>
+            <UiCardHeader title="Select Concept" />
+            <UiCardContent>
+              <UiFlex wrap gap={1}>
+                {conceptNames.map((concept) => (
+                  <UiButton
+                    key={concept}
+                    onClick={() => selectConcept(concept)}
+                    variant={selectedConcept === concept ? 'solid' : 'outline'}
+                  >
+                    {concept}
+                  </UiButton>
+                ))}
+              </UiFlex>
+            </UiCardContent>
+          </UiCard>
+
+          {selectedConceptData ? (
+            <UiFlex column gap={3}>
+              <ComparisonPanel
+                layerName={selectedLayer}
+                conceptName={selectedConcept}
+                typescriptCode={selectedConceptData.typescript}
+                swiftCode={selectedConceptData.swift}
+                explanation={selectedConceptData.explanation}
+              />
+              {selectedConceptData.learningNotes && selectedConceptData.learningNotes.length > 0 && (
+                <UiCard>
+                  <UiCardHeader title="Learning Notes" />
+                  <UiCardContent>
+                    <ul style={{ paddingLeft: 16, margin: 0 }}>
+                      {selectedConceptData.learningNotes.map((note: string, index: number) => (
+                        <UiText as="li" key={index} tone="muted" mb={1}>
+                          {note}
+                        </UiText>
+                      ))}
+                    </ul>
+                  </UiCardContent>
+                </UiCard>
+              )}
+            </UiFlex>
+          ) : (
+            <UiCard>
               <UiCardContent>
-                <Box display="flex" flexWrap="wrap" gap={1}>
-                  {conceptNames.map((concept) => (
-                    <Button
-                      key={concept}
-                      onClick={() => selectConcept(concept)}
-                      variant={selectedConcept === concept ? 'contained' : 'outlined'}
-                    >
-                      {concept}
-                    </Button>
-                  ))}
-                </Box>
+                <UiText align="center" tone="muted">
+                  Select a concept above to see the comparison
+                </UiText>
               </UiCardContent>
             </UiCard>
-
-            {selectedConceptData ? (
-              <Box display="flex" flexDirection="column" gap={3}>
-                <ComparisonPanel
-                  layerName={selectedLayer}
-                  conceptName={selectedConcept}
-                  typescriptCode={selectedConceptData.typescript}
-                  swiftCode={selectedConceptData.swift}
-                  explanation={selectedConceptData.explanation}
-                />
-                {selectedConceptData.learningNotes && selectedConceptData.learningNotes.length > 0 && (
-                  <UiCard>
-                    <UiCardHeader title="Learning Notes" />
-                    <UiCardContent>
-                      <Box component="ul" sx={{ pl: 2, m: 0 }}>
-                        {selectedConceptData.learningNotes.map((note: string, index: number) => (
-                          <Box component="li" key={index} sx={{ color: 'text.secondary', mb: 1 }}>
-                            {note}
-                          </Box>
-                        ))}
-                      </Box>
-                    </UiCardContent>
-                  </UiCard>
-                )}
-              </Box>
-            ) : (
-              <UiCard>
-                <UiCardContent>
-                  <Typography textAlign="center" color="text.secondary">
-                    Select a concept above to see the comparison
-                  </Typography>
-                </UiCardContent>
-              </UiCard>
-            )}
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+          )}
+        </UiGridItem>
+      </UiGrid>
+    </UiScreen>
   );
 }
