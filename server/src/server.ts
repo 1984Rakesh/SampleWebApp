@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import { runMigrations } from './database/migrations';
 import { seedDatabase } from './database/seed';
 import { errorMiddleware } from './middleware/errorMiddleware';
+import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
+import taskRoutes from './routes/taskRoutes';
 
 dotenv.config();
 
@@ -26,6 +29,11 @@ app.get('/health', (_req, res) => {
 app.get('/', (_req, res) => {
   res.json({ message: 'Clean Architecture Learning App API' });
 });
+
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorMiddleware);
