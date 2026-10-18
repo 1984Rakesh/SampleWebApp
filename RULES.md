@@ -95,3 +95,4 @@ Both sides depend on this contract; update both sides together whenever it chang
 - **Repository Interfaces**: `<Feature>Repository.ts` in `domain/repositories/` (client) or `domain/ports/` (server).
 - **Repository Implementations**: Prefix or suffix with the backing technology (`SqliteTaskRepository.ts`, `ReactQueryTaskRepository.ts`).
 - **Type Ownership**: Define shared types in the narrowest layer that owns their meaning (`domain/models/` for domain value types, `data/dtos/` or `presentation/schemas/` for DTOs, `presentation/models/` for `ViewState`).
+- **Component Decomposition**: When a presentational component grows into multiple distinct render regions, extract each region into its own prop-driven component under a feature subfolder (`client/src/presentation/components/<feature>/`) rather than growing a single file. The entry component stays a thin orchestrator owning shared UI state and prop wiring.

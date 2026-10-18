@@ -50,6 +50,7 @@ Before completing any task, verify every item below:
 - [ ] **No Domain Leaks in UI**: Do React screens or components hold domain entities (`Task`, `User`) or import domain enums directly instead of using `ViewState` and `SelectOption[]`? (Must be **No**).
 - [ ] **Sealed UI Primitives**: Do screens or components import `@mui/*`, use `sx`, or consume wrapper props typed as MUI `*Props`? (Must be **No**; `@mui/*` may only be imported inside `client/src/presentation/components/ui/` and `client/src/foundation/theme/`).
 - [ ] **Clearable Optional Fields**: Can nullable fields (`description`, `dueDate`, `bio`, `avatar`) be cleared with `null` or `""` on update without being ignored by `COALESCE` or stripped to `undefined`? (Must be **Yes**).
+- [ ] **Decomposed Render Bodies**: Are components with multiple distinct render regions split into prop-driven sub-components under `client/src/presentation/components/<feature>/`, with the entry component acting as a thin orchestrator? (Must be **Yes**).
 
 ## 5. Verification Commands
 

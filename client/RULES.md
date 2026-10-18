@@ -71,6 +71,8 @@ Foundation wires Domain, Data, and Presentation together
    - Presentation mappers (`taskPresentation.ts`, `userPresentation.ts`) should use domain entity methods (`task.isCompleted()`, `task.isOverdue()`) where available rather than re-implementing domain rules.
 5. **UI Components Stay in `src/presentation/components/`**:
    - Navigation bars (`Navbar`), dialogs, cards, and layout chrome belong in `src/presentation/components/`, not in `src/foundation/`.
+   - When a component's render body mixes multiple distinct regions (e.g., a responsive table + card list + dialog + pagination), decompose it into prop-driven sub-components under a feature subfolder (`src/presentation/components/<feature>/`, e.g. `components/taskList/TaskTable.tsx`, `components/taskList/DeleteTaskDialog.tsx`). The public orchestrator component (e.g. `TaskListContent`) keeps shared local state (pagination, dialog targets), branch selection (loading / error / empty), and prop wiring; extracted sub-components stay stateless and receive `ViewState` + callbacks only.
+   - Internal feature sub-components are not exported from `components/index.ts`; only screen-level entry components are.
 6. **Sealed `ui/` Primitives Are the Only Component-Library Boundary**:
    - `@mui/*` (including `@mui/icons-material`) may only be imported inside `src/presentation/components/ui/` and `src/foundation/theme/`. Screens and components must compose `Ui*` primitives exclusively.
    - `ui/` wrapper props must be narrow and semantic: closed unions (`variant: 'solid' | 'outline' | 'text'`, `tone`, `size: 'sm' | 'md'`, `type`), layout-intent props (`gutterBottom`, `maxWidth`, `fullWidth`, `spaced`, `compact`), and value-based callbacks (`onChange: (value: string) => void`).

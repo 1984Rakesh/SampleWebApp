@@ -75,7 +75,15 @@ When reviewing or refactoring client code, apply these exact corrections:
 - **Symptom**: Updating the profile updates React Query's `['user']` cache, but `Navbar` and `DashboardScreen` still show the old name from `AuthContext` / `localStorage`.
 - **Correction**: Sync `AuthContext` (and `localStorage` session user) whenever the `['user']` query data updates or `updateProfile` succeeds, and validate `localStorage` user data through `userToDomain` on load.
 
-### H. Component-Library Props Leaking Through `ui/` Wrappers
+### H. Monolithic Component Render Bodies
+- **Symptom**: A component's `return` mixes several distinct UI regions—responsive table/card variants, dialogs, pagination, inline action-button groups—making the file hard to scan (e.g., the original `TaskListContent.tsx`).
+- **Correction**:
+  1. Extract each region into a prop-driven component under `components/<feature>/` (e.g., `taskList/TaskTable.tsx`, `taskList/TaskMobileCardList.tsx`, `taskList/TaskItemActions.tsx`, `taskList/DeleteTaskDialog.tsx`).
+  2. Keep the entry component a thin orchestrator: it owns shared local state (`useState` for pagination, pending delete IDs), early-return branches (loading / error / empty), responsive wrappers (`UiResponsive`), and callback wiring.
+  3. Extracted components receive `ViewState` + callbacks only—no `useState`, no ViewModel hooks, no domain imports.
+  4. Do not export internal sub-components from `components/index.ts`; only the entry component is part of the public surface.
+
+### I. Component-Library Props Leaking Through `ui/` Wrappers
 - **Symptom**: `ui/` wrappers extend MUI prop types (`ButtonProps`, `TextFieldProps`, `sx`) or screens/components import `@mui/*` directly.
 - **Correction**:
   1. Give the wrapper a narrow semantic prop API (`variant: 'solid' | 'outline' | 'text'`, `tone`, `size: 'sm' | 'md'`, `gutterBottom`, `onChange: (value: string) => void`)—never `sx`, `component`, or `{...props}` passthrough.
