@@ -16,7 +16,16 @@ interface TaskFormSectionProps {
 }
 
 function TaskFormSection({ editingTask, onSaved, onCancel }: TaskFormSectionProps) {
-  const { formData, updateField, errors, handleSubmit, isSubmitting } = useTaskFormViewModel(editingTask);
+  const {
+    title,
+    submitLabel,
+    formData,
+    priorityOptions,
+    updateField,
+    errors,
+    handleSubmit,
+    isSubmitting,
+  } = useTaskFormViewModel(editingTask);
 
   const handleFormSubmit = async () => {
     try {
@@ -29,8 +38,10 @@ function TaskFormSection({ editingTask, onSaved, onCancel }: TaskFormSectionProp
 
   return (
     <TaskForm
-      task={editingTask}
+      title={title}
+      submitLabel={submitLabel}
       formData={formData}
+      priorityOptions={priorityOptions}
       errors={errors}
       updateField={updateField}
       onSubmit={handleFormSubmit}

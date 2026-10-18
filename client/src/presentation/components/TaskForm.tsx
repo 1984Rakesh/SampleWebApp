@@ -1,126 +1,149 @@
-import type { Task } from '../../domain/models';
-import { TaskPriority } from '../../domain/models';
-
-export interface TaskFormData {
-  title: string;
-  description?: string;
-  priority: TaskPriority;
-  dueDate?: string;
-}
+import type { FormEvent, ReactNode } from 'react';
+import type { SelectOption, TaskFormData } from '../models/TaskFormViewState';
 
 interface TaskFormProps {
-  task?: Task;
+  title: string;
+  submitLabel: string;
   formData: TaskFormData;
+  priorityOptions: SelectOption[];
   errors: Record<string, string>;
   onSubmit: () => void;
   onCancel?: () => void;
   isLoading?: boolean;
-  updateField: (field: keyof TaskFormData, value: string | TaskPriority) => void;
+  updateField: (field: keyof TaskFormData, value: string) => void;
+}
+
+interface FormFieldProps {
+  label: string;
+  htmlFor: string;
+  error?: string;
+  required?: boolean;
+  children: ReactNode;
+}
+
+interface FormActionsProps {
+  submitLabel: string;
+  submitDisabled: boolean;
+  isLoading: boolean;
+  onCancel?: () => void;
+}
+
+const inputClassName =
+  'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white';
+
+function FormField({ label, htmlFor, error, required = false, children }: FormFieldProps) {
+  return (
+    <div>
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        {label}{required && ' *'}
+      </label>
+      {children}
+      {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
+    </div>
+  );
+}
+
+function FormActions({ submitLabel, submitDisabled, isLoading, onCancel }: FormActionsProps) {
+  return (
+    <div className="flex gap-2 mt-6">
+      <button
+        type="submit"
+        disabled={isLoading || submitDisabled}
+        className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
+      >
+        {isLoading ? 'Saving...' : submitLabel}
+      </button>
+      {onCancel && (
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isLoading}
+          className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
+        >
+          Cancel
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function TaskForm({
-  task,
+  title,
+  submitLabel,
   formData,
+  priorityOptions,
   errors,
   onSubmit,
   onCancel,
   isLoading = false,
   updateField,
 }: TaskFormProps) {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
     onSubmit();
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        {task ? 'Edit Task' : 'Create Task'}
-      </h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{title}</h2>
 
       <div className="space-y-4">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Title *
-          </label>
+        <FormField label="Title" htmlFor="title" error={errors.title} required>
           <input
             type="text"
             id="title"
             value={formData.title}
-            onChange={(e) => updateField('title', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            onChange={(event) => updateField('title', event.target.value)}
+            className={inputClassName}
             disabled={isLoading}
           />
-          {errors.title && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>
-          )}
-        </div>
+        </FormField>
 
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Description
-          </label>
+        <FormField label="Description" htmlFor="description">
           <textarea
             id="description"
-            value={formData.description || ''}
-            onChange={(e) => updateField('description', e.target.value)}
+            value={formData.description}
+            onChange={(event) => updateField('description', event.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            className={inputClassName}
             disabled={isLoading}
           />
-        </div>
+        </FormField>
 
-        <div>
-          <label htmlFor="priority" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Priority
-          </label>
+        <FormField label="Priority" htmlFor="priority" error={errors.priority}>
           <select
             id="priority"
             value={formData.priority}
-            onChange={(e) => updateField('priority', e.target.value as TaskPriority)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            onChange={(event) => updateField('priority', event.target.value)}
+            className={inputClassName}
             disabled={isLoading}
           >
-            <option value={TaskPriority.LOW}>Low</option>
-            <option value={TaskPriority.MEDIUM}>Medium</option>
-            <option value={TaskPriority.HIGH}>High</option>
+            {priorityOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
-        </div>
+        </FormField>
 
-        <div>
-          <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Due Date
-          </label>
+        <FormField label="Due Date" htmlFor="dueDate">
           <input
             type="date"
             id="dueDate"
-            value={formData.dueDate || ''}
-            onChange={(e) => updateField('dueDate', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            value={formData.dueDate}
+            onChange={(event) => updateField('dueDate', event.target.value)}
+            className={inputClassName}
             disabled={isLoading}
           />
-        </div>
+        </FormField>
       </div>
 
-      <div className="flex gap-2 mt-6">
-        <button
-          type="submit"
-          disabled={isLoading || !formData.title.trim()}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
-        >
-          {isLoading ? 'Saving...' : task ? 'Update' : 'Create'}
-        </button>
-        {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isLoading}
-            className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
-          >
-            Cancel
-          </button>
-        )}
-      </div>
+      <FormActions
+        submitLabel={submitLabel}
+        submitDisabled={!formData.title.trim()}
+        isLoading={isLoading}
+        onCancel={onCancel}
+      />
     </form>
   );
 }

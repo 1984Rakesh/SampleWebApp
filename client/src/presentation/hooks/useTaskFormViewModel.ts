@@ -3,7 +3,16 @@ import { useAuth } from '../../foundation/context';
 import { useCreateTaskUseCase, useUpdateTaskUseCase } from '../../domain/useCases';
 import type { Task } from '../../domain/models';
 import { TaskPriority } from '../../domain/models';
-import type { TaskFormData } from '../components/TaskForm';
+import type { TaskFormData } from '../models/TaskFormViewState';
+
+const formatOptionLabel = (value: string) =>
+  value
+    .toLowerCase()
+    .replaceAll('_', ' ')
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+
+const getTaskPriority = (value: string) =>
+  Object.values(TaskPriority).find((priority) => priority === value);
 
 export function useTaskFormViewModel(task?: Task) {
   const { user } = useAuth();
@@ -17,12 +26,19 @@ export function useTaskFormViewModel(task?: Task) {
     dueDate: task?.dueDate || '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const priorityOptions = Object.values(TaskPriority).map((priority) => ({
+    value: priority,
+    label: formatOptionLabel(priority),
+  }));
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
+    }
+    if (!getTaskPriority(formData.priority)) {
+      newErrors.priority = 'Select a valid priority';
     }
 
     setErrors(newErrors);
@@ -34,15 +50,20 @@ export function useTaskFormViewModel(task?: Task) {
       return;
     }
 
+    const priority = getTaskPriority(formData.priority);
+    if (!priority) return;
+
+    const taskData = { ...formData, priority };
+
     try {
       if (task) {
         const result = await updateTask.mutateAsync({
           id: task.id,
-          ...formData,
+          ...taskData,
         });
         return result;
       } else {
-        const result = await createTask.mutateAsync(formData);
+        const result = await createTask.mutateAsync(taskData);
         return result;
       }
     } catch (error) {
@@ -51,7 +72,7 @@ export function useTaskFormViewModel(task?: Task) {
     }
   };
 
-  const updateField = (field: keyof TaskFormData, value: string | TaskPriority) => {
+  const updateField = (field: keyof TaskFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => {
@@ -63,7 +84,10 @@ export function useTaskFormViewModel(task?: Task) {
   };
 
   return {
+    title: task ? 'Edit Task' : 'Create Task',
+    submitLabel: task ? 'Update' : 'Create',
     formData,
+    priorityOptions,
     updateField,
     errors,
     handleSubmit,
