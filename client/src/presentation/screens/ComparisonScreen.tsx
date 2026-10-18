@@ -1,6 +1,12 @@
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid2';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import { useComparisonViewModel } from '../hooks';
 import LayerMap from '../components/LayerMap';
 import ComparisonPanel from '../components/ComparisonPanel';
+import { UiCard, UiCardContent, UiCardHeader } from '../components/ui';
 
 export default function ComparisonScreen() {
   const {
@@ -13,45 +19,37 @@ export default function ComparisonScreen() {
   } = useComparisonViewModel();
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+    <Box minHeight="100vh" bgcolor="background.default" p={{ xs: 2, md: 4 }}>
+      <Container maxWidth="lg">
+        <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
           iOS vs Web Architecture Comparison
-        </h1>
+        </Typography>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Layer Map */}
-          <div className="lg:col-span-1">
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             <LayerMap onLayerClick={selectLayer} selectedLayer={selectedLayer} />
-          </div>
+          </Grid>
 
-          {/* Comparison Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Concept Selection */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                Select Concept
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {conceptNames.map((concept) => (
-                  <button
-                    key={concept}
-                    onClick={() => selectConcept(concept)}
-                    className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                      selectedConcept === concept
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    {concept}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <Grid size={{ xs: 12, lg: 8 }}>
+            <UiCard sx={{ mb: 3 }}>
+              <UiCardHeader title="Select Concept" />
+              <UiCardContent>
+                <Box display="flex" flexWrap="wrap" gap={1}>
+                  {conceptNames.map((concept) => (
+                    <Button
+                      key={concept}
+                      onClick={() => selectConcept(concept)}
+                      variant={selectedConcept === concept ? 'contained' : 'outlined'}
+                    >
+                      {concept}
+                    </Button>
+                  ))}
+                </Box>
+              </UiCardContent>
+            </UiCard>
 
-            {/* Comparison Panel */}
             {selectedConceptData ? (
-              <div className="space-y-6">
+              <Box display="flex" flexDirection="column" gap={3}>
                 <ComparisonPanel
                   layerName={selectedLayer}
                   conceptName={selectedConcept}
@@ -60,29 +58,32 @@ export default function ComparisonScreen() {
                   explanation={selectedConceptData.explanation}
                 />
                 {selectedConceptData.learningNotes && selectedConceptData.learningNotes.length > 0 && (
-                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                      Learning Notes
-                    </h3>
-                    <ul className="space-y-2">
-                      {selectedConceptData.learningNotes.map((note: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
-                          <span className="text-blue-600 dark:text-blue-400 mt-1">•</span>
-                          <span>{note}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <UiCard>
+                    <UiCardHeader title="Learning Notes" />
+                    <UiCardContent>
+                      <Box component="ul" sx={{ pl: 2, m: 0 }}>
+                        {selectedConceptData.learningNotes.map((note: string, index: number) => (
+                          <Box component="li" key={index} sx={{ color: 'text.secondary', mb: 1 }}>
+                            {note}
+                          </Box>
+                        ))}
+                      </Box>
+                    </UiCardContent>
+                  </UiCard>
                 )}
-              </div>
+              </Box>
             ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center text-gray-600 dark:text-gray-400">
-                Select a concept above to see the comparison
-              </div>
+              <UiCard>
+                <UiCardContent>
+                  <Typography textAlign="center" color="text.secondary">
+                    Select a concept above to see the comparison
+                  </Typography>
+                </UiCardContent>
+              </UiCard>
             )}
-          </div>
-        </div>
-      </div>
-    </div>
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
 }

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import { useTaskListViewModel, useTaskFormViewModel } from '../hooks';
 import type { Task } from '../../domain/models';
 import {
@@ -7,6 +9,7 @@ import {
   TaskListContent,
   TaskListHeader,
 } from '../components';
+import { UiAlert } from '../components/ui';
 
 interface TaskFormSectionProps {
   editingTask?: Task;
@@ -92,8 +95,8 @@ export default function TaskListScreen() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
-      <div className="max-w-7xl mx-auto">
+    <Box minHeight="100vh" bgcolor="background.default" p={{ xs: 2, md: 4 }}>
+      <Container maxWidth="xl">
         <TaskListHeader onCreate={handleCreate} />
         <TaskFilters
           status={statusFilter}
@@ -106,20 +109,20 @@ export default function TaskListScreen() {
         />
 
         {actionError && (
-          <div className="bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-6">
+          <UiAlert severity="error" sx={{ mb: 2 }}>
             {actionError}
-          </div>
+          </UiAlert>
         )}
 
         {showForm && (
-          <div className="mb-6">
+          <Box mb={3}>
             <TaskFormSection
               key={editingTask?.id ?? 'new'}
               editingTask={editingTask}
               onSaved={handleSaved}
               onCancel={handleCancel}
             />
-          </div>
+          </Box>
         )}
 
         <TaskListContent
@@ -130,7 +133,7 @@ export default function TaskListScreen() {
           onDelete={deleteTask}
           onToggleStatus={toggleTaskStatus}
         />
-      </div>
-    </main>
+      </Container>
+    </Box>
   );
 }

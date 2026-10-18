@@ -1,7 +1,18 @@
-import { Link } from 'react-router-dom';
-import { useAuthViewModel } from '../hooks';
-import { useTaskListViewModel } from '../hooks';
-import { useUserViewModel } from '../hooks';
+import { Link as RouterLink } from 'react-router-dom';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid2';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActionArea from '@mui/material/CardActionArea';
+import Avatar from '@mui/material/Avatar';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import TaskIcon from '@mui/icons-material/Task';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useAuthViewModel, useTaskListViewModel, useUserViewModel } from '../hooks';
 import TaskCard from '../components/TaskCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -14,108 +25,109 @@ export default function DashboardScreen() {
 
   if (userLoading || tasksLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8 flex items-center justify-center">
+      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="background.default" p={4}>
         <LoadingSpinner size="lg" text="Loading dashboard..." />
-      </div>
+      </Box>
     );
   }
 
+  const stats = [
+    { label: 'Completed', value: counts.completed, icon: CheckCircleIcon, color: 'success' as const },
+    { label: 'In Progress', value: counts.inProgress, icon: HourglassEmptyIcon, color: 'info' as const },
+    { label: 'To Do', value: counts.todo, icon: ListAltIcon, color: 'default' as const },
+  ];
+
+  const quickActions = [
+    { to: '/tasks', title: 'Manage Tasks', description: 'Create, edit, and organize your tasks', icon: TaskIcon },
+    { to: '/profile', title: 'View Profile', description: 'Update your profile information', icon: AccountCircleIcon },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+    <Box minHeight="100vh" bgcolor="background.default" p={{ xs: 2, md: 4 }}>
+      <Container maxWidth="lg">
+        <Box mb={4}>
+          <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
             Welcome back, {user?.name || profile?.name || 'User'}!
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          </Typography>
+          <Typography color="text.secondary">
             Here's an overview of your tasks and progress.
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Completed</p>
-                <p className="text-3xl font-bold text-green-600 dark:text-green-400">{counts.completed}</p>
-              </div>
-              <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
-                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            </div>
-          </div>
+        <Grid container spacing={3} mb={4}>
+          {stats.map((stat) => (
+            <Grid key={stat.label} size={{ xs: 12, md: 4 }}>
+              <Card>
+                <CardContent>
+                  <Box display="flex" alignItems="center" justifyContent="space-between">
+                    <Box>
+                      <Typography color="text.secondary" variant="body2">
+                        {stat.label}
+                      </Typography>
+                      <Typography variant="h4" fontWeight={700}>
+                        {stat.value}
+                      </Typography>
+                    </Box>
+                    <Avatar sx={{ bgcolor: `${stat.color}.light`, color: `${stat.color}.dark` }}>
+                      <stat.icon />
+                    </Avatar>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">In Progress</p>
-                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{counts.inProgress}</p>
-              </div>
-              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
+        <Grid container spacing={3} mb={4}>
+          {quickActions.map((action) => (
+            <Grid key={action.to} size={{ xs: 12, md: 6 }}>
+              <Card>
+                <CardActionArea component={RouterLink} to={action.to} sx={{ height: '100%' }}>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Avatar sx={{ bgcolor: 'primary.light', color: 'primary.dark' }}>
+                        <action.icon />
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h6" fontWeight={600}>
+                          {action.title}
+                        </Typography>
+                        <Typography color="text.secondary" variant="body2">
+                          {action.description}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">To Do</p>
-                <p className="text-3xl font-bold text-gray-600 dark:text-gray-400">{counts.todo}</p>
-              </div>
-              <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-full">
-                <svg className="w-8 h-8 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Link
-            to="/tasks"
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-          >
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Manage Tasks</h3>
-            <p className="text-gray-600 dark:text-gray-400">Create, edit, and organize your tasks</p>
-          </Link>
-
-          <Link
-            to="/profile"
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-          >
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">View Profile</h3>
-            <p className="text-gray-600 dark:text-gray-400">Update your profile information</p>
-          </Link>
-        </div>
-
-        {/* Recent Tasks */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Recent Tasks</h2>
-          {recentTasks.length > 0 ? (
-            <div className="space-y-3">
-              {recentTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  onDelete={deleteTask}
-                  onToggleStatus={toggleTaskStatus}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-600 dark:text-gray-400">No tasks yet. Create your first task!</p>
-          )}
-        </div>
-      </div>
-    </div>
+        <Card>
+          <CardContent>
+            <Typography variant="h6" fontWeight={700} gutterBottom>
+              Recent Tasks
+            </Typography>
+            {recentTasks.length > 0 ? (
+              <Box display="flex" flexDirection="column" gap={1.5}>
+                {recentTasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onDelete={deleteTask}
+                    onToggleStatus={toggleTaskStatus}
+                  />
+                ))}
+              </Box>
+            ) : (
+              <Typography color="text.secondary">
+                No tasks yet. Create your first task!
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
   );
 }

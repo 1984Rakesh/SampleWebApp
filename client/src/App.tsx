@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider, ThemeProvider } from './foundation/context';
+import { AuthProvider } from './foundation/context';
+import { ThemeProvider } from './foundation/theme';
 import { AppRouter } from './foundation/router/AppRouter';
 import { ErrorBoundary } from './presentation/components/ErrorBoundary';
-import Toast from './presentation/components/Toast';
+import { UiSnackbar } from './presentation/components/ui';
 import { useState } from 'react';
 
 const queryClient = new QueryClient({
@@ -24,7 +25,8 @@ function App() {
           <AuthProvider>
             <AppRouter />
             {toast && (
-              <Toast
+              <UiSnackbar
+                open={!!toast}
                 message={toast.message}
                 type={toast.type}
                 onClose={() => setToast(null)}

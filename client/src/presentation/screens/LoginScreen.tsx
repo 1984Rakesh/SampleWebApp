@@ -1,82 +1,74 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, type FormEvent } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import { useAuthViewModel } from '../hooks';
+import { UiPage, UiCard, UiCardContent, UiCardHeader, UiTextField, UiButton, UiAlert } from '../components/ui';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, isSubmitting, errorMessage } = useAuthViewModel();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
     await login(email, password);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
-          Sign In
-        </h1>
+    <UiPage>
+      <UiCard sx={{ maxWidth: 448, width: '100%' }}>
+        <UiCardHeader title="Sign In" titleTypographyProps={{ textAlign: 'center', variant: 'h5' }} />
+        <UiCardContent>
+          {errorMessage && (
+            <UiAlert severity="error" sx={{ mb: 2 }}>
+              {errorMessage}
+            </UiAlert>
+          )}
 
-        {errorMessage && (
-          <div className="bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
-            {errorMessage}
-          </div>
-        )}
+          <form onSubmit={handleSubmit} aria-label="Login form">
+            <Stack spacing={2}>
+              <UiTextField
+                id="email"
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+                disabled={isSubmitting}
+                autoComplete="email"
+              />
+              <UiTextField
+                id="password"
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+                disabled={isSubmitting}
+                autoComplete="current-password"
+              />
+              <UiButton
+                type="submit"
+                variant="contained"
+                fullWidth
+                isLoading={isSubmitting}
+                disabled={isSubmitting}
+              >
+                Sign In
+              </UiButton>
+            </Stack>
+          </form>
 
-        <form onSubmit={handleSubmit} className="space-y-4" aria-label="Login form">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
-              required
-              disabled={isSubmitting}
-              aria-required="true"
-              aria-invalid={!!errorMessage}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
-              required
-              disabled={isSubmitting}
-              aria-required="true"
-              aria-invalid={!!errorMessage}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            aria-label={isSubmitting ? 'Signing in' : 'Sign in'}
-          >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-blue-600 hover:text-blue-500 font-medium">
-            Sign up
-          </Link>
-        </p>
-      </div>
-    </div>
+          <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ mt: 2 }}>
+            Don't have an account?{' '}
+            <Link component={RouterLink} to="/register" underline="hover">
+              Sign up
+            </Link>
+          </Typography>
+        </UiCardContent>
+      </UiCard>
+    </UiPage>
   );
 }

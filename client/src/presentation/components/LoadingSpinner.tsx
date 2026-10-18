@@ -1,14 +1,16 @@
-export default function LoadingSpinner({ size = 'md', text }: { size?: 'sm' | 'md' | 'lg'; text?: string }) {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-  };
+import { UiCircularProgress } from './ui';
 
-  return (
-    <div className="flex flex-col items-center justify-center">
-      <div className={`${sizeClasses[size]} border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin`} />
-      {text && <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{text}</p>}
-    </div>
-  );
+interface LoadingSpinnerProps {
+  size?: 'sm' | 'md' | 'lg';
+  text?: string;
+}
+
+const sizeMap: Record<NonNullable<LoadingSpinnerProps['size']>, number> = {
+  sm: 16,
+  md: 32,
+  lg: 48,
+};
+
+export default function LoadingSpinner({ size = 'md', text }: LoadingSpinnerProps) {
+  return <UiCircularProgress size={sizeMap[size]} text={text} />;
 }

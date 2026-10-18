@@ -1,9 +1,18 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth, useTheme } from '../context';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Box from '@mui/material/Box';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { useAuth } from '../context';
+import { useColorMode } from '../theme';
 
 export default function Navbar() {
   const { user, signOut, isAuthenticated } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { mode, toggleMode } = useColorMode();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -15,70 +24,57 @@ export default function Navbar() {
     return null;
   }
 
-  return (
-    <nav className="bg-white dark:bg-gray-800 shadow-ios" role="navigation" aria-label="Main navigation">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center space-x-8">
-            <Link
-              to="/dashboard"
-              className="text-xl font-bold text-ios-blue dark:text-blue-400 transition-colors"
-            >
-              Clean Architecture
-            </Link>
-            <div className="hidden md:flex space-x-4" role="menubar">
-              <Link
-                to="/dashboard"
-                className="text-gray-700 dark:text-gray-300 hover:text-ios-blue dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                role="menuitem"
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/tasks"
-                className="text-gray-700 dark:text-gray-300 hover:text-ios-blue dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                role="menuitem"
-              >
-                Tasks
-              </Link>
-              <Link
-                to="/profile"
-                className="text-gray-700 dark:text-gray-300 hover:text-ios-blue dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                role="menuitem"
-              >
-                Profile
-              </Link>
-              <Link
-                to="/comparison"
-                className="text-gray-700 dark:text-gray-300 hover:text-ios-blue dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                role="menuitem"
-              >
-                Comparison
-              </Link>
-            </div>
-          </div>
+  const navLinks = [
+    { to: '/dashboard', label: 'Dashboard' },
+    { to: '/tasks', label: 'Tasks' },
+    { to: '/profile', label: 'Profile' },
+    { to: '/comparison', label: 'Comparison' },
+  ];
 
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+  return (
+    <AppBar position="static" color="transparent" elevation={1}>
+      <Toolbar>
+        <Typography
+          variant="h6"
+          component={Link}
+          to="/dashboard"
+          sx={{
+            flexGrow: 0,
+            mr: 4,
+            textDecoration: 'none',
+            color: 'primary.main',
+            fontWeight: 700,
+          }}
+        >
+          Clean Architecture
+        </Typography>
+
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, flexGrow: 1 }}>
+          {navLinks.map((link) => (
+            <Button
+              key={link.to}
+              component={Link}
+              to={link.to}
+              color="inherit"
+              sx={{ textTransform: 'none', fontWeight: 500 }}
             >
-              {theme === 'light' ? '🌙' : '☀️'}
-            </button>
-            <span className="text-sm text-gray-700 dark:text-gray-300" aria-label="Current user">
-              {user?.name}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="bg-ios-red hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-              aria-label="Logout"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
-    </nav>
+              {link.label}
+            </Button>
+          ))}
+        </Box>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <IconButton onClick={toggleMode} color="inherit" aria-label="Toggle theme">
+            {mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
+          </IconButton>
+          <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+            {user?.name}
+          </Typography>
+          <Button variant="contained" color="error" onClick={handleLogout}>
+            Logout
+          </Button>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }

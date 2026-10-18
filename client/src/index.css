@@ -1,20 +1,19 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Global styles for the MUI-based app.
+ * MUI CssBaseline handles the CSS reset and base typography.
+ * Add only app-wide customizations below.
+ */
 
-/* Custom styles */
 :root {
   color-scheme: light dark;
 }
 
-/* Smooth transitions for color scheme */
-* {
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-}
-
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
-  * {
-    transition: none !important;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -1,7 +1,11 @@
 import { useState } from 'react';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
 import { useUserViewModel } from '../hooks';
 import UserProfileCard from '../components/UserProfileCard';
 import ProfileEditForm from '../components/ProfileEditForm';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function ProfileScreen() {
   const { profile, isLoading, updateProfile, isUpdating, updateErrorMessage } = useUserViewModel();
@@ -23,24 +27,26 @@ export default function ProfileScreen() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8 flex items-center justify-center">
-        <div className="text-gray-600 dark:text-gray-400">Loading profile...</div>
-      </div>
+      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="background.default" p={4}>
+        <LoadingSpinner text="Loading profile..." />
+      </Box>
     );
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8 flex items-center justify-center">
-        <div className="text-gray-600 dark:text-gray-400">No user found</div>
-      </div>
+      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center" bgcolor="background.default" p={4}>
+        <Typography color="text.secondary">No user found</Typography>
+      </Box>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Profile</h1>
+    <Box minHeight="100vh" bgcolor="background.default" p={{ xs: 2, md: 4 }}>
+      <Container maxWidth="md">
+        <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
+          Profile
+        </Typography>
 
         {isEditing ? (
           <ProfileEditForm
@@ -54,7 +60,7 @@ export default function ProfileScreen() {
         ) : (
           <UserProfileCard profile={profile} onEdit={handleEdit} isLoading={isUpdating} />
         )}
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }

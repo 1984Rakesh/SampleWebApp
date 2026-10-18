@@ -1,17 +1,20 @@
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { UiButton } from './ui';
+
 interface TaskListHeaderProps {
   onCreate: () => void;
 }
 
 export default function TaskListHeader({ onCreate }: TaskListHeaderProps) {
   return (
-    <header className="flex justify-between items-center mb-8">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tasks</h1>
-      <button
-        onClick={onCreate}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors"
-      >
+    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Typography variant="h4" component="h1" fontWeight={700}>
+        Tasks
+      </Typography>
+      <UiButton variant="contained" onClick={onCreate}>
         Create Task
-      </button>
-    </header>
+      </UiButton>
+    </Box>
   );
 }

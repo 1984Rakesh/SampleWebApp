@@ -1,3 +1,9 @@
+import Box from '@mui/material/Box';
+import ButtonBase from '@mui/material/ButtonBase';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
+import { UiCard, UiCardContent, UiCardHeader } from './ui';
+
 interface Layer {
   name: string;
   description: string;
@@ -14,75 +20,81 @@ const layers: Layer[] = [
   {
     name: 'Foundation',
     description: 'Network, Context, Router, DI',
-    color: 'bg-blue-500',
+    color: '#3b82f6',
     concepts: ['Axios Client', 'AuthContext', 'ThemeContext', 'React Router', 'Route Guards'],
   },
   {
     name: 'Domain',
     description: 'Pure Business Logic',
-    color: 'bg-green-500',
+    color: '#22c55e',
     concepts: ['Models', 'Use Cases', 'Enums', 'Validation'],
   },
   {
     name: 'Data',
     description: 'Repositories, Mappers, APIs',
-    color: 'bg-yellow-500',
+    color: '#eab308',
     concepts: ['API Layer', 'Zod Schemas', 'Mappers', 'TanStack Query'],
   },
   {
     name: 'Presentation',
     description: 'UI Components & ViewModels',
-    color: 'bg-purple-500',
+    color: '#a855f7',
     concepts: ['Components', 'Hooks', 'Screens', 'Router Integration'],
   },
 ];
 
 export default function LayerMap({ onLayerClick, selectedLayer }: LayerMapProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-        Clean Architecture Layers
-      </h3>
+    <UiCard>
+      <UiCardHeader title="Clean Architecture Layers" />
+      <UiCardContent>
+        <Box display="flex" flexDirection="column" gap={1.5}>
+          {layers.map((layer) => (
+            <ButtonBase
+              key={layer.name}
+              onClick={() => onLayerClick?.(layer.name)}
+              sx={{
+                width: '100%',
+                textAlign: 'left',
+                borderRadius: 2,
+                p: 1,
+                display: 'block',
+                outline:
+                  selectedLayer === layer.name ? '2px solid' : 'none',
+                outlineColor: 'primary.main',
+                outlineOffset: 2,
+              }}
+            >
+              <Box sx={{ bgcolor: layer.color, borderRadius: 1, p: 1.5, mb: 1 }}>
+                <Typography variant="subtitle1" fontWeight={600} color="#fff">
+                  {layer.name}
+                </Typography>
+                <Typography variant="body2" color="rgba(255,255,255,0.9)">
+                  {layer.description}
+                </Typography>
+              </Box>
+              <Box display="flex" flexWrap="wrap" gap={0.5}>
+                {layer.concepts.map((concept) => (
+                  <Chip key={concept} label={concept} size="small" variant="outlined" />
+                ))}
+              </Box>
+            </ButtonBase>
+          ))}
+        </Box>
 
-      <div className="space-y-3">
-        {layers.map((layer) => (
-          <button
-            key={layer.name}
-            onClick={() => onLayerClick?.(layer.name)}
-            className={`w-full text-left p-4 rounded-lg transition-all ${
-              selectedLayer === layer.name
-                ? 'ring-2 ring-offset-2 ring-blue-500'
-                : 'hover:shadow-md'
-            }`}
-          >
-            <div className={`${layer.color} rounded-md p-3 mb-2`}>
-              <h4 className="text-white font-semibold">{layer.name}</h4>
-              <p className="text-white text-sm opacity-90">{layer.description}</p>
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {layer.concepts.map((concept) => (
-                <span
-                  key={concept}
-                  className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded"
-                >
-                  {concept}
-                </span>
-              ))}
-            </div>
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Data Flow</h4>
-        <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-          <p>→ User interacts with Presentation layer</p>
-          <p>→ Presentation layer calls Domain use cases</p>
-          <p>→ Use cases call Data repositories</p>
-          <p>→ Repositories call APIs and transform data</p>
-          <p>→ Foundation provides infrastructure services</p>
-        </div>
-      </div>
-    </div>
+        <Box mt={3} pt={3} borderTop={1} borderColor="divider">
+          <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+            Data Flow
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            → User interacts with Presentation layer
+            <br />→ Presentation layer calls Domain use cases
+            <br />→ Use cases call Data repositories
+            <br />→ Repositories call APIs and transform data
+            <br />→ Foundation provides infrastructure services
+          </Typography>
+        </Box>
+      </UiCardContent>
+    </UiCard>
   );
 }

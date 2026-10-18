@@ -1,5 +1,9 @@
 import { useState } from 'react';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
 import CodeBlock from './CodeBlock';
+import { UiCard, UiCardContent, UiCardHeader } from './ui';
 
 interface ComparisonPanelProps {
   layerName: string;
@@ -18,47 +22,39 @@ export default function ComparisonPanel({
 }: ComparisonPanelProps) {
   const [activeView, setActiveView] = useState<'typescript' | 'swift'>('typescript');
 
+  const handleChange = (_event: React.MouseEvent<HTMLElement>, value: 'typescript' | 'swift' | null) => {
+    if (value) {
+      setActiveView(value);
+    }
+  };
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-          {conceptName}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Layer: {layerName}</p>
-      </div>
+    <UiCard>
+      <UiCardHeader title={conceptName} subheader={`Layer: ${layerName}`} />
+      <UiCardContent>
+        {explanation && (
+          <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
+            {explanation}
+          </Typography>
+        )}
 
-      {explanation && (
-        <p className="text-gray-700 dark:text-gray-300 text-sm mb-4">{explanation}</p>
-      )}
-
-      <div className="flex gap-2 mb-4">
-        <button
-          onClick={() => setActiveView('typescript')}
-          className={`flex-1 px-4 py-2 rounded-md font-medium transition-colors ${
-            activeView === 'typescript'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-          }`}
+        <ToggleButtonGroup
+          value={activeView}
+          exclusive
+          fullWidth
+          onChange={handleChange}
+          sx={{ mb: 2 }}
         >
-          TypeScript (Web)
-        </button>
-        <button
-          onClick={() => setActiveView('swift')}
-          className={`flex-1 px-4 py-2 rounded-md font-medium transition-colors ${
-            activeView === 'swift'
-              ? 'bg-purple-600 text-white'
-              : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-          }`}
-        >
-          Swift (iOS)
-        </button>
-      </div>
+          <ToggleButton value="typescript">TypeScript (Web)</ToggleButton>
+          <ToggleButton value="swift">Swift (iOS)</ToggleButton>
+        </ToggleButtonGroup>
 
-      {activeView === 'typescript' ? (
-        <CodeBlock code={typescriptCode} language="typescript" title="TypeScript Implementation" />
-      ) : (
-        <CodeBlock code={swiftCode} language="swift" title="Swift Implementation" />
-      )}
-    </div>
+        {activeView === 'typescript' ? (
+          <CodeBlock code={typescriptCode} language="typescript" title="TypeScript Implementation" />
+        ) : (
+          <CodeBlock code={swiftCode} language="swift" title="Swift Implementation" />
+        )}
+      </UiCardContent>
+    </UiCard>
   );
 }
