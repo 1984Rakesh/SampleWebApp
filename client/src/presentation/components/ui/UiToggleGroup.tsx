@@ -8,6 +8,7 @@ interface UiToggleGroupProps {
   onChange: (value: string) => void;
   fullWidth?: boolean;
   gutterBottom?: boolean;
+  disabledValues?: string[];
 }
 
 export default function UiToggleGroup({
@@ -16,6 +17,7 @@ export default function UiToggleGroup({
   onChange,
   fullWidth = false,
   gutterBottom = false,
+  disabledValues = [],
 }: UiToggleGroupProps) {
   const handleChange = (_event: React.MouseEvent<HTMLElement>, next: string | null) => {
     if (next) {
@@ -32,7 +34,7 @@ export default function UiToggleGroup({
       sx={gutterBottom ? { mb: 2 } : undefined}
     >
       {options.map((option) => (
-        <ToggleButton key={option.value} value={option.value}>
+        <ToggleButton key={option.value} value={option.value} disabled={disabledValues.includes(option.value)}>
           {option.label}
         </ToggleButton>
       ))}

@@ -6,10 +6,10 @@ import CardHeader from '@mui/material/CardHeader';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 const cardSx: SxProps<Theme> = {
-  bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#161F30' : 'background.paper'),
+  bgcolor: 'background.paper',
   border: '1px solid',
   borderColor: 'divider',
-  borderRadius: 2,
+  borderRadius: 2.5,
 };
 
 interface UiCardProps {

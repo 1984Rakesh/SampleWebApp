@@ -1,59 +1,28 @@
-import { UiCard, UiCardContent, UiSelect, UiButton, UiStack, UiFlex } from './ui';
+import { UiFlex, UiSearchField, UiSelect, UiStack, UiTabs } from './ui';
 import type { SelectOption } from '../models/SelectOption';
+import type { TaskCountsViewState } from '../models/TaskListViewState';
 
 interface TaskFiltersProps {
+  search: string;
   status: string;
   priority: string;
+  counts: TaskCountsViewState;
+  total: number;
   statusOptions: SelectOption[];
   priorityOptions: SelectOption[];
-  onStatusChange: (status: string) => void;
-  onPriorityChange: (priority: string) => void;
-  onApply: () => void;
+  onSearchChange: (value: string) => void;
+  onStatusChange: (value: string) => void;
+  onPriorityChange: (value: string) => void;
 }
 
-export default function TaskFilters({
-  status,
-  priority,
-  statusOptions,
-  priorityOptions,
-  onStatusChange,
-  onPriorityChange,
-  onApply,
-}: TaskFiltersProps) {
+export default function TaskFilters({ search, status, priority, counts, total, statusOptions, priorityOptions, onSearchChange, onStatusChange, onPriorityChange }: TaskFiltersProps) {
+  const countByValue: Record<string, number> = { '': total, TODO: counts.todo, IN_PROGRESS: counts.inProgress, COMPLETED: counts.completed };
+  const countedStatuses = statusOptions.map((option) => ({ ...option, label: `${option.label} ${countByValue[option.value] ?? 0}` }));
   return (
-    <UiCard spaced>
-      <UiCardContent compact>
-        <UiStack rowFrom="sm" spacing={1.5} align="center">
-          <UiFlex grow>
-            <UiSelect
-              id="statusFilter"
-              label="Status"
-              value={status}
-              options={statusOptions}
-              onChange={onStatusChange}
-              size="sm"
-            />
-          </UiFlex>
-          <UiFlex grow>
-            <UiSelect
-              id="priorityFilter"
-              label="Priority"
-              value={priority}
-              options={priorityOptions}
-              onChange={onPriorityChange}
-              size="sm"
-            />
-          </UiFlex>
-          <UiButton
-            variant="solid"
-            onClick={onApply}
-            minWidth={140}
-            fullWidthBelow="sm"
-          >
-            Apply Filters
-          </UiButton>
-        </UiStack>
-      </UiCardContent>
-    </UiCard>
+    <UiStack rowFrom="md" spacing={1.5} align="center">
+      <UiFlex grow><UiSearchField value={search} onChange={onSearchChange} placeholder="Search tasks" /></UiFlex>
+      <UiTabs value={status} options={countedStatuses} onChange={onStatusChange} ariaLabel="Filter by status" />
+      <UiSelect id="priority-filter" label="Priority" value={priority} options={priorityOptions.map((option) => ({ ...option, label: option.value ? option.label : 'Priority: All' }))} onChange={onPriorityChange} size="sm" />
+    </UiStack>
   );
 }

@@ -27,7 +27,7 @@ export function UiTableContainer({ children }: { children: React.ReactNode }) {
         border: '1px solid',
         borderColor: 'divider',
         borderRadius: 2,
-        overflow: 'hidden',
+        overflowX: 'auto',
         bgcolor: 'background.paper',
       }}
     >
@@ -37,7 +37,7 @@ export function UiTableContainer({ children }: { children: React.ReactNode }) {
 }
 
 export function UiTable({ ariaLabel, children }: { ariaLabel?: string; children: React.ReactNode }) {
-  return <Table aria-label={ariaLabel}>{children}</Table>;
+  return <Table aria-label={ariaLabel} sx={{ minWidth: 860 }}>{children}</Table>;
 }
 
 export function UiTableHead({ children }: { children: React.ReactNode }) {

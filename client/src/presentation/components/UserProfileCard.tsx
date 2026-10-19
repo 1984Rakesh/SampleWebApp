@@ -1,48 +1,21 @@
-import { UiCard, UiCardContent, UiCardHeader, UiButton, UiAvatar, UiFlex, UiText } from './ui';
+import { UiAvatar, UiCard, UiCardContent, UiChip, UiFlex, UiText } from './ui';
 import type { UserProfileViewState } from '../models/UserProfileViewState';
 
-interface UserProfileCardProps {
-  profile: UserProfileViewState;
-  onEdit?: () => void;
-  isLoading?: boolean;
-}
+interface UserProfileCardProps { profile: UserProfileViewState; created: number; completed: number }
 
-export default function UserProfileCard({ profile, onEdit, isLoading = false }: UserProfileCardProps) {
+export default function UserProfileCard({ profile, created, completed }: UserProfileCardProps) {
   return (
     <UiCard>
-      <UiCardHeader
-        title="Profile"
-        action={
-          onEdit ? (
-            <UiButton variant="solid" onClick={onEdit} disabled={isLoading}>
-              Edit
-            </UiButton>
-          ) : null
-        }
-      />
       <UiCardContent>
-        <UiFlex align="start" gap={2}>
-          {profile.avatarUrl && (
-            <UiAvatar src={profile.avatarUrl} alt={profile.name} size="lg" />
-          )}
-          <UiFlex column grow>
-            <UiText variant="h6" weight="semibold" gutterBottom>
-              {profile.name}
-            </UiText>
-            <UiText tone="muted" variant="body2" gutterBottom>
-              {profile.email}
-            </UiText>
-            {profile.bio && (
-              <UiText variant="body2" mt={2}>
-                {profile.bio}
-              </UiText>
-            )}
-            {profile.joinedLabel && (
-              <UiText tone="muted" variant="caption" mt={2}>
-                Joined: {profile.joinedLabel}
-              </UiText>
-            )}
-          </UiFlex>
+        <UiFlex column align="center" textAlign="center" gap={1.5}>
+          <UiAvatar src={profile.avatarUrl} alt={profile.name} label={profile.initial} size="lg" tone="primary" variant="solid" />
+          <UiText variant="h5" as="h2" weight="bold">{profile.name}</UiText>
+          <UiText tone="muted" variant="body2">{profile.email}</UiText>
+          {profile.joinedLabel && <UiChip label={`Joined ${profile.joinedLabel}`} tone="neutral" />}
+        </UiFlex>
+        <UiFlex dividerTop justify="space-between" textAlign="center">
+          <UiFlex column flex={1}><UiText variant="h5" weight="bold">{created}</UiText><UiText variant="body2" tone="muted">Created</UiText></UiFlex>
+          <UiFlex column flex={1}><UiText variant="h5" weight="bold">{completed}</UiText><UiText variant="body2" tone="muted">Completed</UiText></UiFlex>
         </UiFlex>
       </UiCardContent>
     </UiCard>

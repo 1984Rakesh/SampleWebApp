@@ -1,61 +1,22 @@
 import { useUserViewModel } from '../hooks';
-import UserProfileCard from '../components/UserProfileCard';
-import ProfileEditForm from '../components/ProfileEditForm';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { UiPage, UiScreen, UiText } from '../components/ui';
+import ProfileAppearance from '../components/ProfileAppearance';
+import ProfileEditForm from '../components/ProfileEditForm';
+import UserProfileCard from '../components/UserProfileCard';
+import { UiAlert, UiFlex, UiGrid, UiGridItem, UiPage, UiScreen, UiText } from '../components/ui';
 
 export default function ProfileScreen() {
-  const {
-    profile,
-    isLoading,
-    isEditing,
-    editName,
-    editBio,
-    setEditName,
-    setEditBio,
-    startEditing,
-    cancelEditing,
-    saveProfile,
-    isUpdating,
-    updateErrorMessage,
-  } = useUserViewModel();
-
-  if (isLoading) {
-    return (
-      <UiPage>
-        <LoadingSpinner text="Loading profile..." />
-      </UiPage>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <UiPage>
-        <UiText tone="muted">No user found</UiText>
-      </UiPage>
-    );
-  }
-
+  const user = useUserViewModel();
+  if (user.isLoading) return <UiPage><LoadingSpinner text="Loading profile..." /></UiPage>;
+  if (!user.profile) return <UiPage><UiText tone="muted">No user found</UiText></UiPage>;
   return (
-    <UiScreen maxWidth="md">
-      <UiText variant="h4" as="h1" weight="bold" gutterBottom>
-        Profile
-      </UiText>
-
-      {isEditing ? (
-        <ProfileEditForm
-          name={editName}
-          bio={editBio}
-          isSubmitting={isUpdating}
-          errorMessage={updateErrorMessage}
-          onNameChange={setEditName}
-          onBioChange={setEditBio}
-          onSubmit={saveProfile}
-          onCancel={cancelEditing}
-        />
-      ) : (
-        <UserProfileCard profile={profile} onEdit={startEditing} isLoading={isUpdating} />
-      )}
+    <UiScreen maxWidth="lg">
+      <UiFlex column gap={1} mb={4}><UiText variant="h4" as="h1" weight="bold">Profile</UiText><UiText tone="muted">Manage your personal details and preferences.</UiText></UiFlex>
+      {user.errorMessage && <UiAlert type="error" gutterBottom>{user.errorMessage}</UiAlert>}
+      <UiGrid spacing={3}>
+        <UiGridItem md={4}><UserProfileCard profile={user.profile} created={user.taskCounts.created} completed={user.taskCounts.completed} /></UiGridItem>
+        <UiGridItem md={8}><UiFlex column gap={3}><ProfileEditForm name={user.editName} email={user.profile.email} bio={user.editBio} isSubmitting={user.isUpdating} errorMessage={user.updateErrorMessage} onNameChange={user.setEditName} onBioChange={user.setEditBio} onSubmit={user.saveProfile} onCancel={user.cancelEditing} /><ProfileAppearance /></UiFlex></UiGridItem>
+      </UiGrid>
     </UiScreen>
   );
 }

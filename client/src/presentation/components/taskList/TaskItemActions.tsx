@@ -1,5 +1,4 @@
 import { UiFlex, UiIconButton } from '../ui';
-import type { UiIconName } from '../ui';
 import type { TaskItemViewState } from '../../models/TaskListViewState';
 
 interface TaskItemActionsProps {
@@ -13,20 +12,9 @@ export default function TaskItemActions({
   task,
   onEdit,
   onDelete,
-  onToggleStatus,
 }: TaskItemActionsProps) {
-  const toggleIcon: UiIconName = task.isCompleted ? 'undo' : 'check';
-
   return (
     <UiFlex gap={0.5} role="group" ariaLabel={`Actions for ${task.title}`}>
-      <UiIconButton
-        icon={toggleIcon}
-        ariaLabel={task.toggleAriaLabel}
-        tone={task.isCompleted ? 'default' : 'success'}
-        size="sm"
-        tooltip={task.toggleLabel}
-        onClick={() => onToggleStatus(task.id)}
-      />
       <UiIconButton
         icon="edit"
         ariaLabel={`Edit ${task.title}`}

@@ -1,137 +1,34 @@
-import { useAuthViewModel, useTaskListViewModel, useUserViewModel } from '../hooks';
-import TaskCard from '../components/TaskCard';
+import { useState } from 'react';
+import { useDashboardViewModel } from '../hooks';
+import DashboardProgress from '../components/DashboardProgress';
+import DashboardRecentTasks from '../components/DashboardRecentTasks';
+import DashboardStats from '../components/DashboardStats';
 import LoadingSpinner from '../components/LoadingSpinner';
-import {
-  UiAvatar,
-  UiCard,
-  UiCardContent,
-  UiFlex,
-  UiGrid,
-  UiGridItem,
-  UiPage,
-  UiScreen,
-  UiText,
-} from '../components/ui';
-import type { UiIconName } from '../components/ui';
-
-interface StatItem {
-  label: string;
-  value: number;
-  icon: UiIconName;
-  tone: 'success' | 'info' | 'muted';
-}
-
-interface QuickAction {
-  to: string;
-  title: string;
-  description: string;
-  icon: UiIconName;
-}
+import TaskDialog from '../components/TaskDialog';
+import { UiAlert, UiButton, UiFlex, UiGrid, UiGridItem, UiIcon, UiPage, UiScreen, UiText } from '../components/ui';
 
 export default function DashboardScreen() {
-  const { userName } = useAuthViewModel();
-  const { profile, isLoading: userLoading } = useUserViewModel();
-  const { taskItems, counts, isLoading: tasksLoading, deleteTask, toggleTaskStatus } = useTaskListViewModel();
-
-  const recentTasks = taskItems.slice(0, 3);
-
-  if (userLoading || tasksLoading) {
-    return (
-      <UiPage>
-        <LoadingSpinner size="lg" text="Loading dashboard..." />
-      </UiPage>
-    );
-  }
-
-  const stats: StatItem[] = [
-    { label: 'Completed', value: counts.completed, icon: 'check-circle', tone: 'success' },
-    { label: 'In Progress', value: counts.inProgress, icon: 'hourglass', tone: 'info' },
-    { label: 'To Do', value: counts.todo, icon: 'list', tone: 'muted' },
-  ];
-
-  const quickActions: QuickAction[] = [
-    { to: '/tasks', title: 'Manage Tasks', description: 'Create, edit, and organize your tasks', icon: 'task' },
-    { to: '/profile', title: 'View Profile', description: 'Update your profile information', icon: 'profile' },
-  ];
+  const { dashboard, isLoading, errorMessage, toggleTaskStatus } = useDashboardViewModel();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  if (isLoading) return <UiPage><LoadingSpinner size="lg" text="Loading dashboard..." /></UiPage>;
 
   return (
     <UiScreen maxWidth="lg">
-      <UiFlex column mb={4}>
-        <UiText variant="h4" as="h1" weight="bold" gutterBottom>
-          Welcome back, {profile?.name || userName || 'User'}!
-        </UiText>
-        <UiText tone="muted">
-          Here's an overview of your tasks and progress.
-        </UiText>
+      <UiFlex justify="space-between" align="end" wrap gap={2} mb={4}>
+        <UiFlex column gap={1}>
+          <UiText variant="caption" tone="muted" weight="semibold">{dashboard.eyebrow}</UiText>
+          <UiText variant="h4" as="h1" weight="bold">{dashboard.greeting}</UiText>
+          <UiText tone="muted">{dashboard.summary}</UiText>
+        </UiFlex>
+        <UiButton variant="solid" startIcon={<UiIcon name="add" />} onClick={() => setDialogOpen(true)}>New task</UiButton>
       </UiFlex>
-
-      <UiGrid spacing={3} mb={4}>
-        {stats.map((stat) => (
-          <UiGridItem key={stat.label} md={4}>
-            <UiCard>
-              <UiCardContent>
-                <UiFlex align="center" justify="space-between">
-                  <UiFlex column>
-                    <UiText tone="muted" variant="body2">
-                      {stat.label}
-                    </UiText>
-                    <UiText variant="h4" weight="bold">
-                      {stat.value}
-                    </UiText>
-                  </UiFlex>
-                  <UiAvatar icon={stat.icon} tone={stat.tone} />
-                </UiFlex>
-              </UiCardContent>
-            </UiCard>
-          </UiGridItem>
-        ))}
+      {errorMessage && <UiAlert type="error" gutterBottom>{errorMessage}</UiAlert>}
+      <DashboardStats counts={dashboard.counts} total={dashboard.total} dueToday={dashboard.dueToday} dueThisWeek={dashboard.dueThisWeek} />
+      <UiGrid spacing={2}>
+        <UiGridItem md={8}><DashboardRecentTasks tasks={dashboard.recentTasks} onToggle={toggleTaskStatus} /></UiGridItem>
+        <UiGridItem md={4}><DashboardProgress counts={dashboard.counts} total={dashboard.total} percent={dashboard.completionPercent} /></UiGridItem>
       </UiGrid>
-
-      <UiGrid spacing={3} mb={4}>
-        {quickActions.map((action) => (
-          <UiGridItem key={action.to} md={6}>
-            <UiCard to={action.to}>
-              <UiCardContent>
-                <UiFlex align="center" gap={2}>
-                  <UiAvatar icon={action.icon} tone="primary" />
-                  <UiFlex column>
-                    <UiText variant="h6" weight="semibold">
-                      {action.title}
-                    </UiText>
-                    <UiText tone="muted" variant="body2">
-                      {action.description}
-                    </UiText>
-                  </UiFlex>
-                </UiFlex>
-              </UiCardContent>
-            </UiCard>
-          </UiGridItem>
-        ))}
-      </UiGrid>
-
-      <UiCard>
-        <UiCardContent>
-          <UiText variant="h6" weight="bold" gutterBottom>
-            Recent Tasks
-          </UiText>
-          {recentTasks.length > 0 ? (
-            <UiFlex column gap={1.5}>
-              {recentTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  onDelete={deleteTask}
-                  onToggleStatus={toggleTaskStatus}
-                />
-              ))}
-            </UiFlex>
-          ) : (
-            <UiText tone="muted">
-              No tasks yet. Create your first task!
-            </UiText>
-          )}
-        </UiCardContent>
-      </UiCard>
+      {dialogOpen && <TaskDialog key="dashboard-create" open onClose={() => setDialogOpen(false)} />}
     </UiScreen>
   );
 }

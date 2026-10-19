@@ -8,7 +8,12 @@ export interface TaskItemViewState {
   statusTone: BadgeTone;
   priorityLabel: string;
   priorityTone: BadgeTone;
+  dueDate?: string;
   dueDateLabel?: string;
+  createdAt?: string;
+  searchText: string;
+  statusValue: string;
+  priorityValue: string;
   toggleLabel: string;
   toggleAriaLabel: string;
   isCompleted: boolean;

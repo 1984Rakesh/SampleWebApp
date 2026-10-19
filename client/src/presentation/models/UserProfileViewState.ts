@@ -4,4 +4,5 @@ export interface UserProfileViewState {
   bio?: string;
   avatarUrl?: string;
   joinedLabel?: string;
+  initial: string;
 }

@@ -11,6 +11,7 @@ interface UiIconButtonProps {
   size?: 'sm' | 'md';
   tooltip?: string;
   hideFrom?: 'sm' | 'md' | 'lg';
+  bordered?: boolean;
 }
 
 const toneMap = {
@@ -28,6 +29,7 @@ export default function UiIconButton({
   size = 'md',
   tooltip,
   hideFrom,
+  bordered = false,
 }: UiIconButtonProps) {
   const button = (
     <IconButton
@@ -38,6 +40,7 @@ export default function UiIconButton({
       sx={{
         '&:hover': { bgcolor: 'action.hover' },
         ...(hideFrom && { display: { xs: 'inline-flex', [hideFrom]: 'none' } }),
+        ...(bordered && { border: '1px solid', borderColor: tone === 'danger' ? 'rgba(255,158,140,0.3)' : 'divider', borderRadius: 1.5 }),
       }}
     >
       <UiIcon name={icon} size={size} />

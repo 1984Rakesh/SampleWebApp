@@ -1,3 +1,7 @@
+import '@fontsource-variable/bricolage-grotesque/index.css';
+import '@fontsource/dm-sans/400.css';
+import '@fontsource/dm-sans/500.css';
+import '@fontsource/dm-sans/600.css';
 import { useMemo, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';

@@ -13,6 +13,9 @@ interface UiTextFieldProps {
   rows?: number;
   error?: boolean;
   helperText?: string;
+  autoFocus?: boolean;
+  readOnly?: boolean;
+  placeholder?: string;
 }
 
 export default function UiTextField({
@@ -28,6 +31,9 @@ export default function UiTextField({
   rows,
   error = false,
   helperText,
+  autoFocus = false,
+  readOnly = false,
+  placeholder,
 }: UiTextFieldProps) {
   return (
     <TextField
@@ -45,7 +51,9 @@ export default function UiTextField({
       rows={rows}
       error={error}
       helperText={helperText}
-      InputLabelProps={type === 'date' ? { shrink: true } : undefined}
+      autoFocus={autoFocus}
+      placeholder={placeholder}
+      slotProps={{ input: { readOnly }, inputLabel: type === 'date' ? { shrink: true } : undefined }}
     />
   );
 }

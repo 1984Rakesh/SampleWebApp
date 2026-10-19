@@ -11,6 +11,7 @@ interface UiDialogProps {
   description?: React.ReactNode;
   actions?: React.ReactNode;
   maxWidth?: 'xs' | 'sm' | 'md';
+  children?: React.ReactNode;
 }
 
 export default function UiDialog({
@@ -20,6 +21,7 @@ export default function UiDialog({
   description,
   actions,
   maxWidth = 'xs',
+  children,
 }: UiDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth={maxWidth}>
@@ -29,6 +31,7 @@ export default function UiDialog({
           <DialogContentText>{description}</DialogContentText>
         </DialogContent>
       )}
+      {children && <DialogContent>{children}</DialogContent>}
       {actions && <DialogActions>{actions}</DialogActions>}
     </Dialog>
   );

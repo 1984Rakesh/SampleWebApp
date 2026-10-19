@@ -19,6 +19,7 @@ interface UiTextProps {
   maxWidth?: number;
   mt?: number;
   mb?: number;
+  strike?: boolean;
 }
 
 const toneMap: Record<UiTextTone, string> = {
@@ -51,6 +52,7 @@ export default function UiText({
   maxWidth,
   mt,
   mb,
+  strike = false,
 }: UiTextProps) {
   const shared = {
     variant,
@@ -65,6 +67,7 @@ export default function UiText({
     sx: {
       ...(to && { textDecoration: 'none' }),
       ...(breakWord && { minWidth: 0, overflowWrap: 'anywhere' }),
+      ...(strike && { textDecoration: 'line-through' }),
     },
   } as const;
 
