@@ -1,5 +1,7 @@
 export type BadgeTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 
+export type DueDateTone = 'amber' | 'muted' | 'default';
+
 export interface TaskItemViewState {
   id: string;
   title: string;
@@ -10,6 +12,7 @@ export interface TaskItemViewState {
   priorityTone: BadgeTone;
   dueDate?: string;
   dueDateLabel?: string;
+  dueDateTone: DueDateTone;
   createdAt?: string;
   searchText: string;
   statusValue: string;

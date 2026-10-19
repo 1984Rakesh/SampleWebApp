@@ -1,11 +1,16 @@
 import { createContext, useContext } from 'react';
-import type { ThemeMode } from './theme';
+
+export type ColorModePreference = 'light' | 'dark' | 'system';
 
 interface ColorModeContextType {
-  mode: ThemeMode;
+  /** The user's stored preference: 'light', 'dark', or 'system'. */
+  mode: ColorModePreference;
+  /** The resolved appearance: always 'light' or 'dark'. */
+  resolvedMode: 'light' | 'dark';
   toggleMode: () => void;
   setLightMode: () => void;
   setDarkMode: () => void;
+  setSystemMode: () => void;
 }
 
 export const ColorModeContext = createContext<ColorModeContextType | undefined>(undefined);

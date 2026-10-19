@@ -10,11 +10,12 @@ interface UiAvatarProps {
   size?: 'sm' | 'md' | 'lg';
   tone?: 'primary' | 'success' | 'info' | 'muted';
   variant?: 'soft' | 'solid';
+  shape?: 'circle' | 'square';
   tooltip?: string;
   alt?: string;
 }
 
-const sizeMap = { sm: 32, md: 40, lg: 80 } as const;
+const sizeMap = { sm: 32, md: 40, lg: 88 } as const;
 const fontSizeMap = { sm: '0.875rem', md: '1.25rem', lg: '2rem' } as const;
 
 const softToneMap = {
@@ -38,6 +39,7 @@ export default function UiAvatar({
   size = 'md',
   tone = 'primary',
   variant = 'soft',
+  shape = 'circle',
   tooltip,
   alt,
 }: UiAvatarProps) {
@@ -48,7 +50,8 @@ export default function UiAvatar({
     <Avatar
       src={src}
       alt={alt ?? label}
-      sx={{ width: dimension, height: dimension, fontSize: fontSizeMap[size], ...toneSx }}
+      variant={shape === 'square' ? 'rounded' : 'circular'}
+      sx={{ width: dimension, height: dimension, fontSize: fontSizeMap[size], ...toneSx, ...(shape === 'square' && { borderRadius: '10px' }) }}
     >
       {icon ? <UiIcon name={icon} /> : label}
     </Avatar>

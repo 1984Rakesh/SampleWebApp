@@ -1,8 +1,8 @@
 import { Link as RouterLink } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 
-type UiTextVariant = 'h4' | 'h5' | 'h6' | 'subtitle1' | 'subtitle2' | 'body1' | 'body2' | 'caption';
-type UiTextTone = 'default' | 'muted' | 'accent' | 'danger' | 'light' | 'lightMuted';
+type UiTextVariant = 'h1' | 'h3' | 'h4' | 'h5' | 'h6' | 'subtitle1' | 'subtitle2' | 'body1' | 'body2' | 'caption';
+type UiTextTone = 'default' | 'muted' | 'accent' | 'danger' | 'amber' | 'light' | 'lightMuted';
 type UiTextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
 
 interface UiTextProps {
@@ -27,6 +27,7 @@ const toneMap: Record<UiTextTone, string> = {
   muted: 'text.secondary',
   accent: 'primary.main',
   danger: 'error.main',
+  amber: 'warning.main',
   light: '#fff',
   lightMuted: 'rgba(255,255,255,0.9)',
 };

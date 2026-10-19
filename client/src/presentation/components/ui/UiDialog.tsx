@@ -4,6 +4,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
+const displayFont = "'Bricolage Grotesque Variable', 'DM Sans', sans-serif";
+
 interface UiDialogProps {
   open: boolean;
   onClose: () => void;
@@ -25,9 +27,9 @@ export default function UiDialog({
 }: UiDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth={maxWidth}>
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle sx={{ fontFamily: displayFont, fontWeight: 700, fontSize: 28, letterSpacing: '-0.02em', lineHeight: 1.15 }}>{title}</DialogTitle>
       {description && (
-        <DialogContent>
+        <DialogContent sx={{ pt: 0 }}>
           <DialogContentText>{description}</DialogContentText>
         </DialogContent>
       )}

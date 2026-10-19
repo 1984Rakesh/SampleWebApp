@@ -2,7 +2,7 @@ import type { Task } from '../../domain/models';
 import { TaskModel, TaskStatus, TaskPriority } from '../../domain/models';
 import type { SelectOption } from './SelectOption';
 import type { TaskFormData } from './TaskFormViewState';
-import type { BadgeTone, TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
+import type { BadgeTone, DueDateTone, TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
 
 const STATUS_TONES: Record<TaskStatus, BadgeTone> = {
   [TaskStatus.TODO]: 'neutral',
@@ -58,9 +58,32 @@ export function toTaskFormData(task?: Task): TaskFormData {
   };
 }
 
+function dayKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function formatDueDate(isoDate: string, now = new Date()): { label: string; tone: DueDateTone } {
+  const due = new Date(isoDate + 'T00:00:00');
+  const todayKey = dayKey(now);
+  const tomorrowDate = new Date(now);
+  tomorrowDate.setDate(now.getDate() + 1);
+  const tomorrowKey = dayKey(tomorrowDate);
+  const dueKey = dayKey(due);
+
+  if (dueKey === todayKey) return { label: 'Today', tone: 'amber' };
+  if (dueKey === tomorrowKey) return { label: 'Tomorrow', tone: 'default' };
+
+  const isPast = due < now && dueKey !== todayKey;
+  if (isPast) {
+    return { label: due.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }), tone: 'muted' };
+  }
+  return { label: due.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }), tone: 'default' };
+}
+
 export function toTaskItemViewState(task: Task): TaskItemViewState {
   const isCompleted =
     task instanceof TaskModel ? task.isCompleted() : task.status === TaskStatus.COMPLETED;
+  const dueDateInfo = task.dueDate ? formatDueDate(task.dueDate) : undefined;
   return {
     id: task.id,
     title: task.title,
@@ -70,7 +93,8 @@ export function toTaskItemViewState(task: Task): TaskItemViewState {
     priorityLabel: formatEnumLabel(task.priority),
     priorityTone: PRIORITY_TONES[task.priority],
     dueDate: task.dueDate,
-    dueDateLabel: task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : undefined,
+    dueDateLabel: dueDateInfo?.label,
+    dueDateTone: dueDateInfo?.tone ?? 'muted',
     createdAt: task.createdAt,
     searchText: `${task.title} ${task.description ?? ''}`.toLowerCase(),
     statusValue: task.status,

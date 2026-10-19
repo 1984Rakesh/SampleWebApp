@@ -7,7 +7,7 @@ export default function TaskListScreen() {
   const tasks = useTaskListViewModel();
   return (
     <UiScreen maxWidth="lg">
-      <TaskListHeader total={tasks.total} todo={tasks.counts.todo} onCreate={tasks.openCreateForm} />
+      <TaskListHeader total={tasks.total} todo={tasks.counts.todo} />
       <UiFlex column gap={3}>
         <TaskFilters
           search={tasks.searchQuery}
@@ -24,7 +24,7 @@ export default function TaskListScreen() {
         {tasks.actionError && <UiAlert type="error">{tasks.actionError}</UiAlert>}
         <TaskListContent tasks={tasks.taskItems} total={tasks.total} isLoading={tasks.isLoading} errorMessage={tasks.errorMessage} onEdit={tasks.openEditForm} onDelete={tasks.deleteTask} onToggleStatus={tasks.toggleTaskStatus} />
       </UiFlex>
-      {tasks.showForm && <TaskDialog key={tasks.editingTaskId ?? 'create'} open editingTaskId={tasks.editingTaskId} initialData={tasks.editingFormData} onClose={tasks.closeForm} />}
+      {tasks.showForm && tasks.editingTaskId && <TaskDialog key={tasks.editingTaskId} open editingTaskId={tasks.editingTaskId} initialData={tasks.editingFormData} onClose={tasks.closeForm} />}
     </UiScreen>
   );
 }

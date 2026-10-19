@@ -7,7 +7,8 @@ interface UiIconButtonProps {
   icon: UiIconName;
   ariaLabel: string;
   onClick?: () => void;
-  tone?: 'default' | 'success' | 'info' | 'danger';
+  tone?: 'default' | 'primary' | 'success' | 'info' | 'danger';
+  variant?: 'default' | 'solid';
   size?: 'sm' | 'md';
   tooltip?: string;
   hideFrom?: 'sm' | 'md' | 'lg';
@@ -16,6 +17,7 @@ interface UiIconButtonProps {
 
 const toneMap = {
   default: 'default',
+  primary: 'primary',
   success: 'success',
   info: 'info',
   danger: 'error',
@@ -26,21 +28,32 @@ export default function UiIconButton({
   ariaLabel,
   onClick,
   tone = 'default',
+  variant = 'default',
   size = 'md',
   tooltip,
   hideFrom,
   bordered = false,
 }: UiIconButtonProps) {
+  const solidSx = variant === 'solid' ? {
+    bgcolor: 'primary.main',
+    color: 'primary.contrastText',
+    '&:hover': { bgcolor: 'primary.dark' },
+    borderRadius: '50%',
+    width: 40,
+    height: 40,
+  } : {};
+
   const button = (
     <IconButton
       size={size === 'sm' ? 'small' : 'medium'}
-      color={toneMap[tone]}
+      color={variant === 'solid' ? undefined : toneMap[tone]}
       onClick={onClick}
       aria-label={ariaLabel}
       sx={{
-        '&:hover': { bgcolor: 'action.hover' },
+        ...(variant !== 'solid' && { '&:hover': { bgcolor: 'action.hover' } }),
         ...(hideFrom && { display: { xs: 'inline-flex', [hideFrom]: 'none' } }),
         ...(bordered && { border: '1px solid', borderColor: tone === 'danger' ? 'rgba(255,158,140,0.3)' : 'divider', borderRadius: 1.5 }),
+        ...solidSx,
       }}
     >
       <UiIcon name={icon} size={size} />

@@ -9,9 +9,12 @@ interface UiProgressProps {
 export default function UiProgress({ completed, inProgress, todo }: UiProgressProps) {
   const total = completed + inProgress + todo || 1;
   return (
-    <Box sx={{ display: 'flex', height: 10, overflow: 'hidden', borderRadius: 999, bgcolor: '#3A4458' }}>
-      <Box sx={{ width: `${(completed / total) * 100}%`, bgcolor: '#8FE3A8' }} />
-      <Box sx={{ width: `${(inProgress / total) * 100}%`, bgcolor: '#8C9EFF' }} />
+    <Box sx={(theme) => {
+      const dark = theme.palette.mode === 'dark';
+      return { display: 'flex', height: 10, overflow: 'hidden', borderRadius: 999, bgcolor: dark ? '#3A4458' : '#8C96AA' };
+    }}>
+      <Box sx={{ width: `${(completed / total) * 100}%`, bgcolor: 'success.main' }} />
+      <Box sx={{ width: `${(inProgress / total) * 100}%`, bgcolor: 'primary.main' }} />
     </Box>
   );
 }

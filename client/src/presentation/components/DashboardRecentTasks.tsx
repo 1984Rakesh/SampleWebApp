@@ -18,7 +18,7 @@ export default function DashboardRecentTasks({ tasks, onToggle }: DashboardRecen
                 {task.description && <UiText variant="body2" tone="muted" noWrap>{task.description}</UiText>}
                 <UiFlex gap={0.75} wrap><UiChip label={task.statusLabel} tone={task.statusTone} /><UiChip label={`• ${task.priorityLabel}`} tone={task.priorityTone} /></UiFlex>
               </UiFlex>
-              <UiText variant="body2" tone="muted" noWrap>{task.dueDateLabel ?? '—'}</UiText>
+              <UiText variant="body2" tone={task.dueDateTone === 'amber' ? 'amber' : 'muted'} weight={task.dueDateTone === 'amber' ? 'semibold' : undefined} noWrap>{task.dueDateLabel ?? '—'}</UiText>
             </UiFlex>
           </div>
         ))}

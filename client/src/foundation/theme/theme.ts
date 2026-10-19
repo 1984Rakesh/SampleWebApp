@@ -5,13 +5,27 @@ export type ThemeMode = 'light' | 'dark';
 const displayFont = "'Bricolage Grotesque Variable', 'DM Sans', sans-serif";
 const bodyFont = "'DM Sans', system-ui, sans-serif";
 
-export const chipColors = {
-  neutral: { fg: '#B5BDCC', bg: '#1E2430' },
-  info: { fg: '#A9B7FF', bg: 'rgba(140,158,255,0.16)' },
-  success: { fg: '#8FE3A8', bg: 'rgba(111,214,140,0.14)' },
-  warning: { fg: '#F6C177', bg: 'rgba(244,184,96,0.14)' },
-  danger: { fg: '#FF9E8C', bg: 'rgba(255,143,122,0.14)' },
+export type ChipTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+
+export const chipColorsByMode: Record<'light' | 'dark', Record<ChipTone, { fg: string; bg: string }>> = {
+  light: {
+    neutral: { fg: '#4A5468', bg: '#EBEDF2' },
+    info: { fg: '#3745B8', bg: '#E6E9FC' },
+    success: { fg: '#1B6B3A', bg: '#DDF3E4' },
+    warning: { fg: '#8A5A00', bg: '#FDF0D5' },
+    danger: { fg: '#B4321F', bg: '#FDE8E4' },
+  },
+  dark: {
+    neutral: { fg: '#B5BDCC', bg: '#1E2430' },
+    info: { fg: '#A9B7FF', bg: 'rgba(140,158,255,0.16)' },
+    success: { fg: '#8FE3A8', bg: 'rgba(111,214,140,0.14)' },
+    warning: { fg: '#F6C177', bg: 'rgba(244,184,96,0.14)' },
+    danger: { fg: '#FF9E8C', bg: 'rgba(255,143,122,0.14)' },
+  },
 } as const;
+
+/** @deprecated Use chipColorsByMode instead */
+export const chipColors = chipColorsByMode.dark;
 
 const commonOptions: ThemeOptions = {
   shape: { borderRadius: 12 },

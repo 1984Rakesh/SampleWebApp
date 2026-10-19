@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useColorMode } from '../../foundation/theme';
 import { useAuthViewModel } from '../hooks';
+import TaskDialog from './TaskDialog';
 import {
   UiAppBar,
   UiAvatar,
@@ -25,8 +26,9 @@ const navLinks = [
 
 export default function Navbar() {
   const { userName, logout, isAuthenticated } = useAuthViewModel();
-  const { mode, toggleMode } = useColorMode();
+  const { resolvedMode, toggleMode } = useColorMode();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const initial = userName?.trim().charAt(0).toUpperCase() || 'U';
 
   const handleLogout = () => {
@@ -58,9 +60,9 @@ export default function Navbar() {
           </UiFlex>
           <UiFlex align="center" gap={1}>
             <UiIconButton
-              icon={mode === 'light' ? 'theme-dark' : 'theme-light'}
+              icon={resolvedMode === 'light' ? 'theme-dark' : 'theme-light'}
               ariaLabel="Toggle theme"
-              tooltip={mode === 'light' ? 'Use dark theme' : 'Use light theme'}
+              tooltip={resolvedMode === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
               onClick={toggleMode}
               bordered
             />
@@ -73,6 +75,7 @@ export default function Navbar() {
               </UiButton>
             </UiResponsive>
             <UiIconButton icon="logout" ariaLabel="Log out" tooltip="Log out" onClick={handleLogout} tone="danger" bordered />
+            <UiIconButton icon="add" ariaLabel="New task" tooltip="New task" onClick={() => setTaskDialogOpen(true)} variant="solid" tone="primary" />
           </UiFlex>
         </UiToolbar>
       </UiAppBar>
@@ -84,6 +87,7 @@ export default function Navbar() {
         <UiDivider />
         <UiNavList items={navLinks.map((link) => ({ ...link, onClick: () => setDrawerOpen(false) }))} />
       </UiDrawer>
+      {taskDialogOpen && <TaskDialog key="navbar-create" open onClose={() => setTaskDialogOpen(false)} />}
     </>
   );
 }

@@ -1,5 +1,7 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddIcon from '@mui/icons-material/Add';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -17,6 +19,8 @@ import TaskIcon from '@mui/icons-material/Task';
 export type UiIconName =
   | 'profile'
   | 'add'
+  | 'chevron-right'
+  | 'person'
   | 'search'
   | 'theme-dark'
   | 'theme-light'
@@ -34,6 +38,8 @@ export type UiIconName =
 const iconMap: Record<UiIconName, React.ComponentType<{ fontSize?: 'small' | 'medium' }>> = {
   profile: AccountCircleIcon,
   add: AddIcon,
+  'chevron-right': ChevronRightIcon,
+  person: PersonOutlineIcon,
   search: SearchIcon,
   'theme-dark': Brightness4Icon,
   'theme-light': Brightness7Icon,
