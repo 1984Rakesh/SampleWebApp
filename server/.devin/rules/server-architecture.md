@@ -1,7 +1,12 @@
+---
+description: "Express server clean architecture rules"
+trigger: always_on
+---
+
 # Server Clean Architecture Rules (Express + SQLite)
 
-These rules extend the root [`RULES.md`](../RULES.md) for the Express/SQLite server in `server/src/`.
-For operational workflows and refactoring steps, see [`server/AGENTS.md`](./AGENTS.md).
+These rules extend the root [`.devin/rules/clean-architecture.md`](../../../.devin/rules/clean-architecture.md) for the Express/SQLite server in `server/src/`.
+For operational workflows and refactoring steps, see [`server/AGENTS.md`](../../AGENTS.md).
 
 ---
 

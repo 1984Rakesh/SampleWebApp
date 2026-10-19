@@ -1,14 +1,14 @@
 # Clean Architecture Agent Instructions (Shared)
 
-Apply these instructions and the rules in [`RULES.md`](./RULES.md) to all new features, bug fixes, and refactors. Existing violations are never precedents; remediate them whenever they fall within the task scope.
+Apply these instructions and the rules in [`.devin/rules/clean-architecture.md`](./.devin/rules/clean-architecture.md) to all new features, bug fixes, and refactors. Existing violations are never precedents; remediate them whenever they fall within the task scope.
 
 ## 1. Rule & Instruction Hierarchy
 
 Before changing any code, read the rule and instruction files for every side you touch:
 
-- **Shared**: [`RULES.md`](./RULES.md) and [`AGENTS.md`](./AGENTS.md)
-- **Client (`client/`)**: [`client/RULES.md`](./client/RULES.md) and [`client/AGENTS.md`](./client/AGENTS.md)
-- **Server (`server/`)**: [`server/RULES.md`](./server/RULES.md) and [`server/AGENTS.md`](./server/AGENTS.md)
+- **Shared**: [`.devin/rules/clean-architecture.md`](./.devin/rules/clean-architecture.md) and [`AGENTS.md`](./AGENTS.md)
+- **Client (`client/`)**: [`client/.devin/rules/client-architecture.md`](./client/.devin/rules/client-architecture.md) and [`client/AGENTS.md`](./client/AGENTS.md)
+- **Server (`server/`)**: [`server/.devin/rules/server-architecture.md`](./server/.devin/rules/server-architecture.md) and [`server/AGENTS.md`](./server/AGENTS.md)
 
 ## 2. Dependency Direction & Layer Boundaries
 

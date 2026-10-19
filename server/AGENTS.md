@@ -1,6 +1,6 @@
 # Server Agent Instructions (Express + SQLite)
 
-These instructions accompany [`server/RULES.md`](./RULES.md) and root [`AGENTS.md`](../AGENTS.md) / [`RULES.md`](../RULES.md).
+These instructions accompany [`.devin/rules/server-architecture.md`](./.devin/rules/server-architecture.md) and root [`AGENTS.md`](../AGENTS.md) / [`.devin/rules/clean-architecture.md`](../.devin/rules/clean-architecture.md).
 
 ## 1. Layer Overview & File Placement
 

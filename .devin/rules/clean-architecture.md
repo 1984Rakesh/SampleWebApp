@@ -1,10 +1,15 @@
+---
+description: "Shared clean architecture rules"
+trigger: always_on
+---
+
 # Clean Architecture Rules (Shared)
 
 These rules govern the entire repository. Layer-specific rules live alongside each application:
 
-- [`client/RULES.md`](./client/RULES.md) — React client layer rules (Domain, Data, Presentation, Foundation).
-- [`server/RULES.md`](./server/RULES.md) — Express + SQLite server layer rules (Domain, Infrastructure, Presentation, App).
-- [`AGENTS.md`](./AGENTS.md), [`client/AGENTS.md`](./client/AGENTS.md), and [`server/AGENTS.md`](./server/AGENTS.md) — Operational instructions and remediation workflows for coding agents.
+- [`client/.devin/rules/client-architecture.md`](../../client/.devin/rules/client-architecture.md) — React client layer rules (Domain, Data, Presentation, Foundation).
+- [`server/.devin/rules/server-architecture.md`](../../server/.devin/rules/server-architecture.md) — Express + SQLite server layer rules (Domain, Infrastructure, Presentation, App).
+- [`AGENTS.md`](../../AGENTS.md), [`client/AGENTS.md`](../../client/AGENTS.md), and [`server/AGENTS.md`](../../server/AGENTS.md) — Operational instructions and remediation workflows for coding agents.
 
 ---
 

@@ -1,6 +1,6 @@
 # Client Agent Instructions (React)
 
-These instructions accompany [`client/RULES.md`](./RULES.md) and root [`AGENTS.md`](../AGENTS.md) / [`RULES.md`](../RULES.md).
+These instructions accompany [`.devin/rules/client-architecture.md`](./.devin/rules/client-architecture.md) and root [`AGENTS.md`](../AGENTS.md) / [`.devin/rules/clean-architecture.md`](../.devin/rules/clean-architecture.md).
 
 ## 1. Layer Overview & File Placement
 

@@ -1,7 +1,12 @@
+---
+description: "React client clean architecture rules"
+trigger: always_on
+---
+
 # Client Clean Architecture Rules (React)
 
-These rules extend the root [`RULES.md`](../RULES.md) for the React client in `client/src/`.
-For operational workflows and refactoring steps, see [`client/AGENTS.md`](./AGENTS.md).
+These rules extend the root [`.devin/rules/clean-architecture.md`](../../../.devin/rules/clean-architecture.md) for the React client in `client/src/`.
+For operational workflows and refactoring steps, see [`client/AGENTS.md`](../../AGENTS.md).
 
 ---
 
