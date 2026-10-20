@@ -6,7 +6,7 @@ Follow [server architecture rules](./.devin/rules/server-architecture.md), [shar
 
 Building-block order is Foundation → Features → App; import direction is App → Features / Foundation. App binds features and injects their dependencies. Foundation never imports features or App. Within a feature: presentation → domain ← infrastructure.
 
-S4 server acceptance is complete: security, profile and tasks own their layers alongside reusable foundation utilities and a minimal shared domain kernel. No legacy layer-first source roots remain. Empty legacy directories and stale generated dist output were removed with explicit user approval, then rebuilt. Manual import/DI/environment audits, compiled startup smoke tests and unchanged-client mapper compatibility tests pass. Client C2 security/profile/session and earlier App/shared-UI groundwork are migrated; later client phases require separate approval. Stop for approval after each phase; finish all server phases before client phases.
+S4 server acceptance is complete: security, profile and tasks own their layers alongside reusable foundation utilities and a minimal shared domain kernel. No legacy layer-first source roots remain. Empty legacy directories and stale generated dist output were removed with explicit user approval, then rebuilt. Manual import/DI/environment audits, compiled startup smoke tests and unchanged-client mapper compatibility tests pass. The client feature-first migration is also complete: security, profile, tasks, dashboard and comparison own their layers under `client/src/<feature>/` with App-injected cross-feature contracts. Stop for approval after each phase; finish all server phases before client phases.
 
 ```text
 src/

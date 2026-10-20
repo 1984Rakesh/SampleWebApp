@@ -2,7 +2,7 @@
 
 **Goal:** Finish the client feature-first Clean Architecture migration — move tasks, dashboard, and comparison out of the legacy layer-first roots into `client/src/<feature>/`, retire all legacy roots/shims, and finalize rules and audits. Picks up where the old C2 checkpoint stopped (server phases + C1/C2 are done).
 
-**Status:** Phase 2 – Dashboard & comparison verticals · COMPLETE (acceptance passed) · next task P3.1 (await phase approval) · updated 2026-10-20
+**Status:** Phase 3 – Final audit & docs · COMPLETE (acceptance passed) · ALL PHASES DONE — migration finished · updated 2026-10-20
 
 ## Global Rules
 
@@ -78,22 +78,25 @@
 ### Phase 3 – Final audit & docs (was C5)
 **Acceptance check:** all of: `cd client && npm test -- --test-concurrency=1 && npm run build && npm run lint`; `cd server && npm test && npm run test:startup`; `git diff --check`; manual import audit results documented in Decisions.
 
-- [ ] **P3.1** Full import-boundary audit
+- [x] **P3.1** Full import-boundary audit
   - Files: whole `client/src/` tree; use `grep`/IDE, no new tooling.
   - Done when: verified — (a) no feature domain imports React/Axios/Zod/RQ/MUI/foundation/App; (b) foundation imports no feature/App; (c) `@mui` only in `components/ui` + `foundation/theme`; (d) no cross-feature implementation imports (all cross-feature flow via App-injected consumer contracts); (e) no stale imports of deleted legacy paths anywhere incl. tests. Findings written to Decisions.
   - Depends on: P2.3
   - Notes: also confirm no leftover empty directories under `client/src/`.
+  - 2026-10-20: Done. (a) Domain trees import only relative paths + `shared/domain/{errors,validation}` — zero React/Axios/Zod/RQ/MUI/foundation/App. (b) `foundation/`, `shared/`, `components/` have no feature/App imports. (c) `@mui`/`@emotion` appear only under `components/ui/` + `foundation/theme/`. (d) No cross-feature implementation imports — dashboard/comparison greps surface only within-feature relatives; all cross-feature flow via App-injected contexts (`DashboardCapabilities`, `TaskUseCases`, profile consumer context). (e) All remaining `/domain/` + `/data/` path references are App→feature composition imports (legal) or within-feature relatives; no `src/presentation`, `src/domain`, `src/data`, or `FeatureUseCasesContext` references anywhere incl. `client/tests` + `server/tests`. `comparisonData.ts` axios/zod/RQ hits are template-string snippet content, not imports. Zero empty dirs under `client/src`; all barrels non-empty. Layer-direction check: feature data layers never import presentation/App; presentation never imports data/axios/zod/RQ. Findings recorded in Decisions.
 
-- [ ] **P3.2** Finalize rules & instructions
+- [x] **P3.2** Finalize rules & instructions
   - Files: `client/AGENTS.md`, `client/.devin/rules/client-architecture.md`, `AGENTS.md`, `.devin/rules/clean-architecture.md`, `server/AGENTS.md`, `server/.devin/rules/server-architecture.md`.
   - Done when: all migration-status/checkpoint text reflects completed migration (no "pending C3/C4", no legacy-path caveats); trees match reality; remediation recipes no longer reference deleted legacy locations.
   - Depends on: P3.1
+  - 2026-10-20: Done. `client/AGENTS.md`: checkpoint → "migration complete"; tree now shows tasks/dashboard/comparison features and drops legacy `domain/`/`data/`/`presentation/` roots; §2 dashboard bullet → `DashboardCapabilities`; §3 recipes updated (Badge/CodeBlock feature-owned, task-barrel/legacy-debt recipe generalized). `client-architecture.md`: C2 checkpoint → migration complete + presentation-only dashboard/comparison; §3.1 DTO rule → `<feature>/data/dtos`; §4.2 → DashboardCapabilities, §4.3 → `<feature>/presentation/components`. `AGENTS.md`: checkpoint → migration complete; §4.4 → all consumer contexts feature-owned. `clean-architecture.md`: status label + migration bullet → complete; boundary-mapping and data-boundary lines dropped legacy-path caveats; §6 decomposition line targets feature paths only. `server/AGENTS.md` + `server-architecture.md`: status sentences updated to "client migration complete". Verified via grep: zero remaining C3/C4/pending/legacy-caveat references (remaining "legacy" hits are correct field-alias/removed-roots usage).
 
-- [ ] **P3.3** Final regression pass
+- [x] **P3.3** Final regression pass
   - Files: `client/tests/*`, `server/tests/*`.
   - Done when: client 23+ tests pass, server 29 tests + 3 startup smokes pass, builds/lint/whitespace clean; test coverage still exercises session/refresh/profile-sync/task flows after moves.
   - Depends on: P3.2
   - Notes: update any test import paths broken by moves; keep `--test-concurrency=1`.
+  - 2026-10-20: Done. Client: 23/23 tests (`--test-concurrency=1`), build clean (794 kB bundle, pre-existing chunk-size warning only), oxlint 0 warnings/0 errors on 175 files. Server: 29/29 tests + 3/3 startup smokes. `git diff --check` clean; working tree shows only the six docs + plan modified (P3.2). No test import paths needed fixing — P3.1 audit already confirmed none. Coverage intact: composition.test.mjs + security-session.test.mjs still exercise session/refresh/profile-sync/provider flows; server suite covers task/auth/profile boundaries + client-contract compatibility. **Phase 3 acceptance passed:** all four acceptance checks green (client test/build/lint; server test/startup; git diff --check; P3.1 audit findings in Decisions). Migration complete.
 
 ## Decisions
 | Date | Decision | Why |
@@ -105,10 +108,11 @@
 | 2026-10-20 | Phase 1 accepted | P1.1–P1.4 verified: client 23 tests/build/lint, server 29 tests + 3 smokes, `git diff --check` all clean. Dashboard's interim imports of `tasks/presentation` are resolved by P2.1 `DashboardCapabilities`. |
 | 2026-10-20 | Q2 resolved without issue | `FeatureUseCasesContext` split cleanly into per-feature contexts and was deleted in P2.3; no contract divergence. |
 | 2026-10-20 | Phase 2 accepted | P2.1–P2.3 verified on disk: `src/presentation/` and empty `foundation/{auth,context}` removed; dashboard uses injected `DashboardCapabilities`; comparison presentation-only with updated snippets; builds/tests clean. |
+| 2026-10-20 | P3.1 import audit clean | Greps confirm: pure feature domains (relative + shared/domain only), foundation/shared/components import no features/App, `@mui` confined to `components/ui` + `foundation/theme`, no sibling feature implementation imports (cross-feature flow solely via App-injected consumer contexts), no stale legacy path references in src or tests, no empty dirs/dead barrels. `comparisonData.ts` framework mentions are snippet strings. |
+| 2026-10-20 | Phase 3 accepted — plan complete | P3.1–P3.3 verified: import audit clean, six docs finalized, client 23 tests/build/lint + server 29 tests/3 smokes + `git diff --check` all green. Client feature-first migration fully done. |
 
 ## Risks & Open Questions
 - (none open)
-- [ ] **Q2** `FeatureUseCasesContext` currently couples tasks + dashboard profile-summary; it splits per-feature in P1.3/P2.1 and is deleted in P2.3 — interim duplication risk is low but watch for divergent contracts. — blocks: none — owner: manager.
 
 ## Inbox (worker → manager)
 - (empty)

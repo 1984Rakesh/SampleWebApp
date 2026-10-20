@@ -17,7 +17,7 @@ Inside features: Presentation → Domain ← Data
 
 App owns composition, provider/router/shell integration and cross-feature adaptation. Foundation owns reusable capabilities, not DI or feature policy. Features/shared components never import App. Feature domains never import foundation, React, React Query, Axios, Zod, MUI, browser APIs or data/presentation implementations.
 
-**C2 checkpoint:** App/shared UI and complete security/profile domain/data/presentation stacks are migrated. Foundation exposes generic network/storage/theme capabilities only. Tasks/dashboard/comparison remain in legacy src/domain/data/presentation until C3/C4; do not claim those features migrated or create empty layers. Security and profile own separate entities, DTOs and consumer contexts. Remaining legacy contexts contain task and App-injected dashboard profile-summary contracts only.
+**Migration complete:** all five features — security, profile, tasks, dashboard, comparison — own their layers under `src/<feature>/`; no legacy layer-first roots remain. Foundation exposes generic network/storage/theme capabilities only. Dashboard and comparison are presentation-only features (no artificial domain/data layers). Each feature owns its consumer contexts; App injects cross-feature capabilities (`DashboardCapabilities`, profile task-counts) rather than allowing sibling imports.
 
 | Module | Allowed dependencies | Forbidden dependencies |
 | :--- | :--- | :--- |
@@ -40,7 +40,7 @@ Foundation has no feature/App/domain-model dependencies: network receives callba
 
 ## 3. Data and Composition
 
-1. APIs consume/return DTOs, never domain entities/use-case inputs. Keep distinct request/response DTOs and schemas in the owning data layer (security/data/dtos and profile/data/dtos; remaining task DTOs stay in legacy data/dtos until C3).
+1. APIs consume/return DTOs, never domain entities/use-case inputs. Keep distinct request/response DTOs and schemas in the owning feature data layer (`<feature>/data/dtos`).
 2. Mappers normalize nullable/legacy aliases (due_date/user_id/created_at/updated_at), validate transport shapes, then construct domain objects. Translate Axios/backend `{ error: string }` and Zod failures before they reach ViewModels.
 3. React Query keys, filter identity, mutations, invalidation and profile-cache updates stay in data repositories. Profile cache keys include authenticated identity; auth data never writes profile entities into cache. App maps/explicitly seeds profile values after login and binds profile responses to the active session. Reject results from an obsolete login and prevent pre-update reads/earlier mutations from overwriting newer snapshots/cache results. Read query functions execute domain use cases. Expose semantic data/loading/error capabilities, never TanStack types.
 4. App composition binds concrete repositories to use cases. App/providers supplies presentation-owned contexts; consumers never import app/composition. Presentation contracts may contain domain values for ViewModels, not for screens/components. Relocate these contracts to their feature owners as migration proceeds.
@@ -49,8 +49,8 @@ Foundation has no feature/App/domain-model dependencies: network receives callba
 ## 4. Presentation and Shared UI
 
 1. Screens/components render ViewState primitives and SelectOption arrays, not raw Task/Account/Profile entities or domain enums. Editing uses IDs or ViewState. ViewModels own form state, validation feedback, loading and actions. Presentation mappers use domain methods for domain decisions.
-2. Derive dashboard greeting/counts/recent tasks in presentation adapters/ViewModels, not inline screens. Dashboard now receives profile name/loading through an App-injected legacy consumer capability, not security/profile ViewModels. Its remaining task ViewModel composition is C4 scope. Profile receives display-only task counts through its own consumer context; it must never import task internals.
-3. Feature-specific dialogs/cards/forms remain in owning feature presentation (currently legacy presentation/components); shared UI lives in components. Do not move task/profile-specific code into shared components merely because multiple routes use it.
+2. Derive dashboard greeting/counts/recent tasks in presentation adapters/ViewModels, not inline screens. Dashboard receives profile name/loading and display-ready task items/counts/toggle through its own App-injected `DashboardCapabilities` context, not security/profile/tasks internals. Profile receives display-only task counts through its own consumer context; it must never import task internals.
+3. Feature-specific dialogs/cards/forms live in their owning feature's presentation components (`<feature>/presentation/components`); shared UI lives in components. Do not move task/profile-specific code into shared components merely because multiple routes use it.
 4. Shared Navbar is a thin prop-driven orchestrator with toolbar/drawer regions under components/layout/navbar. AppNavbar owns session/theme/navigation callbacks, drawer/create-dialog state and the feature-owned TaskDialog. Never use the auth form ViewModel to render global navigation.
 5. Decompose distinct render regions into controlled feature subcomponents; entry components own shared local UI state and branch/callback wiring. Keep internal pieces out of broad public barrels.
 6. SelectOption belongs to components/ui/SelectOption.ts; feature presentation types must not become dependencies of shared primitives.

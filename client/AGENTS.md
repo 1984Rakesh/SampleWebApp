@@ -6,7 +6,7 @@ Follow [client rules](./.devin/rules/client-architecture.md), [shared rules](../
 
 Building blocks: Foundation → Features → App. Imports: App → Features / Foundation. Within features: presentation → domain ← data. App owns DI, provider/router/shell integration and cross-feature mapping; foundation never imports features or App.
 
-**C2 security/profile/session migration is complete; C3–C5 are pending.** Server phases and C1 App/shared-UI groundwork are complete. Tasks/dashboard/comparison remain in legacy layer-first locations until their approved phases. Stop for approval after every phase.
+**The client feature-first migration is complete.** All features — security, profile, tasks, dashboard, comparison — live under `src/<feature>/`; no legacy layer-first roots remain. Cross-feature capabilities are consumer-owned contracts injected by App.
 
 ```text
 src/
@@ -22,14 +22,19 @@ src/
 │   ├── domain/{models,repositories,useCases}/
 │   ├── data/{api,dtos,mappers,repositories}/
 │   └── presentation/{context,models,hooks,screens,components}/
+├── tasks/
+│   ├── domain/{models,repositories,useCases}/
+│   ├── data/{api,dtos,mappers,repositories}/
+│   └── presentation/{context,models,hooks,screens,components}/
+├── dashboard/
+│   └── presentation/{context,models,hooks,screens,components}/
+├── comparison/
+│   └── presentation/{models,hooks,screens,components}/
 ├── foundation/{network,session,theme}/
 ├── shared/
 │   ├── domain/            # Framework-free errors/common normalization
 │   └── data/              # Common boundary error translation, never domain policy
 ├── components/{ui,feedback,layout}/
-├── domain/                # Remaining task domain only
-├── data/                  # Remaining task transport/cache adapters only
-├── presentation/          # Remaining task/dashboard/comparison UI and injected task/profile-summary contracts
 ├── App.tsx
 └── main.tsx
 ```
@@ -44,8 +49,8 @@ Security Account/AuthSession and Profile/ProfileModel are independent domain rep
 - Generic networking receives token/version/refresh/expiry/public-request callbacks from App. Security owns auth endpoint exclusions. Capture tokens/session generation synchronously, coalesce concurrent refreshes, retry protected requests once, and expire a second 401. Do not let old responses/refreshes revive a logged-out session or clear a newer login. Missing/failed/malformed refresh clears the entire session and notifies reactive subscribers; no forced window.location reload.
 - `app/composition/profileSession.ts` maps account/profile models and binds profile reads/updates to the active session. Check authentication generation and returned ownership. A read or earlier mutation must not overwrite newer profile results; obsolete responses return the current validated snapshot. Never import security into profile or vice versa.
 - Profile cache keys and updates live in its React Query adapter, scoped by identity. Auth data does not write profile cache entries. App explicitly seeds mapped profile values after login and coordinates profile-to-session updates. Domain reads still go through GetCurrentUserUseCase and repository contracts.
-- Profile's consumer-owned context accepts display-only task counts supplied by App, not task models/repositories/ViewModels. Legacy dashboard consumes an App-supplied profile-name/loading capability rather than security/profile ViewModels; its remaining task ViewModel composition is C4 scope. Legacy context files contain no migrated feature contracts.
-- Shared Navbar receives ViewState and callbacks; App owns drawer/task-dialog state and renders the tasks-owned dialog (still legacy presentation until C3). Keep AppProviders order QueryClient → ErrorBoundary → theme → auth → injected feature capabilities. App.tsx remains thin.
+- Profile's consumer-owned context accepts display-only task counts supplied by App, not task models/repositories/ViewModels. Dashboard consumes an App-injected `DashboardCapabilities` context (profile name/loading plus display-ready task items/counts/toggle), never task or profile internals. Each feature owns its consumer contexts; no shared cross-feature context remains.
+- Shared Navbar receives ViewState and callbacks; App owns drawer/task-dialog state and renders the tasks-owned dialog. Keep AppProviders order QueryClient → ErrorBoundary → theme → auth → injected feature capabilities. App.tsx remains thin.
 
 ## 3. Remediation Recipes
 
@@ -54,9 +59,9 @@ Security Account/AuthSession and Profile/ProfileModel are independent domain rep
 - **Raw transport/schema failures:** APIs/mappers translate through shared/data/translateError into domain/application errors, preserving backend error messages. Foundation emits generic HttpError, never domain-specific auth policy. Do not duplicate contradictory domain validation or add catch-and-rethrow blocks with no translation.
 - **Nullable profile updates:** UpdateProfileInput and UpdateProfileDTO support string/null/undefined for bio/avatar. Domain normalizes whitespace/empty to null, omission stays undefined; request mapping preserves both. Name/email normalization remains authoritative in shared domain; registration minimum password length is six, while signin preserves existing required-password behavior.
 - **Domain leaks in UI:** screens/components render ViewState/primitives/options, not domain entities/enums. ViewModels own form state/validation/actions; presentation mappers use domain methods for domain decisions. Profile form components remain controlled.
-- **Mixed render regions:** split feature render regions into controlled subcomponents, retaining only shared local UI orchestration in entry components. Do not export internal pieces from broad barrels. Badge/CodeBlock/task cards remain legacy feature UI pending C3/C4, not shared UI by default.
+- **Mixed render regions:** split feature render regions into controlled subcomponents, retaining only shared local UI orchestration in entry components. Do not export internal pieces from broad barrels. Badge lives in tasks, CodeBlock/LayerMap/ComparisonPanel in comparison — feature-specific UI is not shared UI by default.
 - **MUI/UI coupling:** @mui only in components/ui and foundation/theme. No sx/component/MUI Props/passthrough leakage. Shared components import no business/domain/data/App modules. SelectOption is owned by components/ui. Add missing sealed primitives instead of importing MUI elsewhere.
-- **Legacy task debt:** do not re-export migrated auth/profile types from task domain/data barrels or introduce compatibility shims. Task nullable-input/error refinements remain C3 scope; comparison example strings are C4 content, not executable dependencies.
+- **Feature barrels:** do not re-export another feature's types from feature barrels or introduce compatibility shims between features. Task nullable `description`/`dueDate` inputs carry `string | null | undefined` cleanly to the DTO boundary; comparison example strings are content, not executable dependencies.
 
 ## 4. Verification
 
@@ -71,4 +76,4 @@ Run repository git diff --check. Update server/tests/client-contract.test.ts imp
 
 Tests use Node plus existing Vite SSR/React rendering and Axios adapters; no new dependencies. Test files run sequentially (--test-concurrency=1) to avoid Vite SSR websocket-port conflicts. Close each SSR loader. Tests exercise navbar/provider/guard behavior, validated persistence and reactive subscriptions, auth exclusions, coalesced refresh, expiry, malformed responses, logout races, profile synchronization/ordering, tri-state patches and boundary errors. They are not full browser layout/portal/click tests.
 
-Manually inspect imports for pure domains, isolated features, foundation independence, MUI allowlists and no ViewModel App/data imports. Comparison snippets can contain old example imports; update them during C4, not as runtime violations. AST architecture tooling remains deferred by user decision; do not add a parser dependency or claim a check:architecture script exists.
+Manually inspect imports for pure domains, isolated features, foundation independence, MUI allowlists and no ViewModel App/data imports. Comparison snippets are template-string content describing the feature-first layout, not runtime imports. AST architecture tooling remains deferred by user decision; do not add a parser dependency or claim a check:architecture script exists.

@@ -16,7 +16,7 @@ Feature presentation → Feature domain ← Feature infrastructure
 
 App is the composition tier, not part of foundation. Foundation exposes reusable technical capabilities and never imports App or features. Shared domain contains only framework-free common errors/value rules. Feature domains never import foundation.
 
-S4 server acceptance is complete. All server business code lives in `src/security/`, `src/profile/`, and `src/tasks/`, supported by `src/foundation/` and `src/shared/domain/`. Legacy source roots and stale generated output have been removed with approval; do not recreate top-level domain/infrastructure/presentation roots or add artificial client-only counterparts. Client C2 security/profile/session migration is complete; later client feature phases require separate approval.
+S4 server acceptance is complete. All server business code lives in `src/security/`, `src/profile/`, and `src/tasks/`, supported by `src/foundation/` and `src/shared/domain/`. Legacy source roots and stale generated output have been removed with approval; do not recreate top-level domain/infrastructure/presentation roots or add artificial client-only counterparts. The client feature-first migration is complete; all client features own their layers under `client/src/<feature>/`.
 
 | Module | Allowed internal dependencies | Forbidden dependencies |
 | :--- | :--- | :--- |
