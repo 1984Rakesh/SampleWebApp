@@ -1,0 +1,12 @@
+import type { AuthSession, RegisterUserInput } from '../models/AuthSession';
+import type { AuthRepository } from '../repositories/AuthRepository';
+import { normalizeEmail, normalizeName } from '../../../shared/domain/validation';
+import { ValidationError } from '../../../shared/domain/errors';
+
+export async function registerUserUseCase(repository: AuthRepository, input: RegisterUserInput): Promise<AuthSession> {
+  if (!input.name?.trim()) throw new ValidationError('Name is required');
+  const name = normalizeName(input.name);
+  const email = normalizeEmail(input.email);
+  if (!input.password || input.password.length < 6) throw new ValidationError('Password must be at least 6 characters');
+  return repository.register({ name, email, password: input.password });
+}

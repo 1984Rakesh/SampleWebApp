@@ -1,0 +1,16 @@
+:root{
+--fw-regular:400; /* @kind font */
+--fw-medium:500; /* @kind font */
+--fw-semibold:600; /* @kind font */
+--fw-bold:700; /* @kind font */
+
+--fs-h1:42px;--fs-dialog-title:28px;--fs-h2:22px;--fs-stat:48px;--fs-progress:36px;--fs-profile-name:24px;--fs-brand:19px;
+--fs-body-lg:16px;--fs-body:15px;--fs-secondary:14px;--fs-small:13px;--fs-chip:12px;--fs-caps:12px;--fs-nav:14px;
+--ls-display:-0.01em;--ls-display-tight:-0.02em;--ls-table:0.08em;--ls-eyebrow:0.1em;
+--lh-display:1.1; /* @kind font */
+--lh-body:1.5; /* @kind font */
+
+--text-h1:var(--fw-bold) var(--fs-h1)/var(--lh-display) var(--font-display);
+--text-h2:var(--fw-semibold) var(--fs-h2)/1.25 var(--font-display);
+--text-dialog-title:var(--fw-bold) var(--fs-dialog-title)/1.15 var(--font-display);
+}

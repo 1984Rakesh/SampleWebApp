@@ -5,93 +5,64 @@ trigger: always_on
 
 # Client Clean Architecture Rules (React)
 
-These rules extend the root [`.devin/rules/clean-architecture.md`](../../../.devin/rules/clean-architecture.md) for the React client in `client/src/`.
-For operational workflows and refactoring steps, see [`client/AGENTS.md`](../../AGENTS.md).
+These extend [shared rules](../../../.devin/rules/clean-architecture.md). See [client agent instructions](../../AGENTS.md) for the current tree, remediation recipes and verification.
 
----
-
-## 1. Layer Dependency Rules
+## 1. Module and Layer Dependencies
 
 ```text
-Presentation ──→ Domain ←── Data
-Foundation wires Domain, Data, and Presentation together
+Building blocks: Foundation → Features → App
+Imports: App → Features / Foundation
+Inside features: Presentation → Domain ← Data
 ```
 
-| Layer | Directory | Allowed Internal Imports | Forbidden Imports |
-| :--- | :--- | :--- | :--- |
-| **Domain** | `src/domain/` | `src/domain/models`, `src/domain/repositories` | `react`, `@tanstack/react-query`, `axios`, `zod`, `@mui/*`, `localStorage`, `window`, `src/data/*`, `src/presentation/*`, `src/foundation/*` |
-| **Data** | `src/data/` | `src/domain/*`, `src/data/*`, `src/foundation/network/*` | `src/presentation/*` |
-| **Presentation** | `src/presentation/` | `src/presentation/*`, `src/domain/*` (ViewModels/mappers only), `src/foundation/*` (hooks/providers) | `src/data/*`, `axios`, `zod`, `@tanstack/react-query`, `localStorage`, `@mui/*` (allowed only inside `src/presentation/components/ui/`) |
-| **Foundation** | `src/foundation/` | `src/domain/*`, `src/data/*`, `src/presentation/*` (router screens/shell) | Direct business rule implementations, `@mui/*` (allowed only inside `src/foundation/theme/`) |
+App owns composition, provider/router/shell integration and cross-feature adaptation. Foundation owns reusable capabilities, not DI or feature policy. Features/shared components never import App. Feature domains never import foundation, React, React Query, Axios, Zod, MUI, browser APIs or data/presentation implementations.
 
----
+**C2 checkpoint:** App/shared UI and complete security/profile domain/data/presentation stacks are migrated. Foundation exposes generic network/storage/theme capabilities only. Tasks/dashboard/comparison remain in legacy src/domain/data/presentation until C3/C4; do not claim those features migrated or create empty layers. Security and profile own separate entities, DTOs and consumer contexts. Remaining legacy contexts contain task and App-injected dashboard profile-summary contracts only.
 
-## 2. Domain Layer Rules (`src/domain/`)
+| Module | Allowed dependencies | Forbidden dependencies |
+| :--- | :--- | :--- |
+| Domain | Own models/repositories/use cases; minimal shared domain when introduced | App, foundation, outer layers, frameworks, browser APIs |
+| Data | Own domain/data; generic foundation transport | App, presentation, sibling feature internals |
+| Presentation ViewModels/mappers | Own domain/presentation; injected consumer contracts; generic foundation hooks | App, concrete data adapters, Axios/Zod/React Query |
+| Screens/feature components | ViewState, options, controlled callbacks, own presentation, shared UI | Domain entities/enums, App/data internals, MUI, sx |
+| Shared components | Own UI contracts/components and generic theme capability | App, business models, feature components/hooks, data adapters |
+| Foundation | Generic capabilities and permitted libraries | App, feature implementations, business policy |
+| App | All layers for binding/provider/route/shell integration | Business invariants, duplicate domain validation |
 
-1. **Pure TypeScript Only**: Entities, value objects, enums, repository contracts, and use cases must be pure TypeScript with zero framework or browser dependencies.
-2. **One-Way Dependency Inside Domain**:
-   - `domain/models/` owns entities (`Task`, `User`, `AuthSession`), enums (`TaskStatus`, `TaskPriority`), domain errors, and command/query value types (`CreateTaskInput`, `UpdateTaskInput`, `GetTasksInput`, `ToggleTaskStatusInput`, `UpdateProfileInput`, `LoginInput`, `RegisterUserInput`).
-   - `domain/repositories/` imports only from `domain/models/`—never from `domain/useCases/`.
-   - `domain/useCases/` imports from `domain/models/` and `domain/repositories/`.
-3. **Complete Repository Interfaces**:
-   - Every data operation (both reads and writes) must be represented on the repository interface:
-     - `TaskRepository`: `getTasks`, `createTask`, `updateTask`, `deleteTask`, `toggleTaskStatus`.
-     - `UserRepository`: `getCurrentUser`, `updateProfile`.
-     - `AuthRepository`: `login`, `register`.
-4. **Centralized Domain Validation**:
-   - Put shared validation helpers (such as email validation and required-text normalization) in `domain/models/` so `UserModel`, `TaskModel`, and use cases share a single source of truth.
-   - Validate all mutations in use cases (for example, `updateTaskUseCase` must reject an empty/whitespace-only `title`).
-   - Do not require server-derived fields (such as `userId` on `CreateTaskInput`) in client domain inputs when ownership is determined by the authenticated session on the server.
+Foundation has no feature/App/domain-model dependencies: network receives callbacks and emits generic HttpError; session provides KeyValueStorage/browser mechanics. Security's BrowserSessionRepository owns persisted account validation and session meaning. App alone configures transports, adapters and feature integration. Shared/data contains common outer-boundary error translation, not shared domain policy; it may depend on generic transport errors and Zod, while shared/domain stays framework-free.
 
----
+## 2. Domain and Use Cases
 
-## 3. Data Layer Rules (`src/data/`)
+1. Keep domain pure TypeScript. Models own entities, constants, normalizers, command/query value types; repositories import models only, never use cases. Every read/mutation has a focused use case and repository contract.
+2. Security owns Account/AuthSession, AuthRepository (login/register/refreshToken), SessionRepository and focused login/register/refresh/signout use cases. Profile owns Profile/ProfileModel, nullable UpdateProfileInput, ProfileRepository (getCurrentUser/updateProfile) and focused read/update use cases. App maps account/profile representations explicitly; never alias entities or share feature DTOs. The remaining task contract covers getTasks/createTask/updateTask/deleteTask/toggleTaskStatus. No new backend logout endpoint.
+3. Required-text/email/password/enum invariants belong in domain. Normalize before validating, do not fabricate required IDs/ownership/status, and validate mutations including whitespace-only task/profile names. UI hints/structural schemas do not replace domain validation.
+4. Ownership comes from the verified server session. Client mutation inputs/payloads must not send userId. Nullable updates must distinguish omitted/undefined, explicit null/normalized empty, and non-empty values; preserve these across DTO mapping and domain inputs.
 
-1. **DTO Separation**:
-   - Define explicit Request and Response DTOs in `src/data/dtos/` for every API endpoint (`AuthDTO.ts`, `TaskDTO.ts`, `UserDTO.ts`).
-   - API modules (`AuthApi.ts`, `TaskApi.ts`, `UserApi.ts`) must accept and return DTOs only—never domain models or use-case input types.
-2. **Normalize + Zod Validate in Mappers**:
-   - All DTO ↔ Domain conversions happen in `src/data/mappers/`.
-   - Handle nullable fields (`.nullish().transform((v) => v ?? undefined)`) and legacy snake_case aliases (`due_date`, `user_id`, `created_at`, `updated_at`) inside schemas and mappers before constructing `TaskModel` or `UserModel`.
-3. **Error Translation at the Data Boundary**:
-   - Never let raw `AxiosError` or `ZodError` instances leak past `src/data/` with generic messages like `"Request failed with status code 400"`.
-   - Extract the server's `{ error: string }` message (or Zod issue message) and throw a clean domain/application `Error` with the translated message at the API/repository boundary.
-4. **React Query Encapsulation**:
-   - Keep query keys, cache invalidation (`['tasks']`), and cache updates (`['user']`) inside `src/data/repositories/`.
-   - Include all filter parameters in query keys (`['tasks', filters?.status, filters?.priority]`).
+## 3. Data and Composition
 
----
+1. APIs consume/return DTOs, never domain entities/use-case inputs. Keep distinct request/response DTOs and schemas in the owning data layer (security/data/dtos and profile/data/dtos; remaining task DTOs stay in legacy data/dtos until C3).
+2. Mappers normalize nullable/legacy aliases (due_date/user_id/created_at/updated_at), validate transport shapes, then construct domain objects. Translate Axios/backend `{ error: string }` and Zod failures before they reach ViewModels.
+3. React Query keys, filter identity, mutations, invalidation and profile-cache updates stay in data repositories. Profile cache keys include authenticated identity; auth data never writes profile entities into cache. App maps/explicitly seeds profile values after login and binds profile responses to the active session. Reject results from an obsolete login and prevent pre-update reads/earlier mutations from overwriting newer snapshots/cache results. Read query functions execute domain use cases. Expose semantic data/loading/error capabilities, never TanStack types.
+4. App composition binds concrete repositories to use cases. App/providers supplies presentation-owned contexts; consumers never import app/composition. Presentation contracts may contain domain values for ViewModels, not for screens/components. Relocate these contracts to their feature owners as migration proceeds.
+5. App provider order is QueryClient, ErrorBoundary, theme, auth/session integration, feature capabilities. Auth provider and hook/context definitions remain separate so component modules support Fast Refresh. App.tsx is a thin entry.
 
-## 4. Presentation Layer Rules (`src/presentation/`)
+## 4. Presentation and Shared UI
 
-1. **Screens & Components Must Not Hold Domain Entities**:
-   - Screens (`src/presentation/screens/`) and components (`src/presentation/components/`) must render `ViewState` primitives and `SelectOption[]`—never raw `Task` or `User` domain entities.
-   - When editing an item (e.g., `TaskListScreen`), pass the primitive task `id` (or ViewState) into the ViewModel rather than holding a `Task` domain entity in screen state.
-2. **ViewModels Own All Form State & UI Validation**:
-   - Every screen or form (`TaskForm`, `LoginScreen`, `RegisterScreen`, `ProfileEditForm`) delegates its state, validation errors, loading flags, and submit actions to a ViewModel hook (`use<Feature>ViewModel`) in `src/presentation/hooks/`.
-   - Components must be controlled via props (`value`, `onChange`, `error`, `disabled`, `onSubmit`) rather than duplicating stateful business/form logic.
-3. **One Screen, Cohesive ViewModel Composition**:
-   - Screens should not compute domain statistics, slice collections, or merge multiple conflicting user sources inline; derive display-ready `ViewState` (such as dashboard stats, recent tasks, and greeting labels) in a ViewModel or presentation mapper (`src/presentation/models/`).
-4. **Use Domain Methods in Presentation Mappers**:
-   - Presentation mappers (`taskPresentation.ts`, `userPresentation.ts`) should use domain entity methods (`task.isCompleted()`, `task.isOverdue()`) where available rather than re-implementing domain rules.
-5. **UI Components Stay in `src/presentation/components/`**:
-   - Navigation bars (`Navbar`), dialogs, cards, and layout chrome belong in `src/presentation/components/`, not in `src/foundation/`.
-   - When a component's render body mixes multiple distinct regions (e.g., a responsive table + card list + dialog + pagination), decompose it into prop-driven sub-components under a feature subfolder (`src/presentation/components/<feature>/`, e.g. `components/taskList/TaskTable.tsx`, `components/taskList/DeleteTaskDialog.tsx`). The public orchestrator component (e.g. `TaskListContent`) keeps shared local state (pagination, dialog targets), branch selection (loading / error / empty), and prop wiring; extracted sub-components stay stateless and receive `ViewState` + callbacks only.
-   - Internal feature sub-components are not exported from `components/index.ts`; only screen-level entry components are.
-6. **Sealed `ui/` Primitives Are the Only Component-Library Boundary**:
-   - `@mui/*` (including `@mui/icons-material`) may only be imported inside `src/presentation/components/ui/` and `src/foundation/theme/`. Screens and components must compose `Ui*` primitives exclusively.
-   - `ui/` wrapper props must be narrow and semantic: closed unions (`variant: 'solid' | 'outline' | 'text'`, `tone`, `size: 'sm' | 'md'`, `type`), layout-intent props (`gutterBottom`, `maxWidth`, `fullWidth`, `spaced`, `compact`), and value-based callbacks (`onChange: (value: string) => void`).
-   - `ui/` wrappers must never accept `sx`, `component`, MUI `*Props` types, or forward `{...props}` spread to the underlying MUI component. Wrappers may use `sx`/MUI props **internally** only.
-   - When a screen needs a primitive that does not exist yet, add a new `ui/` primitive with a semantic API (e.g., `UiStack`, `UiIconButton`, `UiTable*`, `UiResponsive`, `UiScreen`, `UiIcon` name registry) rather than importing MUI at the call site.
+1. Screens/components render ViewState primitives and SelectOption arrays, not raw Task/Account/Profile entities or domain enums. Editing uses IDs or ViewState. ViewModels own form state, validation feedback, loading and actions. Presentation mappers use domain methods for domain decisions.
+2. Derive dashboard greeting/counts/recent tasks in presentation adapters/ViewModels, not inline screens. Dashboard now receives profile name/loading through an App-injected legacy consumer capability, not security/profile ViewModels. Its remaining task ViewModel composition is C4 scope. Profile receives display-only task counts through its own consumer context; it must never import task internals.
+3. Feature-specific dialogs/cards/forms remain in owning feature presentation (currently legacy presentation/components); shared UI lives in components. Do not move task/profile-specific code into shared components merely because multiple routes use it.
+4. Shared Navbar is a thin prop-driven orchestrator with toolbar/drawer regions under components/layout/navbar. AppNavbar owns session/theme/navigation callbacks, drawer/create-dialog state and the feature-owned TaskDialog. Never use the auth form ViewModel to render global navigation.
+5. Decompose distinct render regions into controlled feature subcomponents; entry components own shared local UI state and branch/callback wiring. Keep internal pieces out of broad public barrels.
+6. SelectOption belongs to components/ui/SelectOption.ts; feature presentation types must not become dependencies of shared primitives.
+7. Only components/ui and foundation/theme may import @mui, including icons. Wrapper APIs remain narrow/semantic: closed variant/tone/size unions, layout-intent props and value-based callbacks. Never expose sx, component, MUI Props or passthrough spreads. Internal MUI props/sx are allowed only inside that boundary. App and feature UI compose Ui primitives exclusively.
 
----
+## 5. Session, Network and Cross-Feature Synchronization
 
-## 5. Foundation Layer Rules (`src/foundation/`)
+1. App injects security-owned auth endpoint exclusions (/auth/login, /auth/register, /auth/refresh), token/version access, refresh and expiry into generic networking. Wrong credentials reach ViewModels intact. Capture token/generation synchronously; coalesce concurrent protected 401 refreshes; retry once. A second 401, absent refresh token, malformed refresh or refresh failure expires the full session and notifies consumers without a forced page reload.
+2. BrowserSessionRepository validates stored account/token values and clears corrupt/partial sessions. Preserve accessToken/refreshToken/user keys and compatible JSON; snapshots must be cached for useSyncExternalStore. Authentication-generation checks prevent old requests/refreshes from reviving logout state, retrying as a different login or clearing a newer session. Refresh uses a separate non-intercepted transport supplied by App.
+3. App coordinates profile/session/cache representations through explicit boundary mappings and ownership/generation checks. Profile mutation revisions protect newer state from stale read/update results. AuthProvider reacts to session notifications and clears cache on signout/expiry. Generic foundation never imports App or feature implementations.
+4. Feature-to-feature interaction is through consumer-owned contracts adapted/injected by App. Do not import another feature's concrete repositories, DTO mappers or ViewModels.
 
-1. **Network Client & 401 Interceptor (`src/foundation/network/axiosClient.ts`)**:
-   - Attach the `Bearer` token from session storage in the request interceptor.
-   - In the 401 response interceptor, **never** intercept or redirect on `/auth/login`, `/auth/register`, or `/auth/refresh` requests, so authentication errors reach the login/register ViewModel intact.
-   - When token refresh fails on a protected request, clear the entire session (`clearSession()`, including stored user data) and notify auth state cleanly.
-2. **Session Storage Validation & Auth Synchronization**:
-   - Validate stored user JSON through `userToDomain` (Zod schema + `UserModel`) when hydrating a session from `localStorage`; if validation fails, clear the corrupted session.
-   - Keep `AuthContext` and the React Query `['user']` cache synchronized: when `updateProfile` updates the user, update both the query cache and the active `AuthContext` session so `Navbar` and `DashboardScreen` never display stale user data.
+## 6. Verification
+
+Run npm test, npm run build and npm run lint in client, plus repository git diff --check. Tests use Node, existing Vite SSR and React rendering without adding dependencies; they verify controlled UI/capability/provider/session/guard behavior, not browser layout or portal interaction. Keep production Vite configuration unchanged by test-only SSR options. Manually audit executable import paths (embedded comparison snippets are content, not module dependencies). Run the server compatibility tests when shared contract paths/behavior change. AST import checks remain explicitly deferred; do not add a parser dependency or invent a checker script without approval.

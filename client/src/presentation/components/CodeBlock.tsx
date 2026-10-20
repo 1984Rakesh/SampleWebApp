@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UiButton, UiPaper } from './ui';
+import { UiButton, UiPaper } from '../../components/ui';
 
 interface CodeBlockProps {
   code: string;

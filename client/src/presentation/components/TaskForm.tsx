@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
-import { UiCard, UiCardContent, UiCardHeader, UiTextField, UiSelect, UiButton, UiAlert, UiStack } from './ui';
-import type { SelectOption } from '../models/SelectOption';
+import { UiCard, UiCardContent, UiCardHeader, UiTextField, UiSelect, UiButton, UiAlert, UiStack } from '../../components/ui';
+import type { SelectOption } from '../../components/ui/SelectOption';
 import type { TaskFormData, TaskFormFieldErrors } from '../models/TaskFormViewState';
 
 interface TaskFormProps {

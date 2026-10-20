@@ -1,107 +1,82 @@
-import axios, { AxiosError, type InternalAxiosRequestConfig, type AxiosResponse } from 'axios';
-import {
-  getAccessToken,
-  getRefreshToken,
-  saveAccessToken,
-  clearSession,
-} from '../auth/sessionStorage';
+import axios, { type AxiosRequestConfig, type InternalAxiosRequestConfig } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
-
-const AUTH_ENDPOINTS = ['/auth/login', '/auth/register', '/auth/refresh'];
-
-function isAuthEndpoint(url?: string): boolean {
-  if (!url) return false;
-  return AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+export class HttpError extends Error {
+  constructor(message: string, public readonly status?: number) { super(message); this.name = 'HttpError'; }
 }
 
-function toTranslatedError(error: AxiosError): Error {
-  const data = error.response?.data;
-  if (
-    data &&
-    typeof data === 'object' &&
-    'error' in data &&
-    typeof (data as { error?: unknown }).error === 'string'
-  ) {
-    return new Error((data as { error: string }).error);
-  }
-  return error;
+export function toHttpError(error: unknown): Error {
+  if (!axios.isAxiosError(error)) return error instanceof Error ? error : new HttpError('Request failed');
+  const message = error.response?.data?.error;
+  return new HttpError(typeof message === 'string' ? message : error.message, error.response?.status);
 }
 
-// Create axios instance
-const axiosClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+export interface AuthenticationCapabilities {
+  getAccessToken(): string | null;
+  getVersion(): number;
+  refreshAccessToken(): Promise<string>;
+  onSessionExpired(): void;
+  isPublicRequest(url?: string): boolean;
+}
 
-// Request interceptor to add JWT token
-axiosClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = getAccessToken();
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+type RetryRequest = InternalAxiosRequestConfig & { _retry?: boolean; _sessionVersion?: number };
+
+export function createHttpClient(config: AxiosRequestConfig = {}) {
+  let authentication: AuthenticationCapabilities | undefined;
+  let pending: { version: number; promise: Promise<string> } | undefined;
+
+  // Create axios instance
+  const client = axios.create({ timeout: 10000, ...config, headers: { 'Content-Type': 'application/json', ...config.headers } });
+
+  // Request interceptor to add JWT token
+  client.interceptors.request.use((request: RetryRequest) => {
+    if (authentication) {
+      const token = authentication.getAccessToken();
+      const version = authentication.getVersion();
+      if (request._sessionVersion !== undefined && request._sessionVersion !== version) throw new HttpError('Session has ended', 401);
+      request._sessionVersion ??= version;
+      if (token) request.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
-  },
-  (error: AxiosError) => {
-    return Promise.reject(toTranslatedError(error));
-  }
-);
+    return request;
+  }, (error: unknown) => { throw toHttpError(error); }, { synchronous: true });
 
-// Response interceptor for token refresh and error translation
-axiosClient.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response;
-  },
-  async (error: AxiosError) => {
-    const originalRequest = error.config as
-      | (InternalAxiosRequestConfig & { _retry?: boolean })
-      | undefined;
-
+  // Response interceptor for token refresh and error translation
+  client.interceptors.response.use((response) => response, async (error: unknown) => {
+    const original = axios.isAxiosError(error) ? error.config as RetryRequest | undefined : undefined;
+    const auth = authentication;
     // Handle 401 errors on protected routes (skip login/register/refresh endpoints)
-    if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retry &&
-      !isAuthEndpoint(originalRequest.url)
-    ) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = getRefreshToken();
-        if (!refreshToken) {
-          clearSession();
-          window.location.href = '/login';
-          return Promise.reject(toTranslatedError(error));
-        }
-
-        // Attempt to refresh token
-        const response = await axios.post<{ accessToken: string }>(`${API_BASE_URL}/auth/refresh`, {
-          refreshToken,
-        });
-
-        const { accessToken } = response.data;
-        saveAccessToken(accessToken);
-
-        // Retry original request with new token
-        if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        }
-        return axiosClient(originalRequest);
-      } catch (refreshError) {
-        clearSession();
-        window.location.href = '/login';
-        return Promise.reject(
-          refreshError instanceof AxiosError ? toTranslatedError(refreshError) : refreshError
-        );
-      }
+    if (!axios.isAxiosError(error) || error.response?.status !== 401 || !original || !auth || auth.isPublicRequest(original.url)) {
+      throw toHttpError(error);
     }
+    const version = original._sessionVersion;
+    if (version !== auth.getVersion()) throw toHttpError(error);
+    if (original._retry) {
+      auth.onSessionExpired();
+      throw toHttpError(error);
+    }
+    original._retry = true;
+    try {
+      // Attempt to refresh token
+      if (!pending || pending.version !== version) pending = { version, promise: auth.refreshAccessToken() };
+      const flight = pending;
+      let token: string;
+      try { token = await flight.promise; }
+      finally { if (pending === flight) pending = undefined; }
+      if (version !== auth.getVersion()) throw new HttpError('Session has ended', 401);
+      // Retry original request with new token
+      original.headers.Authorization = `Bearer ${token}`;
+      return await client(original);
+    } catch (refreshError) {
+      if (version === auth.getVersion()) auth.onSessionExpired();
+      throw toHttpError(refreshError);
+    }
+  });
 
-    return Promise.reject(toTranslatedError(error));
-  }
-);
+  return {
+    client,
+    configureAuthentication: (capabilities: AuthenticationCapabilities) => { authentication = capabilities; },
+  };
+}
 
-export default axiosClient;
+const transport = createHttpClient();
+export const configureAuthentication = transport.configureAuthentication;
+export default transport.client;

@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
 import { useTaskFormViewModel } from '../hooks';
 import type { TaskFormData } from '../models/TaskFormViewState';
-import { UiAlert, UiButton, UiDialog, UiStack, UiText, UiTextField, UiToggleGroup } from './ui';
+import { UiAlert, UiButton, UiDialog, UiStack, UiText, UiTextField, UiToggleGroup } from '../../components/ui';
 
 interface TaskDialogProps {
   open: boolean;

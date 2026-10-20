@@ -1,4 +1,4 @@
-import type { SelectOption } from './SelectOption';
+import type { SelectOption } from '../../components/ui/SelectOption';
 
 export interface TaskFormData {
   title: string;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import LoadingSpinner from './LoadingSpinner';
-import { UiAlert, UiButton, UiCard, UiFlex, UiText } from './ui';
+import LoadingSpinner from '../../components/feedback/LoadingSpinner';
+import { UiAlert, UiButton, UiCard, UiFlex, UiText } from '../../components/ui';
 import TaskTable from './taskList/TaskTable';
 import DeleteTaskDialog from './taskList/DeleteTaskDialog';
 import type { TaskItemViewState } from '../models/TaskListViewState';

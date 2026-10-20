@@ -1,30 +1,6 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './foundation/context';
-import { ThemeProvider } from './foundation/theme';
-import { AppRouter } from './foundation/router/AppRouter';
-import { ErrorBoundary } from './presentation/components/ErrorBoundary';
+import { AppProviders } from './app/providers/AppProviders';
+import { AppRouter } from './app/router/AppRouter';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 1,
-    },
-  },
-});
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ErrorBoundary>
-        <ThemeProvider>
-          <AuthProvider>
-            <AppRouter />
-          </AuthProvider>
-        </ThemeProvider>
-      </ErrorBoundary>
-    </QueryClientProvider>
-  );
+export default function App() {
+  return <AppProviders><AppRouter /></AppProviders>;
 }
-
-export default App;

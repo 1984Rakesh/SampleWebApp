@@ -1,4 +1,4 @@
-import { UiCard, UiCardContent, UiCardHeader, UiChip, UiFlex, UiPressable, UiText } from './ui';
+import { UiCard, UiCardContent, UiCardHeader, UiChip, UiFlex, UiPressable, UiText } from '../../components/ui';
 
 interface Layer {
   name: string;

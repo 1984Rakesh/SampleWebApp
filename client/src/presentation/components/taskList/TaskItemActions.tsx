@@ -1,4 +1,4 @@
-import { UiFlex, UiIconButton } from '../ui';
+import { UiFlex, UiIconButton } from '../../../components/ui';
 import type { TaskItemViewState } from '../../models/TaskListViewState';
 
 interface TaskItemActionsProps {

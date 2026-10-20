@@ -1,0 +1,22 @@
+<!-- @dsCard group="Components" viewport="700x640" name="Data display" subtitle="StatCard, ProgressBar, TaskRow, TaskTable (dark)" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0}.pane{padding:20px;display:flex;flex-direction:column;gap:14px;}.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}</style></head>
+<body><div id="root"></div><script type="text/babel">
+const NS = window.CleanArchitectureTasksDesignSystem_40f78d;
+const { StatCard, ProgressBar, TaskRow, Card } = NS;
+function Demo({ theme }) {
+const [done,setDone]=React.useState(false);
+const rows=[{id:1,title:'Write API docs for task endpoints',description:'Document the REST routes and example payloads.',status:'To do',priority:'High',dueLabel:'Today',dueToday:true},{id:2,title:'Fix login redirect bug',description:'Users landed on a blank page after sign in.',status:'Done',priority:'High',dueLabel:'16 Oct'}];
+return <>
+<div className="row" style={{alignItems:'stretch'}}><StatCard label="Completed" value={5} tone="done" caption="31% of all tasks" /><StatCard label="To do" value={8} tone="todo" caption="1 due today" captionTone="amber" /></div>
+<Card padding={0}><TaskRow divider={false} task={{...rows[0],status:done?'Done':'To do'}} onToggle={()=>setDone(!done)} /></Card>
+<Card padding={20}><ProgressBar legend segments={[{label:'Completed',value:5},{label:'In progress',value:3},{label:'To do',value:8}]} /></Card>
+</>;
+}
+const themes = ["dark"];
+ReactDOM.createRoot(document.getElementById('root')).render(<div style={{display:'block'}}>{themes.map(t => <div key={t} data-theme={t} className="pane" style={{flex:1}}><Demo theme={t} /></div>)}</div>);
+</script></body></html>

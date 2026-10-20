@@ -1,4 +1,4 @@
-import { UiCheckbox, UiChip, UiFlex, UiTable, UiTableBody, UiTableCell, UiTableContainer, UiTableHead, UiTableRow, UiText } from '../ui';
+import { UiCheckbox, UiChip, UiFlex, UiTable, UiTableBody, UiTableCell, UiTableContainer, UiTableHead, UiTableRow, UiText } from '../../../components/ui';
 import TaskItemActions from './TaskItemActions';
 import type { TaskItemViewState } from '../../models/TaskListViewState';
 

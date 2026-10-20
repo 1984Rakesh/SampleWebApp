@@ -1,6 +1,6 @@
 import type { Task } from '../../domain/models';
 import { TaskModel, TaskStatus, TaskPriority } from '../../domain/models';
-import type { SelectOption } from './SelectOption';
+import type { SelectOption } from '../../components/ui/SelectOption';
 import type { TaskFormData } from './TaskFormViewState';
 import type { BadgeTone, DueDateTone, TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
 

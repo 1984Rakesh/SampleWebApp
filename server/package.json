@@ -7,7 +7,9 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:typecheck && tsx --test tests/*.test.ts",
+    "test:startup": "npm run build && npm run test:typecheck && tsx --test tests/startup.smoke.ts",
+    "test:typecheck": "tsc --ignoreConfig --noEmit --target ES2022 --module commonjs --esModuleInterop --strict --skipLibCheck --noUnusedLocals --noUnusedParameters tests/*.ts"
   },
   "keywords": [],
   "author": "",

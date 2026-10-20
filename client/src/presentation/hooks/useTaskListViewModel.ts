@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTaskUseCases } from '../../foundation/composition';
+import { useTaskUseCases } from '../context';
 import type { Task } from '../../domain/models';
 import { nextTaskStatus } from '../../domain/useCases';
 import {

@@ -1,5 +1,5 @@
-import { UiFlex, UiSearchField, UiSelect, UiStack, UiTabs } from './ui';
-import type { SelectOption } from '../models/SelectOption';
+import { UiFlex, UiSearchField, UiSelect, UiStack, UiTabs } from '../../components/ui';
+import type { SelectOption } from '../../components/ui/SelectOption';
 import type { TaskCountsViewState } from '../models/TaskListViewState';
 
 interface TaskFiltersProps {

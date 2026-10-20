@@ -1,6 +1,6 @@
 import type { TaskCountsViewState } from '../models/TaskListViewState';
-import { UiAvatar, UiCard, UiCardContent, UiGrid, UiGridItem, UiText, UiFlex } from './ui';
-import type { UiIconName } from './ui';
+import { UiAvatar, UiCard, UiCardContent, UiGrid, UiGridItem, UiText, UiFlex } from '../../components/ui';
+import type { UiIconName } from '../../components/ui';
 
 interface DashboardStatsProps { counts: TaskCountsViewState; total: number; dueToday: number; dueThisWeek: number }
 

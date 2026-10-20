@@ -11,7 +11,7 @@ import {
   UiGridItem,
   UiScreen,
   UiText,
-} from '../components/ui';
+} from '../../components/ui';
 
 export default function ComparisonScreen() {
   const {

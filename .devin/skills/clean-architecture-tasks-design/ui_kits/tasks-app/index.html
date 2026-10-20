@@ -1,0 +1,56 @@
+<!-- @dsCard group="Tasks app" viewport="1280x860" name="Tasks web app" subtitle="Dashboard, Tasks, New task dialog, Profile — click-through, light/dark/system" -->
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Clean Architecture — Tasks</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script src="data.js"></script>
+</head><body>
+<div id="root"></div>
+<script type="text/babel" src="screen-dashboard.jsx"></script>
+<script type="text/babel" src="screen-tasks.jsx"></script>
+<script type="text/babel" src="task-dialog.jsx"></script>
+<script type="text/babel" src="screen-profile.jsx"></script>
+<script type="text/babel">
+const KEY = 'color-mode';
+const readPref = () => { try { const v = localStorage.getItem(KEY); return v === 'light' || v === 'dark' || v === 'system' ? v : 'system'; } catch (e) { return 'system'; } };
+const mq = window.matchMedia('(prefers-color-scheme: dark)');
+function App() {
+  const { AppHeader } = window.CleanArchitectureTasksDesignSystem_40f78d;
+  const D = window.TasksKitData;
+  const [pref, setPrefState] = React.useState(readPref);
+  const [sysDark, setSysDark] = React.useState(mq.matches);
+  const [route, setRoute] = React.useState(() => (location.hash.slice(1) || 'dashboard'));
+  const [tasks, setTasks] = React.useState(D.tasks);
+  const [user, setUser] = React.useState(D.user);
+  const [dialog, setDialog] = React.useState({ open: false, task: null });
+  React.useEffect(() => { const f = (e) => setSysDark(e.matches); mq.addEventListener('change', f); return () => mq.removeEventListener('change', f); }, []);
+  const mode = pref === 'system' ? (sysDark ? 'dark' : 'light') : pref;
+  React.useEffect(() => { document.documentElement.setAttribute('data-theme', mode); }, [mode]);
+  const setPref = (p) => { setPrefState(p); try { localStorage.setItem(KEY, p); } catch (e) {} };
+  const go = (r) => { setRoute(r); history.replaceState(null, '', '#' + r); window.scrollTo(0, 0); };
+  const toggle = (t) => setTasks((ts) => ts.map((x) => x.id === t.id ? Object.assign({}, x, { status: x.status === 'Done' ? 'To do' : 'Done' }) : x));
+  const del = (t) => setTasks((ts) => ts.filter((x) => x.id !== t.id));
+  const save = (v) => {
+    const off = v.due ? (D.parseDue(v.due) ?? (dialog.task && v.due === dialog.task.dueLabel ? dialog.task.dueOffset : null)) : null;
+    if (dialog.task) setTasks((ts) => ts.map((x) => x.id === dialog.task.id ? D.decorate(Object.assign({}, x, v, { dueOffset: off })) : x));
+    else setTasks((ts) => [D.decorate({ id: Date.now(), title: v.title, description: v.description, priority: v.priority, status: 'To do', dueOffset: off })].concat(ts));
+    setDialog({ open: false, task: null });
+  };
+  const openNew = () => setDialog({ open: true, task: null });
+  let screen;
+  if (route === 'tasks') screen = <TasksScreen tasks={tasks} onToggle={toggle} onNew={openNew} onEdit={(t) => setDialog({ open: true, task: t })} onDelete={del} />;
+  else if (route === 'profile') screen = <ProfileScreen user={user} tasks={tasks} pref={pref} setPref={setPref} onSaveName={(n) => setUser(Object.assign({}, user, { name: n }))} />;
+  else if (route === 'comparison') screen = <main style={{ maxWidth: 1264, margin: '0 auto', padding: '44px 32px' }}><h1 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 42, fontWeight: 700, letterSpacing: '-0.02em' }}>Comparison</h1><p style={{ color: 'var(--text-secondary)' }}>This screen is not covered by the design spec and is left blank on purpose.</p></main>;
+  else screen = <DashboardScreen tasks={tasks} user={user} onToggle={toggle} onNew={openNew} go={go} />;
+  return (<>
+    <AppHeader active={route} onNavigate={go} userName={user.name} theme={mode} onToggleTheme={() => setPref(mode === 'dark' ? 'light' : 'dark')} onLogout={() => {}} />
+    {screen}
+    <TaskDialog open={dialog.open} task={dialog.task} onClose={() => setDialog({ open: false, task: null })} onSave={save} />
+  </>);
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body></html>

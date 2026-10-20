@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTaskUseCases } from '../../foundation/composition';
+import { useTaskUseCases } from '../context';
 import type { TaskFormData, TaskFormFieldErrors } from '../models/TaskFormViewState';
 import { buildPriorityOptions, toTaskFormData, toTaskPriority } from '../models/taskPresentation';
 

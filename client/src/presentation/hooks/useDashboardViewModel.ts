@@ -1,15 +1,13 @@
-import { useAuthViewModel } from './useAuthViewModel';
 import { useTaskListViewModel } from './useTaskListViewModel';
-import { useUserViewModel } from './useUserViewModel';
+import { useDashboardProfile } from '../context';
 import { toDashboardViewState } from '../models/dashboardPresentation';
 
 export function useDashboardViewModel() {
-  const { userName } = useAuthViewModel();
-  const { profile, isLoading: userLoading } = useUserViewModel();
+  const profile = useDashboardProfile();
   const tasks = useTaskListViewModel();
   return {
-    dashboard: toDashboardViewState(profile?.name || userName || 'User', tasks.taskItems, tasks.counts),
-    isLoading: userLoading || tasks.isLoading,
+    dashboard: toDashboardViewState(profile.name, tasks.taskItems, tasks.counts),
+    isLoading: profile.isLoading || tasks.isLoading,
     errorMessage: tasks.errorMessage,
     toggleTaskStatus: tasks.toggleTaskStatus,
   };

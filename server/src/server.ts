@@ -2,11 +2,10 @@ import 'dotenv/config';
 import { loadConfig } from './app/config';
 import { createContainer } from './app/container';
 import { createApp } from './app/createApp';
-import { runMigrations } from './infrastructure/database/migrations';
-import { seedDatabase } from './infrastructure/database/seed';
+import { runMigrations } from './foundation/database/migrations';
 
 // Initialize database and start server
-function startServer(): void {
+async function startServer(): Promise<void> {
   try {
     const config = loadConfig();
     const container = createContainer(config);
@@ -15,7 +14,7 @@ function startServer(): void {
     runMigrations(container.db);
 
     // Seed database
-    seedDatabase(container.db);
+    await container.seed();
 
     createApp(config, container).listen(config.port, () => {
       console.log(`Server is running on port ${config.port}`);
@@ -27,4 +26,4 @@ function startServer(): void {
   }
 }
 
-startServer();
+void startServer();

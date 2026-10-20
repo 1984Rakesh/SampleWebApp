@@ -5,8 +5,5 @@ export { default as TaskFilters } from './TaskFilters';
 export { default as TaskForm } from './TaskForm';
 export { default as TaskListContent } from './TaskListContent';
 export { default as TaskListHeader } from './TaskListHeader';
-export { default as UserProfileCard } from './UserProfileCard';
-export { default as ProfileEditForm } from './ProfileEditForm';
 export { default as ComparisonPanel } from './ComparisonPanel';
 export { default as LayerMap } from './LayerMap';
-export { default as Navbar } from './Navbar';

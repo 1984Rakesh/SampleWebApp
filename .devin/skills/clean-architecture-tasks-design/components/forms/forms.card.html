@@ -1,0 +1,21 @@
+<!-- @dsCard group="Components" viewport="700x560" name="Forms" subtitle="TextField, Select, Tabs, SegmentedControl, Checkbox" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0}.pane{padding:20px;display:flex;flex-direction:column;gap:14px;}.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}</style></head>
+<body><div id="root"></div><script type="text/babel">
+const NS = window.CleanArchitectureTasksDesignSystem_40f78d;
+const { TextField, Select, Tabs, SegmentedControl, Checkbox } = NS;
+function Demo({ theme }) {
+const [p,setP]=React.useState('Medium'); const [s,setS]=React.useState('All'); const [a,setA]=React.useState(theme==='dark'?'Dark':'Light'); const [c,setC]=React.useState(true);
+return <>
+<div className="row"><TextField variant="toolbar" startIcon="search" placeholder="Search tasks" style={{flex:'1 1 200px'}} /><Tabs label="Status" value={s} onChange={setS} items={[{value:'All',label:'All',count:16},{value:'To do',label:'To do',count:8},{value:'Done',label:'Done',count:5}]} /><Select label="Priority" value="All" options={[{value:'All',label:'Priority: All'},'High','Medium','Low']} /></div>
+<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}><TextField label="Title" required defaultValue="Write release notes" /><TextField label="Email" readOnly value="patolerakesh@hotmail.com" /></div>
+<div className="row"><SegmentedControl tinted label="Priority" options={['Low','Medium','High']} value={p} onChange={setP} /><SegmentedControl label="Appearance" options={['Light','Dark','System']} value={a} onChange={setA} /><Checkbox label="Done" checked={false} /><Checkbox label="Done" checked={c} onChange={setC} /></div>
+</>;
+}
+const themes = ["dark","light"];
+ReactDOM.createRoot(document.getElementById('root')).render(<div style={{display:'block'}}>{themes.map(t => <div key={t} data-theme={t} className="pane" style={{flex:1}}><Demo theme={t} /></div>)}</div>);
+</script></body></html>

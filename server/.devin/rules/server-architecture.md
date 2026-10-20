@@ -5,80 +5,59 @@ trigger: always_on
 
 # Server Clean Architecture Rules (Express + SQLite)
 
-These rules extend the root [`.devin/rules/clean-architecture.md`](../../../.devin/rules/clean-architecture.md) for the Express/SQLite server in `server/src/`.
-For operational workflows and refactoring steps, see [`server/AGENTS.md`](../../AGENTS.md).
+These extend the [shared rules](../../../.devin/rules/clean-architecture.md). See [server agent instructions](../../AGENTS.md) for the current tree, migration status and verification commands.
 
----
-
-## 1. Layer Dependency Rules
+## 1. Module and Layer Dependencies
 
 ```text
-presentation ──→ domain ←── infrastructure
-app/ wires everything together
+App → Features / Foundation
+Feature presentation → Feature domain ← Feature infrastructure
 ```
 
-| Layer | Directory | Allowed Internal Imports | Forbidden Imports |
-| :--- | :--- | :--- | :--- |
-| **Domain** | `src/domain/` | `src/domain/*` | `express`, `zod`, `bcrypt`, `jsonwebtoken`, `better-sqlite3`, `dotenv`, `fs`, `path`, `process.env`, `src/infrastructure/*`, `src/presentation/*`, `src/app/*` |
-| **Infrastructure** | `src/infrastructure/` | `src/domain/*`, `src/infrastructure/*` | `express`, `zod`, `src/presentation/*`, `src/app/*`, `process.env` |
-| **Presentation** | `src/presentation/` | `src/domain/*`, `src/presentation/*`, `express`, `zod` | `better-sqlite3`, `bcrypt`, `jsonwebtoken`, `src/infrastructure/*`, `src/app/*`, `process.env` |
-| **App / Bootstrap** | `src/app/`, `src/server.ts` | All layers | Business logic, inline SQL, or unvalidated request handling |
+App is the composition tier, not part of foundation. Foundation exposes reusable technical capabilities and never imports App or features. Shared domain contains only framework-free common errors/value rules. Feature domains never import foundation.
 
----
+S4 server acceptance is complete. All server business code lives in `src/security/`, `src/profile/`, and `src/tasks/`, supported by `src/foundation/` and `src/shared/domain/`. Legacy source roots and stale generated output have been removed with approval; do not recreate top-level domain/infrastructure/presentation roots or add artificial client-only counterparts. Client C2 security/profile/session migration is complete; later client feature phases require separate approval.
 
-## 2. Domain Layer Rules (`src/domain/`)
+| Module | Allowed internal dependencies | Forbidden dependencies |
+| :--- | :--- | :--- |
+| Feature domain | Own models/ports/use cases, minimal shared domain | Other feature internals, foundation, App, infrastructure/presentation, Express, Zod, crypto/SQLite adapters, Node/browser/environment APIs |
+| Feature infrastructure | Own domain/infrastructure, generic foundation capabilities, shared domain | Other feature internals, presentation, App, Express, Zod, process.env |
+| Feature presentation | Own domain/presentation, generic foundation HTTP helpers, shared domain | Other feature internals, infrastructure, App, SQLite/bcrypt/JWT adapters, process.env |
+| Foundation | Own generic modules, shared domain, appropriate technical libraries | Feature or legacy business models/ports/adapters, App, business policy, process.env |
+| Shared domain | Shared domain only | Frameworks, foundation, App, feature models |
+| App / bootstrap | All layers for composition | Business rules, inline SQL, unvalidated request handling |
 
-1. **Authoritative Constants & Value Normalization**:
-   - `domain/models/Task.ts` owns `TASK_STATUSES`, `TASK_PRIORITIES`, `DEFAULT_TASK_STATUS`, `DEFAULT_TASK_PRIORITY`, `normalizeTaskTitle`, and optional text normalization.
-   - `domain/models/User.ts` owns `normalizeUserName`, `normalizeEmail` (trimming, lowercasing, and email format validation), and `validatePassword` (enforcing minimum password length of 6 characters).
-2. **Use Case Invariants**:
-   - Every use case is a class named `<Operation>UseCase` with constructor-injected ports and a single public `execute(input)` method.
-   - `RegisterUserUseCase` and `LoginUseCase` must normalize email (`normalizeEmail`) and validate credentials using domain rules before calling ports.
-   - `RefreshAccessTokenUseCase` must verify the refresh token using `tokenService.verifyRefreshToken(refreshToken)`, confirm the user still exists via `userRepository.findById(payload.userId)`, and issue a fresh access token.
-   - Do not catch and rethrow errors in use cases when the port already throws the appropriate `DomainError`.
-3. **Clearable Optional Fields**:
-   - `TaskChanges` (`description`, `dueDate`) and `UserProfileChanges` (`bio`, `avatar`) must support `string | null | undefined` so callers can either omit a field (`undefined` = keep current value) or pass `null` / `""` (normalized to `null` = clear value in persistence).
+Cross-feature capabilities use consumer-owned ports injected in App; do not import sibling implementations or use App as a service locator. Account creation/credential lookup/refresh identity belong to security's AccountRepository; profile reads/updates belong to ProfileRepository. Both SQLite adapters receive the same database from App without importing one another.
 
----
+## 2. Domain Rules
 
-## 3. Infrastructure Layer Rules (`src/infrastructure/`)
+1. `tasks/domain/models/Task.ts` owns task status/priority constants, creation defaults, model/filter/change types and title normalization. `shared/domain/normalizeOptionalText.ts` owns the proven common undefined/null/trimmed-string semantics. Errors live in `shared/domain/errors.ts`.
+2. Shared `shared/domain/normalizeUserName.ts` is used by registration and profile updates. Security's `domain/models/Account.ts` owns email normalization and the existing six-character registration password policy. Security's Auth model owns login/register input types, tokens and auth results. Profile's `domain/models/Profile.ts` owns profile/update types; no credential or token types belong there. Do not share a universal User entity.
+3. Use cases are constructor-injected `<Operation>UseCase` classes with a single public `execute` operation. Both reads and writes use ports; ports import models, never use cases. Validate business invariants before calling adapters; outer Zod parsing is structural, not a substitute for domain validation.
+4. Registration normalizes name/email and validates password before calling ports; login normalizes email and verifies credentials without changing its existing invalid-credentials response policy. Refresh verifies a refresh token, then consumes only `findIdentityById` from AccountRepository and signs the current stored identity. Missing accounts are unauthorized. Do not catch only to rethrow adapter-translated errors.
+5. Task changes and profile changes support `string | null | undefined` for nullable fields: omission preserves, null/normalized empty clears, non-empty updates. Never fabricate missing identity, ownership, status or other required persisted values.
 
-1. **Persistence Row Validation (`src/infrastructure/persistence/`)**:
-   - Keep database row interfaces in `snake_case` (`TaskRow`, `UserRow`, `UserCredentialsRow`).
-   - Validate enum columns (`row.status`, `row.priority`) against `TASK_STATUSES` and `TASK_PRIORITIES` in `rowToTask` rather than using unsafe `as TaskStatus` casts.
-   - Normalize SQLite `CURRENT_TIMESTAMP` strings (`YYYY-MM-DD HH:MM:SS`) to ISO-8601 UTC format (`YYYY-MM-DDTHH:MM:SS.000Z` / `YYYY-MM-DDTHH:MM:SSZ`) during row-to-domain mapping so client date parsing is timezone-safe.
-2. **Parameterized & User-Scoped SQL (`src/infrastructure/repositories/`)**:
-   - Scope every task read, update, and delete query by `WHERE id = ? AND user_id = ?`.
-   - Support clearing nullable columns (`description`, `due_date`, `bio`, `avatar`) when `null` is explicitly provided in `changes`, while preserving existing values when a field in `changes` is `undefined`.
-   - Translate `SQLITE_CONSTRAINT_UNIQUE` into `ConflictError` at the repository boundary.
-3. **Token Type Separation (`src/infrastructure/security/JwtTokenService.ts`)**:
-   - Include an explicit token type claim (`type: 'access' | 'refresh'`) when signing JWTs.
-   - `verifyAccessToken` must reject tokens whose `type !== 'access'`; `verifyRefreshToken` must reject tokens whose `type !== 'refresh'`. A refresh token must never be accepted as a Bearer token on protected routes, and an access token must never be accepted by `/api/auth/refresh`.
-   - Translate all `jsonwebtoken` errors into `UnauthorizedError`.
-4. **Database Seed & Migrations (`src/infrastructure/database/`)**:
-   - Receive `db` (and any required security adapters/configuration) as function parameters; never instantiate database connections at module import time.
+## 3. Infrastructure and Foundation
 
----
+1. Each feature's `infrastructure/persistence/` owns snake_case row contracts and explicit mapping. Security owns AccountRow/AccountCredentialsRow/AccountIdentityRow; profile owns ProfileRow; tasks owns TaskRow. Identity lookup selects only id/email; profile queries never select credential columns. Do not expose row types or driver errors to domain/presentation or import another feature's mapper.
+2. Task row mapping checks stored status/priority against domain constants and rejects invalid values without defaulting. Corrupt persisted enums are unexpected internal failures, not client validation failures; global middleware returns a sanitized 500 response.
+3. Generic UTC normalization lives in `foundation/persistence/normalizeSqliteTimestamp.ts`. Convert SQLite `YYYY-MM-DD HH:MM:SS` timestamps to ISO UTC during row mapping; preserve valid existing ISO strings. Never couple user mapping to task mapping.
+4. Parameterize SQL. Task collections are scoped by user_id; individual updates/deletes include id and user_id. Preserve omitted nullable columns and set explicit null to SQL NULL. Translate unique-email constraints into `ConflictError` inside persistence adapters.
+5. JWT/bcrypt implementations belong to `security/infrastructure/security/`. Include access/refresh type claims, verify expected type, translate JWT failures into `UnauthorizedError`, and never accept refresh tokens as access tokens or vice versa.
+6. `foundation/database/` owns connection/migration/seed mechanics. Functions receive dependencies; no import-time connections. Seed takes an async hashing callback, supplied by App, and does not import feature adapters or choose hashing policy. App orchestrates cross-feature provisioning; preserve existing records, schema and seed behavior.
+7. Generic HTTP parsing, identity extraction, logging and error translation live in `foundation/http/`. The generic authenticated-request contract is owned there, not imported from a security domain model. Token verification remains auth/security behavior wired by App.
 
-## 4. Presentation Layer Rules (`src/presentation/`)
+## 4. Presentation and API
 
-1. **Request Schemas & Response DTOs (`src/presentation/schemas/`)**:
-   - Derive Zod enums directly from domain constants (`z.enum(TASK_STATUSES)`, `z.enum(TASK_PRIORITIES)`).
-   - Preserve `null` on clearable optional fields in update schemas (`updateTaskBodySchema`, `updateProfileBodySchema`) instead of transforming `null` to `undefined`.
-   - Type response DTOs strictly (`TaskResponse.status: TaskStatus`, `TaskResponse.priority: TaskPriority`).
-2. **Controllers (`src/presentation/controllers/`)**:
-   - Follow the pipeline: `parseRequest(schema, input)` → `requireUserId(req)` → `useCase.execute(...)` → `dtoMapper(...)` → `res.json(...)`.
-   - Never wrap async controller handlers in `try/catch`; Express 5 forwards rejected promises to `errorMiddleware`.
-3. **Middleware (`src/presentation/middleware/`)**:
-   - `authMiddleware` calls `tokenService.verifyAccessToken(...)` and attaches `req.user`.
-   - `errorMiddleware` maps `ValidationError` → `400`, `UnauthorizedError` → `401`, `NotFoundError` → `404`, `ConflictError` → `409`, malformed JSON → `400`, and unknown errors → `500` with `{ error: 'Internal server error' }`.
+1. Each feature owns presentation schemas/DTOs/mappers/controllers/routes. AuthResponse and AccountResponse belong to security; ProfileResponse belongs to profile. Map explicit field whitelists independently so password hashes never leak. Preserve auth's public `user` envelope without importing profile models/DTOs into security; small explicit mapping duplication is preferable to cross-feature coupling.
+2. Derive Zod task enums from domain constants. Keep request/response DTOs separate and response enum fields narrow. Preserve explicit null in clearable update schemas.
+3. Controllers follow parsing → authenticated identity → use case → response mapping. Express 5 handles rejected async handlers; do not add redundant catch/rethrow blocks.
+4. App injects authentication middleware into route factories. Identity comes only from verified access tokens, never request body userId.
+5. Foundation error middleware maps ValidationError/UnauthorizedError/NotFoundError/ConflictError to 400/401/404/409, malformed JSON to 400, and unexpected errors to 500 with `{ error: 'Internal server error' }`. All error responses use `{ error: string }`.
+6. Preserve `/api/auth`, `/api/users`, `/api/tasks`, existing camelCase JSON, ISO UTC timestamps and 200/201/204 success behavior during reorganization.
 
----
+## 5. App and Verification
 
-## 5. Configuration & Bootstrap Rules (`src/app/`, `src/server.ts`)
+Only `app/config.ts` reads process.env; missing/default production JWT secrets must fail configuration. Only `app/container.ts` constructs repositories, security adapters, use cases, controllers and routers. `app/createApp.ts` mounts middleware/routes; `server.ts` invokes configuration/composition/migrations, awaits App-wired seed, then listens. Keep dist/server.js as the package entry.
 
-1. **Single `process.env` Reader**:
-   - Only `src/app/config.ts` reads `process.env`.
-   - In production (`NODE_ENV === 'production'`), `loadConfig` must throw an error if `JWT_SECRET` is missing or set to the default development placeholder.
-2. **Composition Root (`src/app/container.ts`)**:
-   - Only `container.ts` instantiates repositories, security adapters, use cases, controllers, and routers.
+Run server build, `npm test` (including strict test typechecking), `npm run test:startup` (compiled entry smoke tests), and repository `git diff --check`. The compatibility test uses the unchanged client's validators/mappers without adding a production dependency on client code. Use only disposable databases in tests; startup smoke tests must explicitly set DB_PATH=:memory:, isolate environment/dotenv loading, use ephemeral ports, and stop their child processes. AST import-boundary tooling is deferred by explicit user choice; do not claim a checker script exists or add a parser dependency without approval. Audit domain purity, inward port dependencies, App-only composition, foundation independence and feature isolation manually until tooling is approved.

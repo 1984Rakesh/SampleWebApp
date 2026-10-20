@@ -1,4 +1,4 @@
-import { UiCard, UiCardContent, UiChip, UiFlex, UiStack, UiText } from '../ui';
+import { UiCard, UiCardContent, UiChip, UiFlex, UiStack, UiText } from '../../../components/ui';
 import TaskItemActions from './TaskItemActions';
 import type { TaskItemViewState } from '../../models/TaskListViewState';
 

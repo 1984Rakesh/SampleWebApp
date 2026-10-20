@@ -1,70 +1,64 @@
 # Clean Architecture Agent Instructions (Shared)
 
-Apply these instructions and the rules in [`.devin/rules/clean-architecture.md`](./.devin/rules/clean-architecture.md) to all new features, bug fixes, and refactors. Existing violations are never precedents; remediate them whenever they fall within the task scope.
+Apply these instructions and the [shared architecture rules](./.devin/rules/clean-architecture.md) to every feature, bug fix and refactor. Existing violations are not precedents; remediate those within task scope with regression tests.
 
-## 1. Rule & Instruction Hierarchy
+## 1. Required Instructions
 
-Before changing any code, read the rule and instruction files for every side you touch:
+Before changing a side, read its instructions and rules:
+- Shared: this file and [shared rules](./.devin/rules/clean-architecture.md).
+- Server: [server/AGENTS.md](./server/AGENTS.md) and [server architecture](./server/.devin/rules/server-architecture.md).
+- Client: [client/AGENTS.md](./client/AGENTS.md) and [client architecture](./client/.devin/rules/client-architecture.md).
 
-- **Shared**: [`.devin/rules/clean-architecture.md`](./.devin/rules/clean-architecture.md) and [`AGENTS.md`](./AGENTS.md)
-- **Client (`client/`)**: [`client/.devin/rules/client-architecture.md`](./client/.devin/rules/client-architecture.md) and [`client/AGENTS.md`](./client/AGENTS.md)
-- **Server (`server/`)**: [`server/.devin/rules/server-architecture.md`](./server/.devin/rules/server-architecture.md) and [`server/AGENTS.md`](./server/AGENTS.md)
-
-## 2. Dependency Direction & Layer Boundaries
+## 2. Target Architecture and Migration Status
 
 ```text
-Outer layers (UI / HTTP, persistence, transport) ──→ Domain
-Application / Foundation composition wires the layers together
+Building blocks: Foundation → Features → App
+Imports:         App → Features / Foundation
+Within features: Presentation → Domain ← Data / Infrastructure
 ```
 
-- Keep `domain/` 100% framework-agnostic.
-- Keep `domain/repositories/` (client) and `domain/ports/` (server) dependent only on `domain/models/`, never on `domain/useCases/`.
-- Convert data explicitly at every boundary (Persistence Row ↔ Domain Model ↔ Transport DTO ↔ Presentation ViewState).
-- Isolate framework compromises in composition/adapter modules (`client/src/foundation/composition/`, `server/src/app/container.ts`).
+App binds features and performs DI, provider/route/shell registration and cross-feature adaptation. Foundation provides generic technical capabilities; it never imports features or App. Feature domains are pure TypeScript and never import foundation, frameworks, browser/server APIs or outer layers. Feature outer layers may use appropriate foundation capabilities. Cross-feature dependencies use narrow consumer-owned contracts injected by App, never sibling ViewModel/repository implementation imports.
 
-## 3. Cross-Layer Change Workflow
+Target server modules: `app/`, `foundation/`, `security/`, `profile/`, `tasks/`, `shared/`, with thin `server.ts`. Target client modules add `dashboard/`, `comparison/`, shared `components/`, thin `App.tsx` and `main.tsx`. Within each feature use domain/infrastructure/presentation on server and domain/data/presentation on client as applicable; no empty layers for symmetry.
 
-When implementing or modifying a feature across client and server:
+**Current checkpoint: C2 (server acceptance complete).** Client security/profile now own their domain/data/presentation stacks and consumer contexts; App maps account/profile/session/cache representations and injects display-only cross-feature capabilities. Foundation exposes generic transport/storage/theme only, with no feature/App imports. Shared UI and App composition remain migrated. Tasks/dashboard/comparison remain in legacy roots pending C3/C4. Token refresh/signout/expiry are security-owned and wired through App; profile read/update ordering and authentication generations protect newer sessions/results. Public API/browser routes and stored user/token formats remain compatible. Pause before C3; do not claim future phases complete.
 
-1. **Start in the Domain (`server/src/domain/` & `client/src/domain/`)**:
-   - Define or update domain models, constants, value normalizers, and domain errors in `domain/models/`.
-   - Update repository/port interfaces (`domain/ports/` on server, `domain/repositories/` on client) to cover both reads and writes.
-   - Implement or update the single-operation `<Operation>UseCase.ts` in `domain/useCases/`.
-2. **Implement Infrastructure / Data Adapters (`server/src/infrastructure/` & `client/src/data/`)**:
-   - **Server**: Update row types and validated row-to-domain mappers in `infrastructure/persistence/`, then update SQLite/security adapters.
-   - **Client**: Update request/response DTOs and Zod schemas in `data/dtos/`, update mappers in `data/mappers/`, translate HTTP/Axios errors into domain errors, and wire React Query caches in `data/repositories/`.
-3. **Update Presentation (`server/src/presentation/` & `client/src/presentation/`)**:
-   - **Server**: Update Zod request schemas, response DTO types, and domain-to-DTO mappers; wire controller handlers and routes.
-   - **Client**: Map domain outputs into `ViewState` and `SelectOption[]` in `presentation/models/`; expose state, validation, and actions from `use<Feature>ViewModel.ts`; render purely via props in screens and components.
-4. **Wire in Composition Root (`server/src/app/container.ts` & `client/src/foundation/`)**:
-   - Connect concrete repositories and use cases at the application edge.
+## 3. Implementation Workflow
 
-## 4. Architectural Self-Audit Checklist
+1. Define owned domain models/value types/normalization/errors, repository or port contracts and single-operation use cases. Ports depend only on models/minimal shared domain, never use cases. Every read and write goes through a use case and contract.
+2. Implement owned data/infrastructure adapters with explicit persistence/DTO/domain mappings and boundary error translation. Reuse generic foundation mechanisms, not sibling feature internals.
+3. Update presentation: server structural schemas/controllers/routes/response mapping; client presentation mappers/ViewState, ViewModels and prop-driven screens/components. Never leak DTOs, raw driver/HTTP errors or domain entities into UI.
+4. Bind concrete implementations and cross-feature contracts at the App edge: server `src/app/container.ts`; client `src/app/composition/` and `src/app/providers/`. ViewModels consume contracts owned in their presentation layer, never App modules. Security/profile contexts are feature-owned; remaining legacy task/dashboard-summary contracts stay in `client/src/presentation/context/` until C3/C4.
+5. Update affected instructions/rules/links/diagrams alongside the actual migration. Shared docs distinguish target versus legacy paths; client instructions change only during client phases.
 
-Before completing any task, verify every item below:
+## 4. Self-Audit
 
-- [ ] **No Reverse Dependencies**: Does `domain/` import anything from `data/`, `infrastructure/`, `presentation/`, `foundation/`, `app/`, React, Express, Axios, Zod, or SQLite? (Must be **No**).
-- [ ] **No Upward Port Dependencies**: Do `domain/repositories/` or `domain/ports/` import from `domain/useCases/`? (Must be **No**; shared input/filter types belong in `domain/models/`).
-- [ ] **Complete Read & Write Contracts**: Do read operations (`getTasks`, `getCurrentUser`) go through repository contracts and use cases rather than bypassing them? (Must be **Yes**).
-- [ ] **Boundary Error Translation**: Are Axios/HTTP `{ error: string }` payloads, SQLite constraint errors, and JWT failures translated into domain/application errors at the adapter boundary? (Must be **Yes**).
-- [ ] **No Domain Leaks in UI**: Do React screens or components hold domain entities (`Task`, `User`) or import domain enums directly instead of using `ViewState` and `SelectOption[]`? (Must be **No**).
-- [ ] **Sealed UI Primitives**: Do screens or components import `@mui/*`, use `sx`, or consume wrapper props typed as MUI `*Props`? (Must be **No**; `@mui/*` may only be imported inside `client/src/presentation/components/ui/` and `client/src/foundation/theme/`).
-- [ ] **Clearable Optional Fields**: Can nullable fields (`description`, `dueDate`, `bio`, `avatar`) be cleared with `null` or `""` on update without being ignored by `COALESCE` or stripped to `undefined`? (Must be **Yes**).
-- [ ] **Decomposed Render Bodies**: Are components with multiple distinct render regions split into prop-driven sub-components under `client/src/presentation/components/<feature>/`, with the entry component acting as a thin orchestrator? (Must be **Yes**).
+- No domain imports of foundation, data/infrastructure, presentation, App, React, Express, Axios, Zod, SQLite, crypto implementations or environment/browser APIs.
+- No upward repository/port imports from useCases; command/filter types belong to owned domain models.
+- No foundation imports of features/App; no shared-kernel feature entities or frameworks; no feature-to-App service locator dependencies.
+- DI/concrete feature construction and cross-feature synchronization live in App, not foundation or UI.
+- Reads and writes go through focused use cases and domain repository contracts.
+- Explicit Persistence Row ↔ Domain ↔ DTO ↔ ViewState mappings normalize then validate; never fabricate persisted IDs/ownership/enums.
+- Database/JWT/transport errors are translated at boundaries; public error envelopes and status codes remain consistent.
+- Nullable updates distinguish omitted/undefined, explicit null/empty, and non-empty values through schemas/mappers/SQL.
+- Client components render ViewState/primitives/options, not raw domain entities/enums. ViewModels own form state/validation/actions.
+- MUI imports stay inside `client/src/components/ui/` and `client/src/foundation/theme/`. No sx or MUI prop types leak into consumers. Shared UI contracts such as SelectOption belong to components/ui; shared components must not import business domain/data/App or feature components.
+- Split multi-region render bodies into feature-owned controlled subcomponents. Shared components stay feature-independent; App wires dashboard/navbar capabilities and tasks-owned dialogs.
+- Preserve APIs, browser routes, database schema/data, stored-session compatibility and UI behavior during reorganization.
 
-## 5. Verification Commands
+## 5. Verification
 
-Run the verification suite for every side you modify:
+Run checks for every modified side:
 
 ```bash
-# Client verification
-cd client && npm run build && npm run lint
+# Server
+cd server && npm run build && npm test && npm run test:startup
 
-# Server verification
-cd server && npm run build
+# Client (when modified)
+cd client && npm test && npm run build && npm run lint
 
-# Formatting / whitespace check
+# Repository whitespace
 git diff --check
 ```
 
-Fix all newly introduced errors and warnings before finishing.
+Server tests typecheck before executing and use disposable databases/ephemeral listeners only. Never run fixtures against existing database files or import the persistent startup module. Architecture checker tooling is deferred by user choice; manual import audits remain required, and builds/tests do not replace them. Do not invent a check:architecture script or add a parser dependency without approval. Fix newly introduced failures before completing a phase.

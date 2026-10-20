@@ -2,8 +2,8 @@ import { useDashboardViewModel } from '../hooks';
 import DashboardProgress from '../components/DashboardProgress';
 import DashboardRecentTasks from '../components/DashboardRecentTasks';
 import DashboardStats from '../components/DashboardStats';
-import LoadingSpinner from '../components/LoadingSpinner';
-import { UiAlert, UiFlex, UiGrid, UiGridItem, UiPage, UiScreen, UiText } from '../components/ui';
+import LoadingSpinner from '../../components/feedback/LoadingSpinner';
+import { UiAlert, UiFlex, UiGrid, UiGridItem, UiPage, UiScreen, UiText } from '../../components/ui';
 
 export default function DashboardScreen() {
   const { dashboard, isLoading, errorMessage, toggleTaskStatus } = useDashboardViewModel();

@@ -1,4 +1,4 @@
-import { UiFlex, UiText } from './ui';
+import { UiFlex, UiText } from '../../components/ui';
 
 interface TaskListHeaderProps { total: number; todo: number }
 

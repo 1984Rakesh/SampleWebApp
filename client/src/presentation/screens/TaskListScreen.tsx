@@ -1,7 +1,7 @@
 import { useTaskListViewModel } from '../hooks';
 import { TaskFilters, TaskListContent, TaskListHeader } from '../components';
 import TaskDialog from '../components/TaskDialog';
-import { UiAlert, UiFlex, UiScreen } from '../components/ui';
+import { UiAlert, UiFlex, UiScreen } from '../../components/ui';
 
 export default function TaskListScreen() {
   const tasks = useTaskListViewModel();

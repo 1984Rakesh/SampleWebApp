@@ -1,4 +1,4 @@
-import { UiButton, UiDialog } from '../ui';
+import { UiButton, UiDialog } from '../../../components/ui';
 
 interface DeleteTaskDialogProps {
   open: boolean;

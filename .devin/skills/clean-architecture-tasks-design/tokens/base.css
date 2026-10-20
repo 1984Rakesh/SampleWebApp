@@ -1,0 +1,7 @@
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body,[data-theme]{background-color:var(--bg-default);color:var(--text-primary);font-family:var(--font-body);font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+a{color:var(--primary-soft);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}

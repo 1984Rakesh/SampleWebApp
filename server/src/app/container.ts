@@ -1,30 +1,33 @@
 import type { Router } from 'express';
-import { LoginUseCase } from '../domain/useCases/auth/LoginUseCase';
-import { RefreshAccessTokenUseCase } from '../domain/useCases/auth/RefreshAccessTokenUseCase';
-import { RegisterUserUseCase } from '../domain/useCases/auth/RegisterUserUseCase';
-import { CreateTaskUseCase } from '../domain/useCases/tasks/CreateTaskUseCase';
-import { DeleteTaskUseCase } from '../domain/useCases/tasks/DeleteTaskUseCase';
-import { GetTasksUseCase } from '../domain/useCases/tasks/GetTasksUseCase';
-import { ToggleTaskStatusUseCase } from '../domain/useCases/tasks/ToggleTaskStatusUseCase';
-import { UpdateTaskUseCase } from '../domain/useCases/tasks/UpdateTaskUseCase';
-import { GetCurrentUserUseCase } from '../domain/useCases/users/GetCurrentUserUseCase';
-import { UpdateProfileUseCase } from '../domain/useCases/users/UpdateProfileUseCase';
-import { createDatabase, type DatabaseConnection } from '../infrastructure/database/connection';
-import { SqliteTaskRepository } from '../infrastructure/repositories/SqliteTaskRepository';
-import { SqliteUserRepository } from '../infrastructure/repositories/SqliteUserRepository';
-import { BcryptPasswordHasher } from '../infrastructure/security/BcryptPasswordHasher';
-import { JwtTokenService } from '../infrastructure/security/JwtTokenService';
-import { createAuthController } from '../presentation/controllers/AuthController';
-import { createTaskController } from '../presentation/controllers/TaskController';
-import { createUserController } from '../presentation/controllers/UserController';
-import { createAuthMiddleware } from '../presentation/middleware/authMiddleware';
-import { createAuthRoutes } from '../presentation/routes/authRoutes';
-import { createTaskRoutes } from '../presentation/routes/taskRoutes';
-import { createUserRoutes } from '../presentation/routes/userRoutes';
+import { LoginUseCase } from '../security/domain/useCases/LoginUseCase';
+import { RefreshAccessTokenUseCase } from '../security/domain/useCases/RefreshAccessTokenUseCase';
+import { RegisterUserUseCase } from '../security/domain/useCases/RegisterUserUseCase';
+import { CreateTaskUseCase } from '../tasks/domain/useCases/CreateTaskUseCase';
+import { DeleteTaskUseCase } from '../tasks/domain/useCases/DeleteTaskUseCase';
+import { GetTasksUseCase } from '../tasks/domain/useCases/GetTasksUseCase';
+import { ToggleTaskStatusUseCase } from '../tasks/domain/useCases/ToggleTaskStatusUseCase';
+import { UpdateTaskUseCase } from '../tasks/domain/useCases/UpdateTaskUseCase';
+import { GetCurrentUserUseCase } from '../profile/domain/useCases/GetCurrentUserUseCase';
+import { UpdateProfileUseCase } from '../profile/domain/useCases/UpdateProfileUseCase';
+import { createDatabase, type DatabaseConnection } from '../foundation/database/connection';
+import { seedDatabase } from '../foundation/database/seed';
+import { SqliteTaskRepository } from '../tasks/infrastructure/repositories/SqliteTaskRepository';
+import { SqliteAccountRepository } from '../security/infrastructure/repositories/SqliteAccountRepository';
+import { SqliteProfileRepository } from '../profile/infrastructure/repositories/SqliteProfileRepository';
+import { BcryptPasswordHasher } from '../security/infrastructure/security/BcryptPasswordHasher';
+import { JwtTokenService } from '../security/infrastructure/security/JwtTokenService';
+import { createAuthController } from '../security/presentation/controllers/AuthController';
+import { createTaskController } from '../tasks/presentation/controllers/TaskController';
+import { createProfileController } from '../profile/presentation/controllers/ProfileController';
+import { createAuthMiddleware } from '../security/presentation/middleware/authMiddleware';
+import { createAuthRoutes } from '../security/presentation/routes/authRoutes';
+import { createTaskRoutes } from '../tasks/presentation/routes/taskRoutes';
+import { createProfileRoutes } from '../profile/presentation/routes/profileRoutes';
 import type { AppConfig } from './config';
 
 export interface Container {
   db: DatabaseConnection;
+  seed: () => Promise<void>;
   routers: {
     auth: Router;
     users: Router;
@@ -36,21 +39,22 @@ export function createContainer(config: AppConfig): Container {
   const db = createDatabase(config.dbPath);
 
   const taskRepository = new SqliteTaskRepository(db);
-  const userRepository = new SqliteUserRepository(db);
+  const accountRepository = new SqliteAccountRepository(db);
+  const profileRepository = new SqliteProfileRepository(db);
   const passwordHasher = new BcryptPasswordHasher();
   const tokenService = new JwtTokenService(config.jwt);
 
   const authMiddleware = createAuthMiddleware(tokenService);
 
   const authController = createAuthController({
-    registerUser: new RegisterUserUseCase(userRepository, passwordHasher, tokenService),
-    login: new LoginUseCase(userRepository, passwordHasher, tokenService),
-    refreshAccessToken: new RefreshAccessTokenUseCase(tokenService, userRepository),
+    registerUser: new RegisterUserUseCase(accountRepository, passwordHasher, tokenService),
+    login: new LoginUseCase(accountRepository, passwordHasher, tokenService),
+    refreshAccessToken: new RefreshAccessTokenUseCase(tokenService, accountRepository),
   });
 
-  const userController = createUserController({
-    getCurrentUser: new GetCurrentUserUseCase(userRepository),
-    updateProfile: new UpdateProfileUseCase(userRepository),
+  const profileController = createProfileController({
+    getCurrentUser: new GetCurrentUserUseCase(profileRepository),
+    updateProfile: new UpdateProfileUseCase(profileRepository),
   });
 
   const taskController = createTaskController({
@@ -63,9 +67,10 @@ export function createContainer(config: AppConfig): Container {
 
   return {
     db,
+    seed: () => seedDatabase(db, (password) => passwordHasher.hash(password)),
     routers: {
       auth: createAuthRoutes(authController),
-      users: createUserRoutes(userController, authMiddleware),
+      users: createProfileRoutes(profileController, authMiddleware),
       tasks: createTaskRoutes(taskController, authMiddleware),
     },
   };

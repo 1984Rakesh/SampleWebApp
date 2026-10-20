@@ -1,5 +1,5 @@
 import type { BadgeTone } from '../models/TaskListViewState';
-import { UiChip } from './ui';
+import { UiChip } from '../../components/ui';
 
 interface BadgeProps {
   label: string;

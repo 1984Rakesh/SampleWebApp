@@ -1,5 +1,5 @@
 import type { TaskCountsViewState } from '../models/TaskListViewState';
-import { UiAvatar, UiCard, UiCardContent, UiFlex, UiIcon, UiProgress, UiText } from './ui';
+import { UiAvatar, UiCard, UiCardContent, UiFlex, UiIcon, UiProgress, UiText } from '../../components/ui';
 
 interface DashboardProgressProps { counts: TaskCountsViewState; total: number; percent: number }
 

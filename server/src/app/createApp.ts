@@ -1,7 +1,7 @@
 import express, { type Express } from 'express';
 import cors from 'cors';
-import { errorMiddleware } from '../presentation/middleware/errorMiddleware';
-import { requestLogger } from '../presentation/middleware/requestLogger';
+import { errorMiddleware } from '../foundation/http/errorMiddleware';
+import { requestLogger } from '../foundation/http/requestLogger';
 import type { AppConfig } from './config';
 import type { Container } from './container';
 

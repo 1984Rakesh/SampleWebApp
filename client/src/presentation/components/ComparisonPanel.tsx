@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import CodeBlock from './CodeBlock';
-import { UiCard, UiCardContent, UiCardHeader, UiText, UiToggleGroup } from './ui';
+import { UiCard, UiCardContent, UiCardHeader, UiText, UiToggleGroup } from '../../components/ui';
 
 const viewOptions = [
   { value: 'typescript', label: 'TypeScript (Web)' },
