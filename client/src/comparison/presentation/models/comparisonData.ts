@@ -90,10 +90,10 @@ class NetworkClient {
         name: 'AuthContext',
         typescript: `// React Context for dependency injection
 import { createContext, useContext, useState } from 'react';
-import type { User } from './domain/models';
+import type { Account } from '../../domain/models';
 
 interface AuthContextType {
-  user: User | null;
+  user: Account | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -102,7 +102,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Account | null>(null);
 
   const login = async (email: string, password: string) => {
     // Auth logic
@@ -408,8 +408,8 @@ enum TaskPriority: String, Codable {
       'Use Cases': {
         name: 'Use Cases',
         typescript: `// Use case (interactor) - pure function
-import type { Task } from './models';
-import type { TaskStatus } from './models';
+import type { Task } from '../models';
+import type { TaskStatus } from '../models';
 
 export interface GetTasksInput {
   status?: TaskStatus;
@@ -534,40 +534,42 @@ func updateTaskStatus(task: inout Task, status: TaskStatus) {
     concepts: {
       'API Layer': {
         name: 'API Layer',
-        typescript: `// API layer - REST API callers
-import axiosClient from '../../foundation/network/axiosClient';
-import type { TaskDTO } from '../mappers/TaskMapper';
+        typescript: `// API layer - REST API callers (tasks/data/api/TaskApi.ts)
+import type { AxiosInstance } from 'axios';
+import type { TaskDTO } from '../dtos';
 import { TaskStatus } from '../../domain/models';
 
-export const taskApi = {
-  async getTasks(input?: GetTasksInput): Promise<TaskDTO[]> {
-    const params = new URLSearchParams();
-    if (input?.status) params.append('status', input.status);
-    if (input?.priority) params.append('priority', input.priority);
+export function createTaskApi(client: AxiosInstance) {
+  return {
+    async getTasks(input?: GetTasksInput): Promise<TaskDTO[]> {
+      const params = new URLSearchParams();
+      if (input?.status) params.append('status', input.status);
+      if (input?.priority) params.append('priority', input.priority);
 
-    const response = await axiosClient.get<TaskDTO[]>(\`/tasks?\${params.toString()}\`);
-    return response.data;
-  },
+      const response = await client.get<TaskDTO[]>(\`/tasks?\${params.toString()}\`);
+      return response.data;
+    },
 
-  async createTask(input: CreateTaskInput): Promise<TaskDTO> {
-    const response = await axiosClient.post<TaskDTO>('/tasks', input);
-    return response.data;
-  },
+    async createTask(input: CreateTaskInput): Promise<TaskDTO> {
+      const response = await client.post<TaskDTO>('/tasks', input);
+      return response.data;
+    },
 
-  async updateTask(id: string, input: UpdateTaskInput): Promise<TaskDTO> {
-    const response = await axiosClient.put<TaskDTO>(\`/tasks/\${id}\`, input);
-    return response.data;
-  },
+    async updateTask(id: string, input: UpdateTaskInput): Promise<TaskDTO> {
+      const response = await client.put<TaskDTO>(\`/tasks/\${id}\`, input);
+      return response.data;
+    },
 
-  async deleteTask(id: string): Promise<void> {
-    await axiosClient.delete(\`/tasks/\${id}\`);
-  },
+    async deleteTask(id: string): Promise<void> {
+      await client.delete(\`/tasks/\${id}\`);
+    },
 
-  async toggleTaskStatus(id: string, status: TaskStatus): Promise<TaskDTO> {
-    const response = await axiosClient.patch<TaskDTO>(\`/tasks/\${id}/status\`, { status });
-    return response.data;
-  },
-};`,
+    async toggleTaskStatus(id: string, status: TaskStatus): Promise<TaskDTO> {
+      const response = await client.patch<TaskDTO>(\`/tasks/\${id}/status\`, { status });
+      return response.data;
+    },
+  };
+}`,
         swift: `// iOS API layer - URLSession callers
 import Foundation
 
@@ -626,8 +628,8 @@ class TaskAPI: TaskAPIProtocol {
       },
       'Mappers': {
         name: 'Mappers',
-        typescript: `// Mappers - DTO to Domain transformation
-import { taskSchema } from './schemas';
+        typescript: `// Mappers - DTO to Domain transformation (tasks/data/mappers/TaskMapper.ts)
+import { taskSchema } from '../dtos/schemas';
 import type { Task } from '../../domain/models';
 import { TaskModel } from '../../domain/models';
 
@@ -718,12 +720,15 @@ extension TaskDTO {
       },
       'Repository': {
         name: 'Repository',
-        typescript: `// Repository pattern with TanStack Query
+        typescript: `// Repository pattern with TanStack Query (tasks/data/repositories/)
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { taskApi } from '../api';
-import { taskToDomain } from '../mappers';
-import type { GetTasksInput } from '../../domain/useCases';
+import axiosClient from '../../../foundation/network/axiosClient';
+import { createTaskApi } from '../api';
+import { toDomain } from '../mappers';
+import type { GetTasksInput } from '../../domain/models';
 import type { TaskStatus } from '../../domain/models';
+
+const taskApi = createTaskApi(axiosClient);
 
 export function useTaskRepository() {
   const queryClient = useQueryClient();
@@ -733,7 +738,7 @@ export function useTaskRepository() {
       queryKey: ['tasks', input?.status, input?.priority],
       queryFn: async () => {
         const dtos = await taskApi.getTasks(input);
-        return dtos.map(taskToDomain);
+        return dtos.map(toDomain);
       },
     });
 
@@ -741,7 +746,7 @@ export function useTaskRepository() {
     useMutation({
       mutationFn: async (input: CreateTaskInput) => {
         const response = await taskApi.createTask(input);
-        return taskToDomain(response);
+        return toDomain(response);
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -897,19 +902,18 @@ struct TaskDTO: Codable {
     concepts: {
       'Custom Hooks': {
         name: 'Custom Hooks',
-        typescript: `// Custom hook (ViewModel pattern)
-import { useTaskRepository } from '../../data/repositories';
+        typescript: `// Custom hook (ViewModel pattern) - consumes feature-owned context
+import { useTaskUseCases } from '../context';
 import type { TaskStatus } from '../../domain/models';
 import type { Task } from '../../domain/models';
 
 export function useTaskListViewModel() {
-  const { useGetTasksQuery, useCreateTaskMutation } = useTaskRepository();
+  const taskUseCases = useTaskUseCases();
 
-  const tasksQuery = useGetTasksQuery();
-  const createMutation = useCreateTaskMutation();
+  const tasksQuery = taskUseCases.useTasksQuery({});
 
   const createTask = async (input: CreateTaskInput) => {
-    return await createMutation.mutateAsync(input);
+    return await taskUseCases.createTask(input);
   };
 
   return {
@@ -917,7 +921,7 @@ export function useTaskListViewModel() {
     isLoading: tasksQuery.isLoading,
     error: tasksQuery.error,
     createTask,
-    isCreating: createMutation.isPending,
+    isCreating: taskUseCases.isCreating,
   };
 }
 
@@ -993,8 +997,7 @@ struct TaskListView: View {
         typescript: `// React component (SwiftUI View equivalent)
 import type { Task } from '../../domain/models';
 import { TaskStatus } from '../../domain/models';
-import StatusBadge from './StatusBadge';
-import PriorityBadge from './PriorityBadge';
+import Badge from './Badge';
 
 interface TaskCardProps {
   task: Task;
@@ -1008,8 +1011,8 @@ export default function TaskCard({ task, onEdit, onDelete, onToggleStatus }: Tas
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
       <h3>{task.title}</h3>
       <p>{task.description}</p>
-      <StatusBadge status={task.status} />
-      <PriorityBadge priority={task.priority} />
+      <Badge label={task.status} />
+      <Badge label={task.priority} />
       <button onClick={() => onToggleStatus?.(task.id, TaskStatus.COMPLETED)}>
         Complete
       </button>
@@ -1154,7 +1157,7 @@ struct TaskListView: View {
         name: 'Route Guards',
         typescript: `// React route guards
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context';
+import { useAuth } from '../../security/presentation/context';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();

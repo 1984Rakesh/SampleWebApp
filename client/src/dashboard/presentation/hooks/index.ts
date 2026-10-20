@@ -1,0 +1,1 @@
+export { useDashboardViewModel } from './useDashboardViewModel';

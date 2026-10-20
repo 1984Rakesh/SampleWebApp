@@ -1,9 +1,8 @@
-import type { DashboardViewState } from './DashboardViewState';
-import type { TaskCountsViewState, TaskItemViewState } from '../../tasks/presentation/models/TaskListViewState';
+import type { DashboardTaskCounts, DashboardTaskItem, DashboardViewState } from './DashboardViewState';
 
 const dayKey = (value: Date) => `${value.getFullYear()}-${value.getMonth()}-${value.getDate()}`;
 
-export function toDashboardViewState(name: string, tasks: TaskItemViewState[], counts: TaskCountsViewState, now = new Date()): DashboardViewState {
+export function toDashboardViewState(name: string, tasks: DashboardTaskItem[], counts: DashboardTaskCounts, now = new Date()): DashboardViewState {
   const firstName = name.trim().split(/\s+/)[0] || 'there';
   const hour = now.getHours();
   const salutation = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';

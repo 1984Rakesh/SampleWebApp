@@ -1,8 +1,8 @@
-import type { TaskCountsViewState } from '../../tasks/presentation/models/TaskListViewState';
-import { UiAvatar, UiCard, UiCardContent, UiGrid, UiGridItem, UiText, UiFlex } from '../../components/ui';
-import type { UiIconName } from '../../components/ui';
+import type { DashboardTaskCounts } from '../models/DashboardViewState';
+import { UiAvatar, UiCard, UiCardContent, UiGrid, UiGridItem, UiText, UiFlex } from '../../../components/ui';
+import type { UiIconName } from '../../../components/ui';
 
-interface DashboardStatsProps { counts: TaskCountsViewState; total: number; dueToday: number; dueThisWeek: number }
+interface DashboardStatsProps { counts: DashboardTaskCounts; total: number; dueToday: number; dueThisWeek: number }
 
 export default function DashboardStats({ counts, total, dueToday, dueThisWeek }: DashboardStatsProps) {
   const stats: Array<{ label: string; value: number; icon: UiIconName; tone: 'success' | 'info' | 'muted'; caption: string; captionTone?: 'accent' | 'amber' | 'muted' }> = [

@@ -1,4 +1,4 @@
-import { UiCard, UiCardContent, UiCardHeader, UiChip, UiFlex, UiPressable, UiText } from '../../components/ui';
+import { UiCard, UiCardContent, UiCardHeader, UiChip, UiFlex, UiPressable, UiText } from '../../../components/ui';
 
 interface Layer {
   name: string;
@@ -15,25 +15,25 @@ interface LayerMapProps {
 const layers: Layer[] = [
   {
     name: 'Foundation',
-    description: 'Network, Context, Router, DI',
+    description: 'foundation/: network, session storage, theme',
     color: '#3b82f6',
     concepts: ['Axios Client', 'AuthContext', 'ThemeContext', 'React Router', 'Route Guards'],
   },
   {
     name: 'Domain',
-    description: 'Pure Business Logic',
+    description: 'Pure business logic inside each feature',
     color: '#22c55e',
     concepts: ['Models', 'Use Cases', 'Enums', 'Validation'],
   },
   {
     name: 'Data',
-    description: 'Repositories, Mappers, APIs',
+    description: 'Per-feature repositories, mappers, APIs',
     color: '#eab308',
     concepts: ['API Layer', 'Zod Schemas', 'Mappers', 'TanStack Query'],
   },
   {
     name: 'Presentation',
-    description: 'UI Components & ViewModels',
+    description: 'Feature components, contexts & ViewModels',
     color: '#a855f7',
     concepts: ['Components', 'Hooks', 'Screens', 'Router Integration'],
   },
@@ -73,11 +73,12 @@ export default function LayerMap({ onLayerClick, selectedLayer }: LayerMapProps)
             Data Flow
           </UiText>
           <UiText variant="body2" tone="muted">
-            → User interacts with Presentation layer
-            <br />→ Presentation layer calls Domain use cases
-            <br />→ Use cases call Data repositories
+            → User interacts with a feature's Presentation layer
+            <br />→ Presentation calls Domain use cases via feature-owned contexts
+            <br />→ Use cases call Data repositories through domain contracts
             <br />→ Repositories call APIs and transform data
-            <br />→ Foundation provides infrastructure services
+            <br />→ Foundation provides generic infrastructure services
+            <br />→ App composes features and injects cross-feature capabilities
           </UiText>
         </UiFlex>
       </UiCardContent>

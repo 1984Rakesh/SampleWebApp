@@ -1,7 +1,7 @@
-import type { TaskItemViewState } from '../../tasks/presentation/models/TaskListViewState';
-import { UiCard, UiCardContent, UiCheckbox, UiChip, UiDivider, UiFlex, UiText } from '../../components/ui';
+import type { DashboardTaskItem } from '../models/DashboardViewState';
+import { UiCard, UiCardContent, UiCheckbox, UiChip, UiDivider, UiFlex, UiText } from '../../../components/ui';
 
-interface DashboardRecentTasksProps { tasks: TaskItemViewState[]; onToggle: (id: string) => void }
+interface DashboardRecentTasksProps { tasks: DashboardTaskItem[]; onToggle: (id: string) => void }
 
 export default function DashboardRecentTasks({ tasks, onToggle }: DashboardRecentTasksProps) {
   return (

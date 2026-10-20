@@ -2,7 +2,7 @@
 
 **Goal:** Finish the client feature-first Clean Architecture migration — move tasks, dashboard, and comparison out of the legacy layer-first roots into `client/src/<feature>/`, retire all legacy roots/shims, and finalize rules and audits. Picks up where the old C2 checkpoint stopped (server phases + C1/C2 are done).
 
-**Status:** Phase 1 – Tasks vertical · COMPLETE (acceptance passed) · next task P2.1 (await phase approval) · updated 2026-10-20
+**Status:** Phase 2 – Dashboard & comparison verticals · COMPLETE (acceptance passed) · next task P3.1 (await phase approval) · updated 2026-10-20
 
 ## Global Rules
 
@@ -54,23 +54,26 @@
 ### Phase 2 – Dashboard & comparison verticals (was C4)
 **Acceptance check:** client test/build/lint clean; `client/src/presentation/` and `client/src/foundation/{auth,context}` empty and removed; dashboard greeting/counts/recent tasks and comparison screen render identically; manual audit shows no sibling ViewModel imports.
 
-- [ ] **P2.1** Create `client/src/dashboard/` feature
+- [x] **P2.1** Create `client/src/dashboard/` feature
   - Files: `presentation/hooks/useDashboardViewModel.ts`, `models/{DashboardViewState.ts,dashboardPresentation.ts}`, `screens/DashboardScreen.tsx`, `components/{DashboardStats,DashboardRecentTasks,DashboardProgress}.tsx` → `client/src/dashboard/presentation/{context,models,hooks,screens,components}/`
   - Done when: dashboard ViewModel consumes injected contracts only — a dashboard-owned `DashboardCapabilities` context supplying `{ profileName, isLoading }` + display-ready task items/counts/toggle — never `useTaskListViewModel` or task/profile internals. App (`FeatureUseCasesProvider` or new adapter) maps tasks query results into that contract.
   - Depends on: P1.4
   - Notes: follow the security/profile precedent: feature-owned context + App-injected adapter. Toggle action is a callback taking a task id, not a task ViewModel passthrough.
+  - 2026-10-20: Done. `git mv`'d dashboard models/hooks/screen/components to `dashboard/presentation/`; defined dashboard-owned `DashboardTaskItem`/`DashboardTaskCounts`/`DashboardViewState` types (structurally mapped by App via tasks' `toTaskItemViewState`/`toTaskCounts`). New `DashboardCapabilitiesContext` (`{ profileName, isProfileLoading, taskItems, counts, isTasksLoading, errorMessage, toggleTaskStatus(id) }`); `useDashboardViewModel` consumes it only. New `app/composition/useDashboardCapabilities.ts` adapter: tasks query + `nextTaskStatus`/`toggleTaskStatus` mapping, profile-name logic preserved (`data?.name || user?.name || 'User'`), toggle errors swallowed (dashboard never surfaced them). `FeatureUseCasesProvider` now nests `DashboardCapabilitiesContext.Provider`; `FeatureUseCasesContext` no longer provided (file deleted in P2.3). Router lazy path updated; legacy hooks/screens barrels trimmed. Verified: client build + 23 tests + lint + `git diff --check` clean; zero `tasks/` imports inside `dashboard/`.
 
-- [ ] **P2.2** Create `client/src/comparison/` feature
+- [x] **P2.2** Create `client/src/comparison/` feature
   - Files: `presentation/{hooks/useComparisonViewModel.ts, models/comparisonData.ts, screens/ComparisonScreen.tsx, components/{ComparisonPanel,LayerMap,CodeBlock}.tsx}` → `client/src/comparison/presentation/{models,hooks,screens,components}/`
   - Done when: comparison is presentation-only under `comparison/` (no artificial domain/data layers); `comparisonData.ts` embedded snippets updated to describe the current feature-first `foundation → features → App` layout rather than the old layer-first paths.
   - Depends on: –
   - Notes: snippet strings are content, not imports — update prose/import examples inside strings carefully so they match the real tree (security/profile/tasks/domain+data+presentation, `app/` composition).
+  - 2026-10-20: Done. `git mv`'d all comparison files to `comparison/presentation/`; fixed `components/ui` depths; added feature barrels. Snippet updates: AuthContext `User`→`Account` from `../../domain/models`; use-case imports `'./models'`→`'../models'`; API snippet rewritten to `createTaskApi(client)` factory with DTOs from `'../dtos'`; mapper `'./schemas'`→`'../dtos/schemas'`; repository snippet uses `createTaskApi`/`toDomain`/`GetTasksInput` from `'../../domain/models'`; ViewModel snippet consumes `useTaskUseCases()` from `'../context'`; TaskCard snippet uses real `./Badge` (`label` prop); route guards `useAuth` from `'../../security/presentation/context'`. LayerMap descriptions/data-flow updated to feature-first + App composition line. Deleted emptied legacy barrels (components/hooks/models/screens index.ts); `presentation/` now holds only `context/` for P2.3. Router lazy path updated. Verified: build + 23 tests + lint + `git diff --check` clean.
 
-- [ ] **P2.3** Retire legacy presentation/foundation roots
+- [x] **P2.3** Retire legacy presentation/foundation roots
   - Files: `client/src/presentation/**` (remaining barrels, `context/FeatureUseCasesContext.ts`), `client/src/foundation/{auth,context}/` empty dirs, `app/providers/FeatureUseCasesProvider.tsx`, `app/router/AppRouter.tsx` lazy paths, `client/tests/*`.
   - Done when: `client/src/presentation/` and `client/src/domain/`, `client/src/data/` no longer exist; profile-summary contract moves to a dashboard-owned consumer context; `FeatureUseCasesContext` is deleted and each feature consumes its own context; router imports point at feature screens.
   - Depends on: P2.1, P2.2
   - Notes: profile's display-only task-counts injection (profile consumer context ← App) already exists; verify it now sources from `tasks/`, not a legacy path.
+  - 2026-10-20: Done. Deleted `src/presentation/` entirely (`FeatureUseCasesContext` + barrel — unused since P2.1) and empty `foundation/{auth,context}` dirs. `src/` is now purely `app/`, features (`security`, `profile`, `tasks`, `dashboard`, `comparison`), `foundation/`, `shared/`, `components/` + entry files. Router lazy paths all point at feature screens; `useUserUseCases` `toTaskCounts` confirmed sourcing from `tasks/presentation`. No test changes needed (composition.test.mjs loads only feature contexts). **Phase 2 acceptance passed:** client 23 tests + build + lint clean; server 29 tests + 3 startup smokes clean; `git diff --check` clean. Manual audit: zero `@mui` outside `components/ui` + `foundation/theme`; feature domains pure (no react/axios/zod/RQ/foundation/App imports); no sibling feature implementation imports (all cross-feature flow via App-injected contexts); foundation/shared/components have no feature/App imports.
 
 ### Phase 3 – Final audit & docs (was C5)
 **Acceptance check:** all of: `cd client && npm test -- --test-concurrency=1 && npm run build && npm run lint`; `cd server && npm test && npm run test:startup`; `git diff --check`; manual import audit results documented in Decisions.
@@ -98,9 +101,13 @@
 | 2026-01-15 | Plan created as `client-verticals` covering old C3–C5 | Previous plan completed through C2; remaining client phases need worker-sized tasks. |
 | 2026-01-15 | Dashboard gets injected `DashboardCapabilities`, not task ViewModel | Prior decision: no sibling ViewModel imports; App adapts task data into dashboard's consumer contract. |
 | 2026-01-15 | `Badge` migrates with tasks; `CodeBlock`/`LayerMap`/`ComparisonPanel` with comparison | They render feature-specific content; shared `components/` stays feature-independent. |
+| 2026-10-20 | Q1 answered: tasks context keeps the React Query–backed `useTasksQuery` shape | Behavior identical; matches profile/security precedent of data-owned query adapters. |
+| 2026-10-20 | Phase 1 accepted | P1.1–P1.4 verified: client 23 tests/build/lint, server 29 tests + 3 smokes, `git diff --check` all clean. Dashboard's interim imports of `tasks/presentation` are resolved by P2.1 `DashboardCapabilities`. |
+| 2026-10-20 | Q2 resolved without issue | `FeatureUseCasesContext` split cleanly into per-feature contexts and was deleted in P2.3; no contract divergence. |
+| 2026-10-20 | Phase 2 accepted | P2.1–P2.3 verified on disk: `src/presentation/` and empty `foundation/{auth,context}` removed; dashboard uses injected `DashboardCapabilities`; comparison presentation-only with updated snippets; builds/tests clean. |
 
 ## Risks & Open Questions
-- [ ] **Q1** Should `useTasksQuery` keep its React Query–backed shape inside the tasks-owned context, or be reshaped to plain use-case functions? — blocks: P1.3 — owner: worker may decide; keep behavior identical.
+- (none open)
 - [ ] **Q2** `FeatureUseCasesContext` currently couples tasks + dashboard profile-summary; it splits per-feature in P1.3/P2.1 and is deleted in P2.3 — interim duplication risk is low but watch for divergent contracts. — blocks: none — owner: manager.
 
 ## Inbox (worker → manager)

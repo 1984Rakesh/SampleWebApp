@@ -7,10 +7,10 @@ import AppNavbar from '../composition/AppNavbar';
 // Placeholder screens - will be implemented in Phase 9
 const LoginScreen = React.lazy(() => import('../../security/presentation/screens/LoginScreen'));
 const RegisterScreen = React.lazy(() => import('../../security/presentation/screens/RegisterScreen'));
-const DashboardScreen = React.lazy(() => import('../../presentation/screens/DashboardScreen'));
+const DashboardScreen = React.lazy(() => import('../../dashboard/presentation/screens/DashboardScreen'));
 const ProfileScreen = React.lazy(() => import('../../profile/presentation/screens/ProfileScreen'));
 const TaskListScreen = React.lazy(() => import('../../tasks/presentation/screens/TaskListScreen'));
-const ComparisonScreen = React.lazy(() => import('../../presentation/screens/ComparisonScreen'));
+const ComparisonScreen = React.lazy(() => import('../../comparison/presentation/screens/ComparisonScreen'));
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,7 +1,7 @@
-import type { TaskCountsViewState } from '../../tasks/presentation/models/TaskListViewState';
-import { UiAvatar, UiCard, UiCardContent, UiFlex, UiIcon, UiProgress, UiText } from '../../components/ui';
+import type { DashboardTaskCounts } from '../models/DashboardViewState';
+import { UiAvatar, UiCard, UiCardContent, UiFlex, UiIcon, UiProgress, UiText } from '../../../components/ui';
 
-interface DashboardProgressProps { counts: TaskCountsViewState; total: number; percent: number }
+interface DashboardProgressProps { counts: DashboardTaskCounts; total: number; percent: number }
 
 export default function DashboardProgress({ counts, total, percent }: DashboardProgressProps) {
   const items = [
