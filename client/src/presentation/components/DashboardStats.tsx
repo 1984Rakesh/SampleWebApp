@@ -1,4 +1,4 @@
-import type { TaskCountsViewState } from '../models/TaskListViewState';
+import type { TaskCountsViewState } from '../../tasks/presentation/models/TaskListViewState';
 import { UiAvatar, UiCard, UiCardContent, UiGrid, UiGridItem, UiText, UiFlex } from '../../components/ui';
 import type { UiIconName } from '../../components/ui';
 

@@ -5,7 +5,7 @@ import { useProfileRepository } from '../../profile/data/repositories/ReactQuery
 import { updateProfileUseCase } from '../../profile/domain/useCases/UpdateProfileUseCase';
 import type { UpdateProfileInput } from '../../profile/domain/models/Profile';
 import { useAuth } from '../../security/presentation/context/AuthSessionContext';
-import { toTaskCounts } from '../../presentation/models/taskPresentation';
+import { toTaskCounts } from '../../tasks/presentation/models/taskPresentation';
 import { sessions } from './securityRuntime';
 import { bindProfileSession } from './profileSession';
 import { useTaskUseCases } from './useTaskUseCases';

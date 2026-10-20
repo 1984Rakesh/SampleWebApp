@@ -1,4 +1,6 @@
-import { useTaskRepository } from '../../data/repositories';
+import axiosClient from '../../foundation/network/axiosClient';
+import { createTaskApi } from '../../tasks/data/api';
+import { createTaskRepository, useTaskRepository } from '../../tasks/data/repositories';
 import {
   createTaskUseCase,
   updateTaskUseCase,
@@ -8,11 +10,13 @@ import {
   type UpdateTaskInput,
   type DeleteTaskInput,
   type ToggleTaskStatusInput,
-} from '../../domain/useCases';
+} from '../../tasks/domain/useCases';
+
+const taskRepository = createTaskRepository(createTaskApi(axiosClient));
 
 export function useTaskUseCases() {
   const { repository, useTasksQuery, isCreating, isUpdating, isDeleting, isToggling } =
-    useTaskRepository();
+    useTaskRepository(taskRepository);
 
   return {
     useTasksQuery,

@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { randomUUID } from 'node:crypto';
 import type { AuthResponseDTO } from '../../client/src/security/data/dtos/AuthDTO';
-import type { TaskDTO } from '../../client/src/data/dtos/TaskDTO';
+import type { TaskDTO } from '../../client/src/tasks/data/dtos/TaskDTO';
 import type { ProfileDTO } from '../../client/src/profile/data/dtos/ProfileDTO';
 import { refreshTokenResponseSchema } from '../../client/src/security/data/dtos/schemas';
 import { toDomain as authToDomain, toLoginRequestDTO, toRegisterRequestDTO } from '../../client/src/security/data/mappers/AuthMapper';
-import { toDomain as taskToDomain, toCreateTaskDTO, toUpdateTaskDTO } from '../../client/src/data/mappers/TaskMapper';
+import { toDomain as taskToDomain, toCreateTaskDTO, toUpdateTaskDTO } from '../../client/src/tasks/data/mappers/TaskMapper';
 import { toDomain as userToDomain, toUpdateProfileDTO } from '../../client/src/profile/data/mappers/ProfileMapper';
-import { TaskPriority, TaskStatus } from '../../client/src/domain/models/enums';
+import { TaskPriority, TaskStatus } from '../../client/src/tasks/domain/models/enums';
 import { assertError, createTestServer } from './helpers';
 
 test('client feature request and response mappers preserve compatibility with server endpoints', async (t) => {

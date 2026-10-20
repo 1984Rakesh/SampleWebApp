@@ -1,4 +1,4 @@
-import type { TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
+import type { TaskCountsViewState, TaskItemViewState } from '../../tasks/presentation/models/TaskListViewState';
 
 export interface DashboardViewState {
   eyebrow: string;

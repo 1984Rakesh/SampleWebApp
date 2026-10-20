@@ -1,4 +1,4 @@
-import { useTaskListViewModel } from './useTaskListViewModel';
+import { useTaskListViewModel } from '../../tasks/presentation/hooks/useTaskListViewModel';
 import { useDashboardProfile } from '../context';
 import { toDashboardViewState } from '../models/dashboardPresentation';
 

@@ -1,5 +1,5 @@
 import type { DashboardViewState } from './DashboardViewState';
-import type { TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
+import type { TaskCountsViewState, TaskItemViewState } from '../../tasks/presentation/models/TaskListViewState';
 
 const dayKey = (value: Date) => `${value.getFullYear()}-${value.getMonth()}-${value.getDate()}`;
 

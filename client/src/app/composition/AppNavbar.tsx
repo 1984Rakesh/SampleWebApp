@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/layout/Navbar';
 import { useColorMode } from '../../foundation/theme';
 import { useAuth } from '../../security/presentation/context/AuthSessionContext';
-import TaskDialog from '../../presentation/components/TaskDialog';
+import TaskDialog from '../../tasks/presentation/components/TaskDialog';
 
 const links = [
   { to: '/dashboard', label: 'Dashboard' },

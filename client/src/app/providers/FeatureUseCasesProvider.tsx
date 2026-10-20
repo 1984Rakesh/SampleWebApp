@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { FeatureUseCasesContext } from '../../presentation/context/FeatureUseCasesContext';
 import { AuthUseCasesContext } from '../../security/presentation/context/AuthUseCasesContext';
 import { ProfileUseCasesContext } from '../../profile/presentation/context/ProfileUseCasesContext';
+import { TaskUseCasesContext } from '../../tasks/presentation/context/TaskUseCasesContext';
 import { useAuth } from '../../security/presentation/context/AuthSessionContext';
 import { useAuthUseCases, useTaskUseCases, useUserUseCases } from '../composition';
 
@@ -17,7 +18,9 @@ export function FeatureUseCasesProvider({ children }: { children: ReactNode }) {
   return (
     <AuthUseCasesContext.Provider value={auth}>
       <ProfileUseCasesContext.Provider value={profile}>
-        <FeatureUseCasesContext.Provider value={{ tasks, useProfileSummary }}>{children}</FeatureUseCasesContext.Provider>
+        <TaskUseCasesContext.Provider value={tasks}>
+          <FeatureUseCasesContext.Provider value={{ useProfileSummary }}>{children}</FeatureUseCasesContext.Provider>
+        </TaskUseCasesContext.Provider>
       </ProfileUseCasesContext.Provider>
     </AuthUseCasesContext.Provider>
   );
