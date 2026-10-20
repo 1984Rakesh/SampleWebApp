@@ -1,5 +1,4 @@
-import Box from '@mui/material/Box';
-
+// @ds TaskProgress v2026-10-20
 interface UiProgressProps {
   completed: number;
   inProgress: number;
@@ -9,12 +8,9 @@ interface UiProgressProps {
 export default function UiProgress({ completed, inProgress, todo }: UiProgressProps) {
   const total = completed + inProgress + todo || 1;
   return (
-    <Box sx={(theme) => {
-      const dark = theme.palette.mode === 'dark';
-      return { display: 'flex', height: 10, overflow: 'hidden', borderRadius: 999, bgcolor: dark ? '#3A4458' : '#8C96AA' };
-    }}>
-      <Box sx={{ width: `${(completed / total) * 100}%`, bgcolor: 'success.main' }} />
-      <Box sx={{ width: `${(inProgress / total) * 100}%`, bgcolor: 'primary.main' }} />
-    </Box>
+    <div className="flex h-2.5 overflow-hidden rounded-full bg-chart-3">
+      <div className="bg-chart-1" style={{ width: `${(completed / total) * 100}%` }} />
+      <div className="bg-chart-2" style={{ width: `${(inProgress / total) * 100}%` }} />
+    </div>
   );
 }

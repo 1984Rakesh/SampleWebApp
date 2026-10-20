@@ -1,7 +1,7 @@
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 import UiIcon from './UiIcon';
 import type { UiIconName } from './UiIcon';
+import { cn } from '@/lib/utils';
 
 interface UiIconButtonProps {
   icon: UiIconName;
@@ -13,14 +13,21 @@ interface UiIconButtonProps {
   tooltip?: string;
   hideFrom?: 'sm' | 'md' | 'lg';
   bordered?: boolean;
+  destructiveHover?: boolean;
 }
 
-const toneMap = {
-  default: 'default',
-  primary: 'primary',
-  success: 'success',
-  info: 'info',
-  danger: 'error',
+const toneClassMap = {
+  default: 'text-muted-foreground hover:bg-accent',
+  primary: 'text-primary hover:bg-accent',
+  success: 'text-success hover:bg-accent',
+  info: 'text-status-progress-foreground hover:bg-accent',
+  danger: 'text-destructive hover:bg-accent',
+} as const;
+
+const hideFromClassMap = {
+  sm: 'sm:hidden',
+  md: 'md:hidden',
+  lg: 'lg:hidden',
 } as const;
 
 export default function UiIconButton({
@@ -33,32 +40,37 @@ export default function UiIconButton({
   tooltip,
   hideFrom,
   bordered = false,
+  destructiveHover = false,
 }: UiIconButtonProps) {
-  const solidSx = variant === 'solid' ? {
-    bgcolor: 'primary.main',
-    color: 'primary.contrastText',
-    '&:hover': { bgcolor: 'primary.dark' },
-    borderRadius: '50%',
-    width: 40,
-    height: 40,
-  } : {};
-
   const button = (
-    <IconButton
-      size={size === 'sm' ? 'small' : 'medium'}
-      color={variant === 'solid' ? undefined : toneMap[tone]}
+    <button
+      type="button"
       onClick={onClick}
       aria-label={ariaLabel}
-      sx={{
-        ...(variant !== 'solid' && { '&:hover': { bgcolor: 'action.hover' } }),
-        ...(hideFrom && { display: { xs: 'inline-flex', [hideFrom]: 'none' } }),
-        ...(bordered && { border: '1px solid', borderColor: tone === 'danger' ? 'rgba(255,158,140,0.3)' : 'divider', borderRadius: 1.5 }),
-        ...solidSx,
-      }}
+      className={cn(
+        'inline-flex items-center justify-center rounded-full outline-none transition-colors',
+        'focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50',
+        size === 'sm' ? 'size-8' : 'size-10',
+        variant === 'solid'
+          ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+          : toneClassMap[tone],
+        bordered && cn('border rounded-md', tone === 'danger' ? 'border-destructive/30' : 'border-border'),
+        destructiveHover && 'hover:text-destructive',
+        hideFrom && hideFromClassMap[hideFrom],
+      )}
     >
       <UiIcon name={icon} size={size} />
-    </IconButton>
+    </button>
   );
 
-  return tooltip ? <Tooltip title={tooltip}>{button}</Tooltip> : button;
+  if (!tooltip) return button;
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 }

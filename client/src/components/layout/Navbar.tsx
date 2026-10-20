@@ -1,3 +1,4 @@
+// @ds AppHeader v2026-10-20
 import NavbarToolbar from './navbar/NavbarToolbar';
 import NavbarDrawer from './navbar/NavbarDrawer';
 import type { NavbarProps } from './navbar/NavbarViewState';

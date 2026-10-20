@@ -1,6 +1,4 @@
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
+import { Loader2 } from 'lucide-react';
 
 interface UiCircularProgressProps {
   text?: string;
@@ -9,9 +7,13 @@ interface UiCircularProgressProps {
 
 export default function UiCircularProgress({ text, size = 40 }: UiCircularProgressProps) {
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" gap={2}>
-      <CircularProgress size={size} />
-      {text && <Typography color="text.secondary">{text}</Typography>}
-    </Box>
+    <div className="flex flex-col items-center justify-center gap-4">
+      <Loader2
+        className="animate-spin text-primary"
+        style={{ width: size, height: size }}
+        aria-hidden="true"
+      />
+      {text && <p className="text-muted-foreground">{text}</p>}
+    </div>
   );
 }

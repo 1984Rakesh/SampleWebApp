@@ -1,10 +1,13 @@
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import type { SelectChangeEvent } from '@mui/material/Select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+import { Label } from './label';
+import { cn } from '@/lib/utils';
 import type { SelectOption } from './SelectOption';
+
+// Radix Select rejects empty-string item values; an empty option value (the
+// "all" choice) travels through the widget as this sentinel instead.
+const EMPTY_VALUE = '__ui_select_empty__';
+const toInternal = (value: string) => (value === '' ? EMPTY_VALUE : value);
+const fromInternal = (value: string) => (value === EMPTY_VALUE ? '' : value);
 
 interface UiSelectProps {
   id?: string;
@@ -15,6 +18,7 @@ interface UiSelectProps {
   disabled?: boolean;
   error?: boolean;
   helperText?: string;
+  hideLabel?: boolean;
   size?: 'sm' | 'md';
 }
 
@@ -27,32 +31,42 @@ export default function UiSelect({
   disabled = false,
   error = false,
   helperText,
+  hideLabel = false,
   size = 'md',
 }: UiSelectProps) {
   const selectId = id ?? label.toLowerCase().replace(/\s+/g, '-');
   const labelId = `${selectId}-label`;
-
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    onChange(event.target.value);
-  };
+  const helperId = helperText ? `${selectId}-helper` : undefined;
 
   return (
-    <FormControl fullWidth error={error} disabled={disabled} size={size === 'sm' ? 'small' : 'medium'}>
-      <InputLabel id={labelId}>{label}</InputLabel>
-      <Select
-        labelId={labelId}
-        id={selectId}
-        value={value}
-        label={label}
-        onChange={handleChange}
-      >
-        {options.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
+    <div className="grid w-full gap-1.5">
+      <Label id={labelId} htmlFor={selectId} className={hideLabel ? 'sr-only' : undefined}>
+        {label}
+      </Label>
+      <Select value={toInternal(value)} onValueChange={(next) => onChange(fromInternal(next))} disabled={disabled}>
+        <SelectTrigger
+          id={selectId}
+          size={size === 'sm' ? 'sm' : 'default'}
+          className="w-full"
+          aria-labelledby={labelId}
+          aria-invalid={error || undefined}
+          aria-describedby={helperId}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value || EMPTY_VALUE} value={toInternal(option.value)}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
       </Select>
-      {helperText && <FormHelperText>{helperText}</FormHelperText>}
-    </FormControl>
+      {helperText && (
+        <p id={helperId} className={cn('text-sm', error ? 'text-destructive' : 'text-muted-foreground')}>
+          {helperText}
+        </p>
+      )}
+    </div>
   );
 }

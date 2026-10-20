@@ -7,7 +7,7 @@ export function toUserProfileViewState(user: Profile): UserProfileViewState {
     email: user.email,
     bio: user.bio,
     avatarUrl: user.avatar,
-    joinedLabel: user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) : undefined,
+    joinedLabel: user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : undefined,
     initial: user.name.trim().charAt(0).toUpperCase() || 'U',
   };
 }

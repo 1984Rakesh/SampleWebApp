@@ -1,8 +1,10 @@
-import Box from '@mui/material/Box';
-import type { SxProps, Theme } from '@mui/material/styles';
+import type { CSSProperties } from 'react';
+import { cn } from '@/lib/utils';
+import { gapClass, pClass, pxClass, pyClass, ptClass, mtClass, mbClass, mlClass, mrClass } from './spacing';
 
 interface UiFlexProps {
   children?: React.ReactNode;
+  inline?: boolean;
   column?: boolean;
   align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline';
   justify?: 'start' | 'center' | 'end' | 'space-between';
@@ -10,6 +12,8 @@ interface UiFlexProps {
   wrap?: boolean;
   grow?: boolean;
   flex?: number;
+  fullWidth?: boolean;
+  fixedWidthFrom?: 'sm' | 'md' | 'lg';
   minWidth0?: boolean;
   centered?: boolean;
   dividerTop?: boolean;
@@ -29,22 +33,30 @@ interface UiFlexProps {
 }
 
 const alignMap = {
-  start: 'flex-start',
-  center: 'center',
-  end: 'flex-end',
-  stretch: 'stretch',
-  baseline: 'baseline',
+  start: 'items-start',
+  center: 'items-center',
+  end: 'items-end',
+  stretch: 'items-stretch',
+  baseline: 'items-baseline',
+} as const;
+
+// Fixed narrow-field width that kicks in at a breakpoint; full width below it.
+const fixedWidthFromMap = {
+  sm: 'w-full sm:w-40',
+  md: 'w-full md:w-40',
+  lg: 'w-full lg:w-40',
 } as const;
 
 const justifyMap = {
-  start: 'flex-start',
-  center: 'center',
-  end: 'flex-end',
-  'space-between': 'space-between',
+  start: 'justify-start',
+  center: 'justify-center',
+  end: 'justify-end',
+  'space-between': 'justify-between',
 } as const;
 
 export default function UiFlex({
   children,
+  inline = false,
   column = false,
   align,
   justify,
@@ -52,6 +64,8 @@ export default function UiFlex({
   wrap = false,
   grow = false,
   flex,
+  fullWidth = false,
+  fixedWidthFrom,
   minWidth0 = false,
   centered = false,
   dividerTop = false,
@@ -69,34 +83,42 @@ export default function UiFlex({
   role,
   ariaLabel,
 }: UiFlexProps) {
-  const sx: SxProps<Theme> = {
-    display: 'flex',
-    ...(column && { flexDirection: 'column' }),
-    ...(align && { alignItems: alignMap[align] }),
-    ...(justify && { justifyContent: justifyMap[justify] }),
-    ...(gap !== undefined && { gap }),
-    ...(wrap && { flexWrap: 'wrap' }),
-    ...(grow && { flexGrow: 1 }),
+  const style: CSSProperties = {
     ...(flex !== undefined && { flex }),
-    ...(minWidth0 && { minWidth: 0 }),
-    ...(centered && { minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }),
-    ...(dividerTop && { mt: 3, pt: 3, borderTop: 1, borderColor: 'divider' }),
-    ...(rounded && { borderRadius: 1 }),
-    ...(bgColor && { bgcolor: bgColor }),
-    ...(p !== undefined && { p }),
-    ...(px !== undefined && { px }),
-    ...(py !== undefined && { py }),
-    ...(pt !== undefined && { pt }),
-    ...(mt !== undefined && { mt }),
-    ...(mb !== undefined && { mb }),
-    ...(ml !== undefined && { ml }),
-    ...(mr !== undefined && { mr }),
-    ...(textAlign && { textAlign }),
+    ...(bgColor && { backgroundColor: bgColor }),
   };
 
   return (
-    <Box sx={sx} role={role} aria-label={ariaLabel}>
+    <div
+      role={role}
+      aria-label={ariaLabel}
+      style={Object.keys(style).length ? style : undefined}
+      className={cn(
+        inline ? 'inline-flex' : 'flex',
+        column && 'flex-col',
+        centered && 'min-h-screen items-center justify-center',
+        align && !centered && alignMap[align],
+        justify && !centered && justifyMap[justify],
+        gapClass(gap),
+        wrap && 'flex-wrap',
+        grow && 'grow',
+        fullWidth && 'w-full',
+        fixedWidthFrom && fixedWidthFromMap[fixedWidthFrom],
+        minWidth0 && 'min-w-0',
+        dividerTop && 'mt-6 border-t border-border pt-6',
+        rounded && 'rounded',
+        textAlign && 'text-center',
+        pClass(p),
+        pxClass(px),
+        pyClass(py),
+        ptClass(pt),
+        mtClass(mt),
+        mbClass(mb),
+        mlClass(ml),
+        mrClass(mr),
+      )}
+    >
       {children}
-    </Box>
+    </div>
   );
 }

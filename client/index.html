@@ -4,6 +4,30 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Apply the resolved color mode before first paint to avoid a flash.
+      // A valid localStorage['color-mode'] wins; a valid legacy 'theme' value is
+      // the fallback; anything else resolves to the OS preference.
+      (function () {
+        var pref = null;
+        try {
+          pref = localStorage.getItem('color-mode');
+          if (pref !== 'light' && pref !== 'dark' && pref !== 'system') {
+            pref = localStorage.getItem('theme');
+          }
+        } catch (error) {
+          pref = null;
+        }
+        try {
+          var dark = pref === 'dark' || (pref !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          var root = document.documentElement;
+          root.classList.toggle('dark', dark);
+          root.style.colorScheme = dark ? 'dark' : 'light';
+        } catch (error) {
+          // matchMedia or DOM unavailable; CSS defaults to light.
+        }
+      })();
+    </script>
     <title>client</title>
   </head>
   <body>

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import Button from '@mui/material/Button';
+import { cn } from '@/lib/utils';
 
 interface UiNavButtonProps {
   to: string;
@@ -9,23 +9,17 @@ interface UiNavButtonProps {
 
 export default function UiNavButton({ to, children, onClick }: UiNavButtonProps) {
   return (
-    <Button
-      component={NavLink}
+    <NavLink
       to={to}
       onClick={onClick}
       end={to === '/dashboard'}
-      sx={{
-        minWidth: 0,
-        px: 1.75,
-        py: 1,
-        borderRadius: 999,
-        color: 'text.secondary',
-        fontSize: 14,
-        fontWeight: 500,
-        '&.active': { bgcolor: 'action.selected', color: 'text.primary' },
-      }}
+      className={({ isActive }) => cn(
+        'inline-flex min-w-0 items-center rounded-full px-3.5 py-2 text-sm font-medium transition-colors outline-none',
+        'text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring',
+        isActive && 'bg-accent text-foreground',
+      )}
     >
       {children}
-    </Button>
+    </NavLink>
   );
 }

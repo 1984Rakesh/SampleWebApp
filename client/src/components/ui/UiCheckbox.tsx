@@ -1,6 +1,4 @@
-import Checkbox from '@mui/material/Checkbox';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import { Checkbox } from './checkbox';
 
 interface UiCheckboxProps {
   checked: boolean;
@@ -13,12 +11,10 @@ export default function UiCheckbox({ checked, ariaLabel, onChange, disabled = fa
   return (
     <Checkbox
       checked={checked}
-      onChange={onChange}
+      onCheckedChange={onChange}
       disabled={disabled}
       aria-label={ariaLabel}
-      icon={<RadioButtonUncheckedIcon />}
-      checkedIcon={<CheckCircleIcon />}
-      sx={{ p: 0.5, color: '#6B778E', '&.Mui-checked': { color: 'success.main' } }}
+      className="size-5 rounded-full data-[state=checked]:border-success data-[state=checked]:bg-success data-[state=checked]:text-background dark:data-[state=checked]:bg-success"
     />
   );
 }

@@ -1,23 +1,24 @@
 import { Link as RouterLink } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import type { SxProps, Theme } from '@mui/material/styles';
+import { Loader2 } from 'lucide-react';
+import { Button } from './button';
+import { cn } from '@/lib/utils';
 
-type UiButtonVariant = 'solid' | 'outline' | 'text';
+type UiButtonVariant = 'solid' | 'outline' | 'text' | 'link';
 type UiButtonTone = 'primary' | 'danger' | 'muted';
 type UiButtonSize = 'sm' | 'md';
 type Breakpoint = 'sm' | 'md' | 'lg';
 
-const variantMap: Record<UiButtonVariant, 'contained' | 'outlined' | 'text'> = {
-  solid: 'contained',
-  outline: 'outlined',
-  text: 'text',
-};
+const variantMap = {
+  solid: 'default',
+  outline: 'outline',
+  text: 'ghost',
+  link: 'link',
+} as const;
 
-const toneMap: Record<UiButtonTone, 'primary' | 'error' | 'inherit'> = {
-  primary: 'primary',
-  danger: 'error',
-  muted: 'inherit',
+const fullWidthBelowMap: Record<Breakpoint, string> = {
+  sm: 'w-full sm:w-auto',
+  md: 'w-full md:w-auto',
+  lg: 'w-full lg:w-auto',
 };
 
 interface UiButtonProps {
@@ -36,6 +37,7 @@ interface UiButtonProps {
   ariaLabel?: string;
   to?: string;
   startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
 }
 
 export default function UiButton({
@@ -54,44 +56,79 @@ export default function UiButton({
   ariaLabel,
   to,
   startIcon,
+  endIcon,
 }: UiButtonProps) {
-  const sx: SxProps<Theme> = {
-    textTransform: 'none',
-    fontWeight: 500,
-    ...(minWidth !== undefined && { minWidth }),
-    ...(noShrink && { flexShrink: 0 }),
-    ...(fullWidthBelow && {
-      width: { xs: '100%', [fullWidthBelow]: 'auto' },
-    }),
-    ...(tone === 'muted' && {
-      bgcolor: 'grey.700',
-      color: 'grey.300',
-      '&:hover': { bgcolor: 'grey.600' },
-    }),
-  };
+  const destructive = tone === 'danger';
+  const buttonVariant = variant === 'solid' && destructive ? 'destructive' : variantMap[variant];
+
+  const className = cn(
+    'font-medium',
+    noShrink && 'shrink-0',
+    fullWidth && 'w-full',
+    fullWidthBelow && fullWidthBelowMap[fullWidthBelow],
+    destructive && variant !== 'solid' && cn(
+      'text-destructive hover:text-destructive',
+      variant === 'outline' && 'border-destructive hover:bg-destructive/10',
+    ),
+    tone === 'muted' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+    variant === 'link' && 'h-auto px-0',
+  );
+
+  const content = isLoading ? (
+    <>
+      <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+      {children}
+    </>
+  ) : (
+    <>
+      {startIcon}
+      {children}
+      {endIcon}
+    </>
+  );
+
+  if (to) {
+    if (disabled || isLoading) {
+      return (
+        <Button
+          variant={buttonVariant}
+          size={size === 'sm' ? 'sm' : 'default'}
+          type="button"
+          disabled
+          aria-label={ariaLabel}
+          style={minWidth !== undefined ? { minWidth } : undefined}
+          className={className}
+        >
+          {content}
+        </Button>
+      );
+    }
+    return (
+      <Button
+        asChild
+        variant={buttonVariant}
+        size={size === 'sm' ? 'sm' : 'default'}
+        aria-label={ariaLabel}
+        style={minWidth !== undefined ? { minWidth } : undefined}
+        className={className}
+      >
+        <RouterLink to={to} onClick={onClick}>{content}</RouterLink>
+      </Button>
+    );
+  }
 
   return (
     <Button
-      variant={variantMap[variant]}
-      color={tone === 'muted' ? 'inherit' : toneMap[tone]}
-      size={size === 'sm' ? 'small' : 'medium'}
-      fullWidth={fullWidth}
-      type={type}
+      variant={buttonVariant}
+      size={size === 'sm' ? 'sm' : 'default'}
+      type={type ?? 'button'}
       disabled={disabled || isLoading}
       onClick={onClick}
       aria-label={ariaLabel}
-      startIcon={startIcon}
-      sx={sx}
-      {...(to ? { component: RouterLink, to } : {})}
+      style={minWidth !== undefined ? { minWidth } : undefined}
+      className={className}
     >
-      {isLoading ? (
-        <>
-          <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
-          {children}
-        </>
-      ) : (
-        children
-      )}
+      {content}
     </Button>
   );
 }

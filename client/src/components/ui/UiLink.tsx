@@ -1,5 +1,4 @@
 import { Link as RouterLink } from 'react-router-dom';
-import Link from '@mui/material/Link';
 
 interface UiLinkProps {
   to: string;
@@ -8,8 +7,8 @@ interface UiLinkProps {
 
 export default function UiLink({ to, children }: UiLinkProps) {
   return (
-    <Link component={RouterLink} to={to} underline="hover">
+    <RouterLink to={to} className="text-primary underline-offset-4 hover:underline">
       {children}
-    </Link>
+    </RouterLink>
   );
 }

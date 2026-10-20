@@ -1,6 +1,7 @@
 import {
   UiAppBar, UiAvatar, UiButton, UiFlex, UiIconButton, UiNavButton, UiResponsive, UiText, UiToolbar,
 } from '../../ui';
+import { Logo } from '../../app/Logo';
 import type { NavbarProps } from './NavbarViewState';
 
 type Props = Pick<NavbarProps, 'view' | 'onOpenNavigation' | 'onToggleTheme' | 'onLogout' | 'onCreateTask'>;
@@ -12,12 +13,7 @@ export default function NavbarToolbar({ view, onOpenNavigation, onToggleTheme, o
         <UiIconButton icon="menu" ariaLabel="Open navigation" onClick={onOpenNavigation} hideFrom="md" />
         <UiFlex grow align="center" minWidth0 gap={1}>
           <UiButton to={view.brand.to} ariaLabel="Go to Dashboard" noShrink>
-            <UiFlex align="center" gap={1}>
-              <UiAvatar label={view.brand.mark} size="sm" tone="primary" variant="solid" />
-              <UiResponsive display="inline" hideBelow="sm">
-                <UiText variant="h6" weight="bold" noWrap>{view.brand.label}</UiText>
-              </UiResponsive>
-            </UiFlex>
+            <Logo name={view.brand.label} hideWordmarkBelow="sm" />
           </UiButton>
           <UiResponsive display="flex" hideBelow="md">
             <UiFlex gap={0.5} ml={1}>
@@ -41,7 +37,7 @@ export default function NavbarToolbar({ view, onOpenNavigation, onToggleTheme, o
               </UiFlex>
             </UiButton>
           </UiResponsive>
-          <UiIconButton icon="logout" ariaLabel="Log out" tooltip="Log out" onClick={onLogout} tone="danger" bordered />
+          <UiIconButton icon="logout" ariaLabel="Log out" tooltip="Log out" onClick={onLogout} bordered />
           <UiIconButton icon="add" ariaLabel="New task" tooltip="New task" onClick={onCreateTask} variant="solid" tone="primary" />
         </UiFlex>
       </UiToolbar>

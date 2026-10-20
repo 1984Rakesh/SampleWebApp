@@ -1,4 +1,7 @@
-import TextField from '@mui/material/TextField';
+import { Input } from './input';
+import { Label } from './label';
+import { Textarea } from './textarea';
+import { cn } from '@/lib/utils';
 
 interface UiTextFieldProps {
   id?: string;
@@ -35,25 +38,47 @@ export default function UiTextField({
   readOnly = false,
   placeholder,
 }: UiTextFieldProps) {
+  const fieldId = id ?? label.toLowerCase().replace(/\s+/g, '-');
+  const helperId = helperText ? `${fieldId}-helper` : undefined;
+
+  const shared = {
+    id: fieldId,
+    value,
+    required,
+    disabled,
+    autoFocus,
+    placeholder,
+    'aria-invalid': error || undefined,
+    'aria-describedby': helperId,
+  };
+
   return (
-    <TextField
-      fullWidth
-      variant="outlined"
-      id={id}
-      label={label}
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      type={type}
-      required={required}
-      disabled={disabled}
-      autoComplete={autoComplete}
-      multiline={multiline}
-      rows={rows}
-      error={error}
-      helperText={helperText}
-      autoFocus={autoFocus}
-      placeholder={placeholder}
-      slotProps={{ input: { readOnly }, inputLabel: type === 'date' ? { shrink: true } : undefined }}
-    />
+    <div className="grid w-full gap-1.5">
+      <Label htmlFor={fieldId}>
+        {label}
+        {required && <span aria-hidden="true" className="text-destructive">*</span>}
+      </Label>
+      {multiline ? (
+        <Textarea
+          {...shared}
+          rows={rows}
+          readOnly={readOnly}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      ) : (
+        <Input
+          {...shared}
+          type={type}
+          autoComplete={autoComplete}
+          readOnly={readOnly}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      )}
+      {helperText && (
+        <p id={helperId} className={cn('text-sm', error ? 'text-destructive' : 'text-muted-foreground')}>
+          {helperText}
+        </p>
+      )}
+    </div>
   );
 }

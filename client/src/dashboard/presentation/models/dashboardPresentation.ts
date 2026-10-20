@@ -1,5 +1,10 @@
 import type { DashboardTaskCounts, DashboardTaskItem, DashboardViewState } from './DashboardViewState';
 
+const summaryText = (dueToday: number, todo: number) =>
+  dueToday === 0
+    ? `Nothing due today and ${todo} ${todo === 1 ? 'is' : 'are'} still to do.`
+    : `${dueToday} ${dueToday === 1 ? 'task is' : 'tasks are'} due today and ${todo} ${todo === 1 ? 'is' : 'are'} still to do.`;
+
 const dayKey = (value: Date) => `${value.getFullYear()}-${value.getMonth()}-${value.getDate()}`;
 
 export function toDashboardViewState(name: string, tasks: DashboardTaskItem[], counts: DashboardTaskCounts, now = new Date()): DashboardViewState {
@@ -19,7 +24,7 @@ export function toDashboardViewState(name: string, tasks: DashboardTaskItem[], c
   return {
     eyebrow: now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase(),
     greeting: `${salutation}, ${firstName}`,
-    summary: `${dueToday} ${dueToday === 1 ? 'task is' : 'tasks are'} due today and ${counts.todo} ${counts.todo === 1 ? 'is' : 'are'} still to do.`,
+    summary: summaryText(dueToday, counts.todo),
     counts,
     total,
     completionPercent: total ? Math.round((counts.completed / total) * 100) : 0,

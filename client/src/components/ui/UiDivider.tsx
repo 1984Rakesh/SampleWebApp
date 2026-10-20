@@ -1,5 +1,5 @@
-import Divider from '@mui/material/Divider';
+import { Separator } from './separator';
 
 export default function UiDivider() {
-  return <Divider />;
+  return <Separator />;
 }

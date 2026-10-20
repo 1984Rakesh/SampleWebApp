@@ -1,14 +1,8 @@
-import '@fontsource-variable/bricolage-grotesque/index.css';
-import '@fontsource/dm-sans/400.css';
-import '@fontsource/dm-sans/500.css';
-import '@fontsource/dm-sans/600.css';
-import { useMemo, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { createAppTheme, type ThemeMode } from './theme';
-import { ColorModeContext, type ColorModePreference } from './useColorMode';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
+import { ColorModeContext, type ColorModePreference, type ThemeMode } from './useColorMode';
 
-const STORAGE_KEY = 'theme';
+const STORAGE_KEY = 'color-mode';
+const LEGACY_STORAGE_KEY = 'theme';
 
 function getOsPreference(): ThemeMode {
   if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -17,12 +11,24 @@ function getOsPreference(): ThemeMode {
   return 'light';
 }
 
-function getInitialPreference(): ColorModePreference {
-  const saved = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEY) : null;
-  if (saved === 'light' || saved === 'dark' || saved === 'system') {
-    return saved;
+function isValidPreference(value: string | null): value is ColorModePreference {
+  return value === 'light' || value === 'dark' || value === 'system';
+}
+
+function readStoredPreference(key: string): ColorModePreference | null {
+  try {
+    const saved = window.localStorage.getItem(key);
+    return isValidPreference(saved) ? saved : null;
+  } catch {
+    return null;
   }
-  return 'system';
+}
+
+function getInitialPreference(): ColorModePreference {
+  if (typeof window === 'undefined') {
+    return 'system';
+  }
+  return readStoredPreference(STORAGE_KEY) ?? readStoredPreference(LEGACY_STORAGE_KEY) ?? 'system';
 }
 
 function resolveMode(pref: ColorModePreference): ThemeMode {
@@ -38,7 +44,11 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [osMode, setOsMode] = useState<ThemeMode>(getOsPreference);
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, preference);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, preference);
+    } catch {
+      // Storage may be unavailable; the preference still applies for this session.
+    }
   }, [preference]);
 
   // Listen for OS theme changes when in system mode
@@ -51,6 +61,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   const resolved: ThemeMode = preference === 'system' ? osMode : preference;
 
+  // Keep <html> in sync with the resolved mode so token CSS and native
+  // widgets track it; index.html applies the same value before first paint.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('dark', resolved === 'dark');
+    root.style.colorScheme = resolved;
+  }, [resolved]);
+
   const toggleMode = useCallback(() => {
     setPreference((prev) => {
       if (prev === 'system') return resolveMode('system') === 'dark' ? 'light' : 'dark';
@@ -62,14 +80,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const setDarkMode = useCallback(() => setPreference('dark'), []);
   const setSystemMode = useCallback(() => setPreference('system'), []);
 
-  const theme = useMemo(() => createAppTheme(resolved), [resolved]);
-
   return (
     <ColorModeContext.Provider value={{ mode: preference, resolvedMode: resolved, toggleMode, setLightMode, setDarkMode, setSystemMode }}>
-      <MuiThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </MuiThemeProvider>
+      {children}
     </ColorModeContext.Provider>
   );
 }

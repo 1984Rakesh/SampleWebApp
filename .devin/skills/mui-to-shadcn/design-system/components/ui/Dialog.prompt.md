@@ -1,0 +1,1 @@
+shadcn Dialog. New/Edit task: `DialogHeader` (title + "Add the details. You can change them later."), fields in `grid gap-4`, `DialogFooter` with outline Cancel + default submit. Controlled via `open` / `onOpenChange`.

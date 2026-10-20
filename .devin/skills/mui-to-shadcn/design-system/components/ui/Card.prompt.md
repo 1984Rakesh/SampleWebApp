@@ -1,0 +1,1 @@
+shadcn Card. Compose `Card > CardHeader(CardTitle, CardDescription, CardAction) > CardContent > CardFooter`. Card has py-6 and gap-6; sections have px-6. For edge-to-edge lists use `className="gap-0 py-0"`.

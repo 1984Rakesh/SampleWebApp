@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 
 export type ColorModePreference = 'light' | 'dark' | 'system';
+export type ThemeMode = 'light' | 'dark';
 
 interface ColorModeContextType {
   /** The user's stored preference: 'light', 'dark', or 'system'. */

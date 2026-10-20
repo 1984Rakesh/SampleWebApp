@@ -1,5 +1,5 @@
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import { useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 
 interface UiSnackbarProps {
   open: boolean;
@@ -16,16 +16,23 @@ export default function UiSnackbar({
   onClose,
   autoHideDuration = 3000,
 }: UiSnackbarProps) {
-  return (
-    <Snackbar
-      open={open}
-      autoHideDuration={autoHideDuration}
-      onClose={onClose}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-    >
-      <Alert severity={type} variant="filled" onClose={onClose}>
-        {message}
-      </Alert>
-    </Snackbar>
-  );
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => onCloseRef.current();
+    const id = toast[type](message, {
+      duration: autoHideDuration,
+      onDismiss: close,
+      onAutoClose: close,
+    });
+    return () => {
+      toast.dismiss(id);
+    };
+  }, [open, message, type, autoHideDuration]);
+
+  return null;
 }

@@ -1,0 +1,1 @@
+Top bar for every screen. `<AppHeader active="tasks" userName={user.name} theme={mode} onNavigate={go} onToggleTheme={toggle} onLogout={logout} />`. Nav items are ghost Buttons; active gets bg-accent.

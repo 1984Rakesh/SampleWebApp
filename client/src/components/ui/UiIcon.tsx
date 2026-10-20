@@ -1,20 +1,25 @@
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AddIcon from '@mui/icons-material/Add';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import SearchIcon from '@mui/icons-material/Search';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-import ListAltIcon from '@mui/icons-material/ListAlt';
-import LogoutIcon from '@mui/icons-material/Logout';
-import MenuIcon from '@mui/icons-material/Menu';
-import ReplayIcon from '@mui/icons-material/Replay';
-import TaskIcon from '@mui/icons-material/Task';
+// @ds Icon v2026-10-20
+import {
+  CircleUserRound,
+  Plus,
+  ChevronRight,
+  UserRound,
+  Search,
+  Moon,
+  Sun,
+  CircleCheck,
+  Trash2,
+  Pencil,
+  Hourglass,
+  List,
+  LogOut,
+  Menu,
+  RotateCcw,
+  ListTodo,
+  ArrowRight,
+  type LucideIcon,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export type UiIconName =
   | 'profile'
@@ -33,26 +38,28 @@ export type UiIconName =
   | 'logout'
   | 'menu'
   | 'undo'
-  | 'task';
+  | 'task'
+  | 'arrow-right';
 
-const iconMap: Record<UiIconName, React.ComponentType<{ fontSize?: 'small' | 'medium' }>> = {
-  profile: AccountCircleIcon,
-  add: AddIcon,
-  'chevron-right': ChevronRightIcon,
-  person: PersonOutlineIcon,
-  search: SearchIcon,
-  'theme-dark': Brightness4Icon,
-  'theme-light': Brightness7Icon,
-  'check-circle': CheckCircleIcon,
-  check: CheckCircleOutlineIcon,
-  delete: DeleteOutlineIcon,
-  edit: EditOutlinedIcon,
-  hourglass: HourglassEmptyIcon,
-  list: ListAltIcon,
-  logout: LogoutIcon,
-  menu: MenuIcon,
-  undo: ReplayIcon,
-  task: TaskIcon,
+const iconMap: Record<UiIconName, LucideIcon> = {
+  profile: CircleUserRound,
+  add: Plus,
+  'chevron-right': ChevronRight,
+  person: UserRound,
+  search: Search,
+  'theme-dark': Moon,
+  'theme-light': Sun,
+  'check-circle': CircleCheck,
+  check: CircleCheck,
+  delete: Trash2,
+  edit: Pencil,
+  hourglass: Hourglass,
+  list: List,
+  logout: LogOut,
+  menu: Menu,
+  undo: RotateCcw,
+  task: ListTodo,
+  'arrow-right': ArrowRight,
 };
 
 interface UiIconProps {
@@ -62,5 +69,5 @@ interface UiIconProps {
 
 export default function UiIcon({ name, size = 'md' }: UiIconProps) {
   const Icon = iconMap[name];
-  return <Icon fontSize={size === 'sm' ? 'small' : 'medium'} />;
+  return <Icon className={cn(size === 'sm' ? 'size-4' : 'size-5')} aria-hidden="true" />;
 }

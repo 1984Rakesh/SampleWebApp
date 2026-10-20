@@ -1,4 +1,4 @@
-import ButtonBase from '@mui/material/ButtonBase';
+import { cn } from '@/lib/utils';
 
 interface UiPressableProps {
   children: React.ReactNode;
@@ -8,20 +8,16 @@ interface UiPressableProps {
 
 export default function UiPressable({ children, onClick, selected = false }: UiPressableProps) {
   return (
-    <ButtonBase
+    <button
+      type="button"
       onClick={onClick}
-      sx={{
-        width: '100%',
-        textAlign: 'left',
-        borderRadius: 2,
-        p: 1,
-        display: 'block',
-        outline: selected ? '2px solid' : 'none',
-        outlineColor: 'primary.main',
-        outlineOffset: 2,
-      }}
+      className={cn(
+        'block w-full rounded-lg p-2 text-left outline-offset-2 transition-colors',
+        'focus-visible:ring-[3px] focus-visible:ring-ring/50',
+        selected ? 'outline-2 outline-primary' : 'outline-none',
+      )}
     >
       {children}
-    </ButtonBase>
+    </button>
   );
 }

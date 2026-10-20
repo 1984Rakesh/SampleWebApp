@@ -1,5 +1,6 @@
 import type { Task } from '../../domain/models';
 import { TaskModel, TaskStatus, TaskPriority } from '../../domain/models';
+import { TASK_STATUS_LABELS } from '@/lib/task-labels';
 import type { SelectOption } from '../../../components/ui/SelectOption';
 import type { TaskFormData } from './TaskFormViewState';
 import type { BadgeTone, DueDateTone, TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
@@ -34,7 +35,7 @@ export function toTaskPriority(value: string): TaskPriority | undefined {
 export function buildStatusOptions(): SelectOption[] {
   return Object.values(TaskStatus).map((status) => ({
     value: status,
-    label: formatEnumLabel(status),
+    label: TASK_STATUS_LABELS[status],
   }));
 }
 
@@ -88,7 +89,7 @@ export function toTaskItemViewState(task: Task): TaskItemViewState {
     id: task.id,
     title: task.title,
     description: task.description,
-    statusLabel: formatEnumLabel(task.status),
+    statusLabel: TASK_STATUS_LABELS[task.status],
     statusTone: STATUS_TONES[task.status],
     priorityLabel: formatEnumLabel(task.priority),
     priorityTone: PRIORITY_TONES[task.priority],

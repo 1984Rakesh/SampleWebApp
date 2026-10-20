@@ -3,25 +3,27 @@ import DashboardProgress from '../components/DashboardProgress';
 import DashboardRecentTasks from '../components/DashboardRecentTasks';
 import DashboardStats from '../components/DashboardStats';
 import LoadingSpinner from '../../../components/feedback/LoadingSpinner';
-import { UiAlert, UiFlex, UiGrid, UiGridItem, UiPage, UiScreen, UiText } from '../../../components/ui';
+import { UiAlert, UiAsideGrid, UiFlex, UiPage, UiScreen, UiText } from '../../../components/ui';
 
 export default function DashboardScreen() {
   const { dashboard, isLoading, errorMessage, toggleTaskStatus } = useDashboardViewModel();
   if (isLoading) return <UiPage><LoadingSpinner size="lg" text="Loading dashboard..." /></UiPage>;
 
   return (
-    <UiScreen maxWidth="lg">
-      <UiFlex column gap={1} mb={4}>
-        <UiText variant="caption" tone="muted" weight="semibold">{dashboard.eyebrow}</UiText>
-        <UiText variant="h4" as="h1" weight="bold">{dashboard.greeting}</UiText>
-        <UiText tone="muted">{dashboard.summary}</UiText>
+    <UiScreen maxWidth="6xl">
+      <UiFlex column gap={4}>
+        <UiFlex column gap={1}>
+          <UiText variant="caption" tone="muted" weight="semibold">{dashboard.eyebrow}</UiText>
+          <UiText variant="pageTitle">{dashboard.greeting}</UiText>
+          <UiText tone="muted">{dashboard.summary}</UiText>
+        </UiFlex>
+        {errorMessage && <UiAlert type="error" gutterBottom>{errorMessage}</UiAlert>}
+        <DashboardStats counts={dashboard.counts} total={dashboard.total} dueToday={dashboard.dueToday} dueThisWeek={dashboard.dueThisWeek} />
+        <UiAsideGrid template="rail" gap={3}>
+          <DashboardRecentTasks tasks={dashboard.recentTasks} onToggle={toggleTaskStatus} />
+          <DashboardProgress counts={dashboard.counts} total={dashboard.total} percent={dashboard.completionPercent} />
+        </UiAsideGrid>
       </UiFlex>
-      {errorMessage && <UiAlert type="error" gutterBottom>{errorMessage}</UiAlert>}
-      <DashboardStats counts={dashboard.counts} total={dashboard.total} dueToday={dashboard.dueToday} dueThisWeek={dashboard.dueThisWeek} />
-      <UiGrid spacing={2}>
-        <UiGridItem md={8}><DashboardRecentTasks tasks={dashboard.recentTasks} onToggle={toggleTaskStatus} /></UiGridItem>
-        <UiGridItem md={4}><DashboardProgress counts={dashboard.counts} total={dashboard.total} percent={dashboard.completionPercent} /></UiGridItem>
-      </UiGrid>
     </UiScreen>
   );
 }

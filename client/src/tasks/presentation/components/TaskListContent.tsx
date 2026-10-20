@@ -21,7 +21,7 @@ export default function TaskListContent({ tasks, isLoading, errorMessage, onEdit
   const shown = visibleTasks.length;
   return (
     <>
-      <UiCard><TaskTable tasks={visibleTasks} onEdit={onEdit} onDelete={setDeleteId} onToggleStatus={onToggleStatus} /><UiFlex justify="space-between" align="center" wrap gap={1} px={2.5} py={2}><UiText variant="body2" tone="muted">Showing {shown} of {tasks.length} tasks</UiText><UiFlex gap={1}><UiButton variant="outline" size="sm" disabled={visiblePage === 0} onClick={() => setPage((value) => value - 1)}>Previous</UiButton><UiButton variant="outline" size="sm" disabled={visiblePage >= lastPage} onClick={() => setPage((value) => value + 1)}>Next</UiButton></UiFlex></UiFlex></UiCard>
+      <TaskTable tasks={visibleTasks} onEdit={onEdit} onDelete={setDeleteId} onToggleStatus={onToggleStatus} footer={<><span>Showing {shown} of {tasks.length} tasks</span><UiFlex gap={1}><UiButton variant="outline" size="sm" disabled={visiblePage === 0} onClick={() => setPage((value) => value - 1)}>Previous</UiButton><UiButton variant="outline" size="sm" disabled={visiblePage >= lastPage} onClick={() => setPage((value) => value + 1)}>Next</UiButton></UiFlex></>} />
       <DeleteTaskDialog open={!!deleteId} onCancel={() => setDeleteId(null)} onConfirm={confirmDelete} />
     </>
   );

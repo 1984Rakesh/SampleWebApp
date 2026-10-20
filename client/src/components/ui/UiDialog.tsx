@@ -1,10 +1,18 @@
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './dialog';
+import { cn } from '@/lib/utils';
 
-const displayFont = "'Bricolage Grotesque Variable', 'DM Sans', sans-serif";
+const maxWidthClassMap = {
+  xs: 'sm:max-w-md',
+  sm: 'sm:max-w-xl',
+  md: 'sm:max-w-4xl',
+} as const;
 
 interface UiDialogProps {
   open: boolean;
@@ -26,15 +34,18 @@ export default function UiDialog({
   children,
 }: UiDialogProps) {
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth={maxWidth}>
-      <DialogTitle sx={{ fontFamily: displayFont, fontWeight: 700, fontSize: 28, letterSpacing: '-0.02em', lineHeight: 1.15 }}>{title}</DialogTitle>
-      {description && (
-        <DialogContent sx={{ pt: 0 }}>
-          <DialogContentText>{description}</DialogContentText>
-        </DialogContent>
-      )}
-      {children && <DialogContent>{children}</DialogContent>}
-      {actions && <DialogActions>{actions}</DialogActions>}
+    <Dialog open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
+      <DialogContent
+        className={cn(maxWidthClassMap[maxWidth])}
+        {...(description ? {} : { 'aria-describedby': undefined })}
+      >
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
+        </DialogHeader>
+        {children}
+        {actions && <DialogFooter>{actions}</DialogFooter>}
+      </DialogContent>
     </Dialog>
   );
 }

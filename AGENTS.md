@@ -42,7 +42,7 @@ Target server modules: `app/`, `foundation/`, `security/`, `profile/`, `tasks/`,
 - Database/JWT/transport errors are translated at boundaries; public error envelopes and status codes remain consistent.
 - Nullable updates distinguish omitted/undefined, explicit null/empty, and non-empty values through schemas/mappers/SQL.
 - Client components render ViewState/primitives/options, not raw domain entities/enums. ViewModels own form state/validation/actions.
-- MUI imports stay inside `client/src/components/ui/` and `client/src/foundation/theme/`. No sx or MUI prop types leak into consumers. Shared UI contracts such as SelectOption belong to components/ui; shared components must not import business domain/data/App or feature components.
+- Vendored shadcn/ui primitives, radix-ui, lucide-react and Tailwind composition stay inside `client/src/components/ui/` and `client/src/components/app/`. No component-library prop types or class passthroughs leak into consumers. Shared UI contracts such as SelectOption belong to components/ui; shared components must not import business domain/data/App or feature components.
 - Split multi-region render bodies into feature-owned controlled subcomponents. Shared components stay feature-independent; App wires dashboard/navbar capabilities and tasks-owned dialogs.
 - Preserve APIs, browser routes, database schema/data, stored-session compatibility and UI behavior during reorganization.
 

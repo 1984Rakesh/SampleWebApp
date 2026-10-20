@@ -14,11 +14,10 @@ export default function TaskItemActions({
   onDelete,
 }: TaskItemActionsProps) {
   return (
-    <UiFlex gap={0.5} role="group" ariaLabel={`Actions for ${task.title}`}>
+    <UiFlex inline gap={0.5} role="group" ariaLabel={`Actions for ${task.title}`}>
       <UiIconButton
         icon="edit"
         ariaLabel={`Edit ${task.title}`}
-        tone="info"
         size="sm"
         tooltip="Edit"
         onClick={() => onEdit(task.id)}
@@ -26,9 +25,9 @@ export default function TaskItemActions({
       <UiIconButton
         icon="delete"
         ariaLabel={`Delete ${task.title}`}
-        tone="danger"
         size="sm"
         tooltip="Delete"
+        destructiveHover
         onClick={() => onDelete(task.id)}
       />
     </UiFlex>

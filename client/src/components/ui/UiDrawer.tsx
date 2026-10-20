@@ -1,10 +1,8 @@
 import { Link as RouterLink } from 'react-router-dom';
-import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
+import { Sheet, SheetContent, SheetTitle } from './sheet';
 import UiIcon from './UiIcon';
 import type { UiIconName } from './UiIcon';
+import { cn } from '@/lib/utils';
 
 interface UiDrawerProps {
   open: boolean;
@@ -14,15 +12,12 @@ interface UiDrawerProps {
 
 export function UiDrawer({ open, onClose, children }: UiDrawerProps) {
   return (
-    <Drawer
-      anchor="left"
-      open={open}
-      onClose={onClose}
-      ModalProps={{ keepMounted: true }}
-      PaperProps={{ sx: { width: 280, maxWidth: '85vw', bgcolor: 'background.paper' } }}
-    >
-      {children}
-    </Drawer>
+    <Sheet open={open} onOpenChange={(next) => { if (!next) onClose(); }}>
+      <SheetContent side="left" showCloseButton={false} className="w-70 max-w-[85vw] gap-0 p-0">
+        <SheetTitle className="sr-only">Navigation</SheetTitle>
+        {children}
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -38,20 +33,29 @@ interface UiNavListProps {
   items: UiNavItem[];
 }
 
+const navItemClass = (tone?: 'danger') => cn(
+  'flex w-full items-center gap-4 px-4 py-2 text-left text-sm transition-colors hover:bg-accent',
+  tone === 'danger' ? 'text-destructive' : 'text-foreground',
+);
+
 export function UiNavList({ items }: UiNavListProps) {
   return (
-    <List sx={{ py: 1 }}>
+    <ul className="py-2">
       {items.map((item) => (
-        <ListItemButton
-          key={item.label}
-          onClick={item.onClick}
-          sx={item.tone === 'danger' ? { color: 'error.main' } : undefined}
-          {...(item.to ? { component: RouterLink, to: item.to } : {})}
-        >
-          {item.icon && <UiIcon name={item.icon} />}
-          <ListItemText primary={item.label} sx={item.icon ? { ml: 2 } : undefined} />
-        </ListItemButton>
+        <li key={item.label}>
+          {item.to ? (
+            <RouterLink to={item.to} onClick={item.onClick} className={navItemClass(item.tone)}>
+              {item.icon && <UiIcon name={item.icon} />}
+              <span>{item.label}</span>
+            </RouterLink>
+          ) : (
+            <button type="button" onClick={item.onClick} className={navItemClass(item.tone)}>
+              {item.icon && <UiIcon name={item.icon} />}
+              <span>{item.label}</span>
+            </button>
+          )}
+        </li>
       ))}
-    </List>
+    </ul>
   );
 }

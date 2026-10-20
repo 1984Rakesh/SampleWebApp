@@ -6,7 +6,7 @@ import { UiAlert, UiFlex, UiScreen } from '../../../components/ui';
 export default function TaskListScreen() {
   const tasks = useTaskListViewModel();
   return (
-    <UiScreen maxWidth="lg">
+    <UiScreen maxWidth="6xl">
       <TaskListHeader total={tasks.total} todo={tasks.counts.todo} />
       <UiFlex column gap={3}>
         <TaskFilters

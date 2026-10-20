@@ -4,7 +4,7 @@ export { default as UiTextField } from './UiTextField';
 export { default as UiSelect } from './UiSelect';
 export { default as UiSearchField } from './UiSearchField';
 export { default as UiTabs } from './UiTabs';
-export { UiCard, UiCardHeader, UiCardContent } from './UiCard';
+export { UiCard, UiCardHeader, UiCardContent, UiCardFooter } from './UiCard';
 export { default as UiAlert } from './UiAlert';
 export { default as UiCircularProgress } from './UiCircularProgress';
 export { default as UiCheckbox } from './UiCheckbox';
@@ -33,11 +33,19 @@ export {
   UiTableBody,
   UiTableCell,
   UiTableContainer,
+  UiTableFooter,
   UiTableHead,
   UiTablePagination,
   UiTableRow,
 } from './UiTable';
 export { default as UiPressable } from './UiPressable';
 export { default as UiPaper } from './UiPaper';
+export { default as UiToastHost } from './UiToastHost';
+export { default as UiFormFooter } from './UiFormFooter';
+export { default as UiAsideGrid } from './UiAsideGrid';
+export { default as UiSwatch } from './UiSwatch';
+export { default as UiCode } from './UiCode';
+export { default as UiList } from './UiList';
+export { default as UiTonePanel } from './UiTonePanel';
 export type { UiIconName } from './UiIcon';
 export type { UiNavItem } from './UiDrawer';

@@ -24,7 +24,6 @@ before(async () => {
   vite = await createServer({
     server: { middlewareMode: true, watch: null, hmr: false },
     appType: 'custom',
-    ssr: { noExternal: [/^@mui\//] },
   });
   Navbar = (await vite.ssrLoadModule('/src/components/layout/Navbar.tsx')).default;
   NavbarToolbar = (await vite.ssrLoadModule('/src/components/layout/navbar/NavbarToolbar.tsx')).default;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UiButton, UiPaper } from '../../../components/ui';
+import { UiButton, UiCode, UiPaper } from '../../../components/ui';
 
 interface CodeBlockProps {
   code: string;
@@ -36,11 +36,7 @@ export default function CodeBlock({ code, language = 'typescript', title }: Code
         </UiButton>
       }
     >
-      <pre style={{ padding: 16, overflow: 'auto', margin: 0 }}>
-        <code className={`language-${language}`} style={{ fontSize: '0.875rem', color: '#F3F4F6' }}>
-          {code}
-        </code>
-      </pre>
+      <UiCode code={code} language={language} />
     </UiPaper>
   );
 }

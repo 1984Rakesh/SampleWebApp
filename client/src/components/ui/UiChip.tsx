@@ -1,8 +1,16 @@
-import Chip from '@mui/material/Chip';
-import { useTheme } from '@mui/material/styles';
-import { chipColorsByMode, type ChipTone } from '../../foundation/theme/theme';
+// @ds TaskBadge v2026-10-20
+import { Badge } from './badge';
+import { cn } from '@/lib/utils';
 
-export type UiChipTone = ChipTone;
+export type UiChipTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+
+const toneClassMap: Record<UiChipTone, string> = {
+  neutral: 'bg-status-todo text-status-todo-foreground',
+  info: 'bg-status-progress text-status-progress-foreground',
+  success: 'bg-status-done text-status-done-foreground',
+  warning: 'bg-priority-medium text-priority-medium-foreground',
+  danger: 'bg-priority-high text-priority-high-foreground',
+};
 
 interface UiChipProps {
   label: string;
@@ -11,25 +19,13 @@ interface UiChipProps {
 }
 
 export default function UiChip({ label, tone = 'neutral', variant = 'solid' }: UiChipProps) {
-  const theme = useTheme();
   if (variant === 'outline') {
-    return <Chip label={label} size="small" variant="outlined" />;
+    return <Badge variant="outline">{label}</Badge>;
   }
 
-  const mode = theme.palette.mode === 'dark' ? 'dark' : 'light';
-  const colors = chipColorsByMode[mode][tone];
-
   return (
-    <Chip
-      label={label}
-      size="small"
-      sx={{
-        bgcolor: colors.bg,
-        color: colors.fg,
-        borderRadius: '16px',
-        fontWeight: 500,
-        fontSize: '0.75rem',
-      }}
-    />
+    <Badge variant="secondary" className={cn('border-transparent', toneClassMap[tone])}>
+      {label}
+    </Badge>
   );
 }

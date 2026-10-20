@@ -4,6 +4,7 @@ import { AuthProvider } from './AuthProvider';
 import { FeatureUseCasesProvider } from './FeatureUseCasesProvider';
 import { ThemeProvider } from '../../foundation/theme';
 import { ErrorBoundary } from '../../components/feedback/ErrorBoundary';
+import { UiToastHost } from '../../components/ui';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,6 +22,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         <ThemeProvider>
           <AuthProvider>
             <FeatureUseCasesProvider>{children}</FeatureUseCasesProvider>
+            <UiToastHost />
           </AuthProvider>
         </ThemeProvider>
       </ErrorBoundary>

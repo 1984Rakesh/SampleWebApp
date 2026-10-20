@@ -15,7 +15,7 @@ Imports: App → Features / Foundation
 Inside features: Presentation → Domain ← Data
 ```
 
-App owns composition, provider/router/shell integration and cross-feature adaptation. Foundation owns reusable capabilities, not DI or feature policy. Features/shared components never import App. Feature domains never import foundation, React, React Query, Axios, Zod, MUI, browser APIs or data/presentation implementations.
+App owns composition, provider/router/shell integration and cross-feature adaptation. Foundation owns reusable capabilities, not DI or feature policy. Features/shared components never import App. Feature domains never import foundation, React, React Query, Axios, Zod, UI component libraries, browser APIs or data/presentation implementations.
 
 **Migration complete:** all five features — security, profile, tasks, dashboard, comparison — own their layers under `src/<feature>/`; no legacy layer-first roots remain. Foundation exposes generic network/storage/theme capabilities only. Dashboard and comparison are presentation-only features (no artificial domain/data layers). Each feature owns its consumer contexts; App injects cross-feature capabilities (`DashboardCapabilities`, profile task-counts) rather than allowing sibling imports.
 
@@ -24,7 +24,7 @@ App owns composition, provider/router/shell integration and cross-feature adapta
 | Domain | Own models/repositories/use cases; minimal shared domain when introduced | App, foundation, outer layers, frameworks, browser APIs |
 | Data | Own domain/data; generic foundation transport | App, presentation, sibling feature internals |
 | Presentation ViewModels/mappers | Own domain/presentation; injected consumer contracts; generic foundation hooks | App, concrete data adapters, Axios/Zod/React Query |
-| Screens/feature components | ViewState, options, controlled callbacks, own presentation, shared UI | Domain entities/enums, App/data internals, MUI, sx |
+| Screens/feature components | ViewState, options, controlled callbacks, own presentation, shared UI | Domain entities/enums, App/data internals, vendored UI primitives |
 | Shared components | Own UI contracts/components and generic theme capability | App, business models, feature components/hooks, data adapters |
 | Foundation | Generic capabilities and permitted libraries | App, feature implementations, business policy |
 | App | All layers for binding/provider/route/shell integration | Business invariants, duplicate domain validation |
@@ -54,7 +54,7 @@ Foundation has no feature/App/domain-model dependencies: network receives callba
 4. Shared Navbar is a thin prop-driven orchestrator with toolbar/drawer regions under components/layout/navbar. AppNavbar owns session/theme/navigation callbacks, drawer/create-dialog state and the feature-owned TaskDialog. Never use the auth form ViewModel to render global navigation.
 5. Decompose distinct render regions into controlled feature subcomponents; entry components own shared local UI state and branch/callback wiring. Keep internal pieces out of broad public barrels.
 6. SelectOption belongs to components/ui/SelectOption.ts; feature presentation types must not become dependencies of shared primitives.
-7. Only components/ui and foundation/theme may import @mui, including icons. Wrapper APIs remain narrow/semantic: closed variant/tone/size unions, layout-intent props and value-based callbacks. Never expose sx, component, MUI Props or passthrough spreads. Internal MUI props/sx are allowed only inside that boundary. App and feature UI compose Ui primitives exclusively.
+7. Only components/ui (and generic blocks in components/app) may import vendored shadcn/ui primitives, radix-ui, lucide-react icons and compose Tailwind token utilities. Wrapper APIs remain narrow/semantic: closed variant/tone/size unions, layout-intent props and value-based callbacks. Never expose Radix/shadcn Props, `asChild`, class-name passthroughs or arbitrary spreads. Internal primitive props/classes are allowed only inside that boundary. App and feature UI compose Ui primitives exclusively.
 
 ## 5. Session, Network and Cross-Feature Synchronization
 

@@ -9,6 +9,7 @@ import {
   UiFlex,
   UiGrid,
   UiGridItem,
+  UiList,
   UiScreen,
   UiText,
 } from '../../../components/ui';
@@ -25,7 +26,7 @@ export default function ComparisonScreen() {
 
   return (
     <UiScreen maxWidth="lg">
-      <UiText variant="h4" as="h1" weight="bold" gutterBottom>
+      <UiText variant="pageTitle" gutterBottom>
         iOS vs Web Architecture Comparison
       </UiText>
 
@@ -65,13 +66,13 @@ export default function ComparisonScreen() {
                 <UiCard>
                   <UiCardHeader title="Learning Notes" />
                   <UiCardContent>
-                    <ul style={{ paddingLeft: 16, margin: 0 }}>
+                    <UiList>
                       {selectedConceptData.learningNotes.map((note: string, index: number) => (
                         <UiText as="li" key={index} tone="muted" mb={1}>
                           {note}
                         </UiText>
                       ))}
-                    </ul>
+                    </UiList>
                   </UiCardContent>
                 </UiCard>
               )}
