@@ -10,3 +10,4 @@
 - 2026-10-25 — P1.T2a dispatched to Devin (Lite).
 - 2026-10-25 — P1.T2a merged as PR #21 (36d3152); conventions: avoid rerunning the shadcn CLI, revert its `cn` package.
 - 2026-10-25 — P1.T3 dispatched to Devin (Normal).
+- 2026-10-25 — P1.T3 merged as PR #22 (882a1b4); Phase 1 complete. P3.T4 notes: tint priority toggle items in TaskDialog.

@@ -1,7 +1,7 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
-- Current phase: P1 — DS tokens and primitives
-- Next task: P1.T3
+- Current phase: P2 — Rules and shared components
+- Next task: P2.T1
 - Last updated: 2026-10-25
 
 ## Goal
@@ -14,7 +14,7 @@ Exit criteria: theme CSS carries the DS tokens; regenerated shadcn primitives wi
 - [x] P1.T1 — Adopt DS theme tokens · ui · PR #19 · deps —
 - [x] P1.T2 — Regenerate shadcn primitives · ui · PR #20 · deps P1.T1
 - [x] P1.T2a — shadcn CLI alias and quiet verify script · setup · PR #21 · deps P1.T2
-- [~] P1.T3 — DS variants on primitives · ui · PR — · deps P1.T2a
+- [x] P1.T3 — DS variants on primitives · ui · PR #22 · deps P1.T2a
 
 ## Phase 2 — Rules and shared components
 Exit criteria: dependency-cruiser and docs allow direct shadcn in feature presentation/App; `components/app` and navbar/feedback use primitives only.
