@@ -37,5 +37,5 @@ Exit criteria: `grep -rE "\bUi[A-Z]" client/src --include='*.ts*' | grep -v '^cl
 Exit criteria: no `client/src/components/ui/Ui*`; tests cover DS primitives; docs updated; browser walkthrough passes.
 - [ ] P4.T1 — Replace wrapper tests · test · PR — · deps P3.T1–P3.T7
 - [ ] P4.T2 — Delete the Ui* wrapper layer · refactor · PR — · deps P4.T1
-- [ ] P4.T3 — Vendor DS docs, retire mui-to-shadcn skill · setup · PR — · deps P4.T2
+- [ ] P4.T3 — Vendor DS docs · setup · PR — · deps P4.T2
 - [ ] P4.T4 — Browser acceptance walkthrough · test · PR — · deps P4.T3

@@ -1,1 +1,0 @@
-shadcn Separator (horizontal default).
