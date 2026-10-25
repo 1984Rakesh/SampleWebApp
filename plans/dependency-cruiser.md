@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T10
+- Next task: P2.T10 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P2.T9 merged)
 
 ## Goal
@@ -274,7 +274,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: added 31 `index.ts` barrels under `server/src/{security,profile,tasks}/<layer>/<sub>/` and rewrote every cross-folder `src/` import to use them, with one commit per feature (security, profile, tasks). Barrels use named re-exports only and `export type` for types. Each exports only the symbols that `src/` imports from outside its folder. Same-folder imports stay relative. Merged duplicate imports from the same barrel into one statement. No aliases were needed. No files outside scope changed. `server/tests/*` is unchanged because the barrel rule's `from` is `^src/`, so test deep imports aren't flagged. Server check:architecture 130 → 37 (barrel 129 → 36, tests→client 1 → 1). 93 hits removed, all targeting feature folders, and 0 added. The remaining hits target foundation/shared (P2.T10) and client (P2.T11). no-circular is 0. Compiled dist container and feature barrels load with no `undefined` exports. Build ok, test 29/29, test:startup 3/3, client check:architecture 0, `git diff --check` clean. Suggestion: tests still deep-import feature files; consider a later rule/task if tests should use barrels too.
     - 2026-10-25 — Manager: reviewed (29 barrels in per-feature commits; server 130 → 37 with 93 in-scope removals and none added; no require cycles; startup/tests green; client still 0); squash-merged PR #14. Tests stay white-box (Decision).
 
-- [ ] **P2.T10 — Server barrels: foundation, shared, app**
+- [~] **P2.T10 — Server barrels: foundation, shared, app**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t10
   - Base: feat/dependency-cruiser
@@ -373,3 +373,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T9 Do revised (no 40-file stop; one PR with per-feature commits, user choice). Dispatched P2.T9 to Devin.
 - 2026-10-25 — Manager: P2.T9 merged (PR #14). Decision: tests stay white-box.
 - 2026-10-25 — Manager: P2.T10 Done-when corrected; the tests→client hit belongs to P2.T11.
+- 2026-10-25 — Manager: dispatched P2.T10 to Devin.
