@@ -6,3 +6,4 @@
 - 2026-10-25 — plans/RULES.md architecture bullet about vendored UI is updated by the Manager after P2.T1 merges
 - 2026-10-25 — Cut Devin waste: root `client/tsconfig.json` gets `@/*` paths so the shadcn CLI resolves the alias; client verify runs via a quiet `npm run verify`; code and ledger commits are pushed together; AGENTS.md trimming waits until after P2.T1 → P1.T2a, P2.T4, RULES.md
 - 2026-10-25 — Rule files stay `always_on` but are generic and compact; AGENTS.md files hold only pointers, workflow, verify and test safety; section numbers are frozen because dependency-cruiser comments cite them (supersedes "trim after P2.T1") → P2.T4 dropped
+- 2026-10-25 — Workers get exact reference lists and pre-answered facts instead of open-ended reading; experiments to confirm stated behaviour are disallowed (Devin token analysis: P1.T2a spent ~10 turns probing oxlint, P1.T3 read all DS docs at once) → conventions.md, task Manager notes
