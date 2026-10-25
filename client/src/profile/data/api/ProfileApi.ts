@@ -1,6 +1,6 @@
 import type { AxiosInstance } from 'axios';
 import type { ProfileDTO, UpdateProfileDTO } from '../dtos';
-import { atDataBoundary } from '../../../shared/data/translateError';
+import { atDataBoundary } from '../../../shared/data';
 
 export function createProfileApi(client: AxiosInstance) {
   return {

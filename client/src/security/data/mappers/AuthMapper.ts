@@ -1,6 +1,6 @@
 import { authResponseSchema, refreshTokenResponseSchema, type AuthResponseDTO, type LoginRequestDTO, type RegisterRequestDTO } from '../dtos';
 import { AccountModel, type AuthSession, type LoginInput, type RegisterUserInput } from '../../domain/models';
-import { translateError } from '../../../shared/data/translateError';
+import { translateError } from '../../../shared/data';
 
 export function toDomain(dto: AuthResponseDTO): AuthSession {
   try {

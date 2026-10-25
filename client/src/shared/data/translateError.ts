@@ -1,6 +1,6 @@
 import { ZodError } from 'zod';
 import { HttpError, toHttpError } from '../../foundation/network';
-import { ConflictError, DataError, DomainError, NotFoundError, UnauthorizedError, ValidationError } from '../domain/errors';
+import { ConflictError, DataError, DomainError, NotFoundError, UnauthorizedError, ValidationError } from '../domain';
 
 export function translateError(error: unknown): DomainError {
   if (error instanceof DomainError) return error;

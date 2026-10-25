@@ -1,7 +1,6 @@
 import type { AuthSession, RegisterUserInput } from '../models';
 import type { AuthRepository } from '../repositories';
-import { normalizeEmail, normalizeName } from '../../../shared/domain/validation';
-import { ValidationError } from '../../../shared/domain/errors';
+import { normalizeEmail, normalizeName, ValidationError } from '../../../shared/domain';
 
 export async function registerUserUseCase(repository: AuthRepository, input: RegisterUserInput): Promise<AuthSession> {
   if (!input.name?.trim()) throw new ValidationError('Name is required');
