@@ -21,17 +21,18 @@ Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `c
 ## Phase 0 — CI and rule docs
 Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server verify commands in GitHub Actions. Rule docs state the agreed rules, no longer defer tooling, and the old ledger/skills are archived.
 
-- [~] **P0.T1 — Add GitHub Actions CI**
+- [r] **P0.T1 — Add GitHub Actions CI**
   - Type: setup
   - Branch: task/dependency-cruiser/p0-t1
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/1
   - Files: `.github/workflows/ci.yml`
   - Context: plans/RULES.md (Verify commands). There is no CI today. Client tests run sequentially with Vite SSR. Server tests need both apps' dependencies installed, because `server/tests/client-contract.test.ts` imports client code.
   - Do: Add one workflow on `pull_request` (all branches) and `push` to `main` and `feat/**`. Jobs: `client` (Node 24, `npm ci`, test, build, lint) and `server` (Node 24, `npm ci` in client and server, build, test, test:startup), plus a `git diff --check` step against the PR base. Cache npm per lockfile. Add no `check:architecture` yet (P3.T1 adds it).
   - Done when: the workflow runs on this PR and both jobs pass. No source files changed.
   - Depends on: —
   - Notes:
+    - 2026-10-25 — Devin: added `.github/workflows/ci.yml` (only file changed besides this ledger). The `client` job runs `git diff --check HEAD^1 HEAD` on the PR merge commit, which checks the PR diff against its base. It runs on `pull_request` only, and push runs skip it. The `server` job runs `npm ci` in client then server. npm cache keyed per lockfile through `setup-node` `cache-dependency-path`. Concurrency cancels superseded runs. Actions pinned to `@v5` major tags. Local Node 24.22.1 run: client 65/65 tests, build, lint green. Server build, 29/29 tests, startup 3/3 green. Suggestion: pin actions to SHAs later if desired.
 
 - [ ] **P0.T2 — Update architecture rule docs for dependency-cruiser**
   - Type: setup
