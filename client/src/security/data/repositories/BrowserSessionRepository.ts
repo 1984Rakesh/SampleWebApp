@@ -1,6 +1,6 @@
 import type { Account, AuthSession } from '../../domain/models';
 import type { SessionRepository } from '../../domain/repositories';
-import type { KeyValueStorage } from '../../../foundation/session/storage';
+import type { KeyValueStorage } from '../../../foundation/session';
 import { authToDomain } from '../mappers';
 import { UnauthorizedError } from '../../../shared/domain/errors';
 

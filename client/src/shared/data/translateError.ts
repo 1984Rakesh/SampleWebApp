@@ -1,5 +1,5 @@
 import { ZodError } from 'zod';
-import { HttpError, toHttpError } from '../../foundation/network/axiosClient';
+import { HttpError, toHttpError } from '../../foundation/network';
 import { ConflictError, DataError, DomainError, NotFoundError, UnauthorizedError, ValidationError } from '../domain/errors';
 
 export function translateError(error: unknown): DomainError {
