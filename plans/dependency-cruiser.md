@@ -109,11 +109,11 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
     - 2026-10-25 — Devin: added `client/.dependency-cruiser.cjs`, `dependency-cruiser@18.6.0` (exact pin; 18.7.0 is under the 7-day minimum) and the `check:architecture` script. npm also pruned a stale optional-peer `yaml` lockfile entry. Config: `tsc` parser, `tsConfig: tsconfig.app.json`, `tsPreCompilationDeps: true`, all rules `error` with doc-section comments. A feature is any top-level `src/` folder except app/foundation/shared/components/assets, so `lib/` is checked as a feature. `no-orphans` uses native `orphan` plus `reachable: false` from `src/main.tsx` (native orphan misses files that import others). Barrel rule (e) is 3 rule objects that share one name, because back-references only flow from→to. Baseline: 213 errors (barrel 156, components/shared → `lib` 44, orphans 7, sibling → `lib` 4, ui-vendor in `lib/utils` 2), 0 layer-boundary hits. A temporary domain → axios import was reported. `comparisonData.ts` has 0 resolved deps. `npm test` 65/65, build and lint OK. Suggestion: a dedicated no-`src/lib` rule (doc rule (a)) was not added because it is not in Do.
     - 2026-10-25 — Manager: reviewed config + baseline (213: barrel 156, lib-related 50, orphans 7; 0 layer-boundary); squash-merged PR #4. Baseline counts are the Done-when reference for Phase 2.
 
-- [~] **P1.T2 — Server dependency-cruiser config**
+- [r] **P1.T2 — Server dependency-cruiser config**
   - Type: setup
   - Branch: task/dependency-cruiser/p1-t2
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/5
   - Files: `server/package.json`, `server/package-lock.json`, `server/.dependency-cruiser.cjs`
   - Context: `server/.devin/rules/server-architecture.md` (after P0.T2). Server TypeScript 7 has no JS compiler API. Use dependency-cruiser's `parser: 'swc'` with `@swc/core` as a devDependency, or another parser setup that works without TS 7's API; record the choice in Notes. Keep TS 7 as the build compiler.
   - Do: Add the devDependencies and script `"check:architecture": "depcruise src tests --config .dependency-cruiser.cjs"`. Every rule is `severity: 'error'`:
@@ -140,6 +140,7 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
   - Done when: `npm run check:architecture` runs, and the PR body has its full output. All rules are error-level. A deliberate `import express from 'express'` in a domain file is reported (shown, then reverted). Server verify commands pass.
   - Depends on: P1.T1
   - Notes:
+    - 2026-10-25 — Devin: added `server/.dependency-cruiser.cjs`, devDeps `dependency-cruiser@18.6.0` + `@swc/core@1.16.18` (exact pins; 18.7.0 and 1.16.20 are under the 7-day minimum) and the `check:architecture` script. Parser choice: `parser: 'swc'`, `tsPreCompilationDeps: true`, no `tsConfig` (no server path aliases); TS 7 stays the build compiler; depcruise prints a non-fatal `missing-typescript-transpiler` notice. 21 rule objects, all `error`, client rule names/two-object no-orphans/three-object barrel rule mirrored. Client tree is `doNotFollow`, so only the direct tests→client edge is judged. Library allowlists apply `from: ^src/` (tests/errors.test.ts imports express types) and include `@types/*`. APP = `src/app/` + `src/server.ts`. Baseline: 130 errors = barrel 129 (features 93, shared/foundation 36) + tests-to-client 1 (`tests/client-contract.test.ts → client/src/tasks/domain/models/enums.ts`, a real rule (d) violation not covered by any Phase 2 task); 0 layer, library or orphan hits. A temporary domain → express import was reported; other rules were probed in a throwaway copy. Build, 29/29 tests, 3/3 startup pass; `git diff --check` clean. Suggestion: add client-style `no-non-package-json`/`not-to-dev-dep` rules later.
 
 ## Phase 2 — Fix existing violations
 Exit criteria: `npm run check:architecture` reports 0 violations on both sides, with behaviour and visuals unchanged.
