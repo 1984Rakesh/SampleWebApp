@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P1 — Add dependency-cruiser (report only)
-- Next task: P1.T2
+- Next task: P1.T2 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P1.T1 merged)
 
 ## Goal
@@ -109,7 +109,7 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
     - 2026-10-25 — Devin: added `client/.dependency-cruiser.cjs`, `dependency-cruiser@18.6.0` (exact pin; 18.7.0 is under the 7-day minimum) and the `check:architecture` script. npm also pruned a stale optional-peer `yaml` lockfile entry. Config: `tsc` parser, `tsConfig: tsconfig.app.json`, `tsPreCompilationDeps: true`, all rules `error` with doc-section comments. A feature is any top-level `src/` folder except app/foundation/shared/components/assets, so `lib/` is checked as a feature. `no-orphans` uses native `orphan` plus `reachable: false` from `src/main.tsx` (native orphan misses files that import others). Barrel rule (e) is 3 rule objects that share one name, because back-references only flow from→to. Baseline: 213 errors (barrel 156, components/shared → `lib` 44, orphans 7, sibling → `lib` 4, ui-vendor in `lib/utils` 2), 0 layer-boundary hits. A temporary domain → axios import was reported. `comparisonData.ts` has 0 resolved deps. `npm test` 65/65, build and lint OK. Suggestion: a dedicated no-`src/lib` rule (doc rule (a)) was not added because it is not in Do.
     - 2026-10-25 — Manager: reviewed config + baseline (213: barrel 156, lib-related 50, orphans 7; 0 layer-boundary); squash-merged PR #4. Baseline counts are the Done-when reference for Phase 2.
 
-- [ ] **P1.T2 — Server dependency-cruiser config**
+- [~] **P1.T2 — Server dependency-cruiser config**
   - Type: setup
   - Branch: task/dependency-cruiser/p1-t2
   - Base: feat/dependency-cruiser
@@ -306,3 +306,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P0.T3 merged (PR #3); Phase 0 complete.
 - 2026-10-25 — Manager: dispatched P1.T1 to Devin.
 - 2026-10-25 — Manager: P1.T1 merged (PR #4). Revised P3.T1 Do: add explicit `no-src-lib` client rule.
+- 2026-10-25 — Manager: dispatched P1.T2 to Devin.
