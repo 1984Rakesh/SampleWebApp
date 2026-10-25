@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { AuthSession, LoginInput, RegisterUserInput } from '../../domain/models/AuthSession';
+import type { AuthSession, LoginInput, RegisterUserInput } from '../../domain/models';
 
 export interface AuthUseCases {
   login(input: LoginInput): Promise<AuthSession>;

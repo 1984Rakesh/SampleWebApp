@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { Account } from '../../domain/models/Account';
-import type { AuthSession } from '../../domain/models/AuthSession';
+import type { Account, AuthSession } from '../../domain/models';
 
 export interface AuthSessionState {
   user: Account | null;

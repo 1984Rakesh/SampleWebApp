@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { loadConfig } from './app/config';
 import { createContainer } from './app/container';
 import { createApp } from './app/createApp';
-import { runMigrations } from './foundation/database/migrations';
+import { runMigrations } from './foundation/database';
 
 // Initialize database and start server
 async function startServer(): Promise<void> {

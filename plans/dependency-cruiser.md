@@ -1,0 +1,386 @@
+# Plan: Enforce clean architecture with dependency-cruiser
+
+## Status
+- Feature branch: feat/dependency-cruiser
+- Current phase: Done — all phases complete
+- Next task: — (feature PR feat/dependency-cruiser → main, for the user to merge)
+- Last updated: 2026-10-25 by Manager (P3.T1 merged; plan complete)
+
+## Goal
+Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
+
+## Feature Rules
+- Follows plans/RULES.md
+- The user has approved adding dependency-cruiser and a TS parser dependency, plus a `check:architecture` script (Decision 2026-10-25). Until P0.T2 merges, the repo docs still say otherwise; this plan overrides them.
+- Phase 2 tasks are `refactor`: no behaviour or visual change; tests change only import paths.
+- `comparison/presentation/models/comparisonData.ts` holds example code inside template strings. It is content, not imports; configs must not report it.
+
+## Status Legend
+`[ ]` todo · `[~]` in progress · `[r]` in review · `[x]` merged · `[!]` blocked · `[-]` dropped
+
+## Phase 0 — CI and rule docs
+Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server verify commands in GitHub Actions. Rule docs state the agreed rules, no longer defer tooling, and the old ledger/skills are archived.
+
+- [x] **P0.T1 — Add GitHub Actions CI**
+  - Type: setup
+  - Branch: task/dependency-cruiser/p0-t1
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/1
+  - Files: `.github/workflows/ci.yml`
+  - Context: plans/RULES.md (Verify commands). There is no CI today. Client tests run sequentially with Vite SSR. Server tests need both apps' dependencies installed, because `server/tests/client-contract.test.ts` imports client code.
+  - Do: Add one workflow on `pull_request` (all branches) and `push` to `main` and `feat/**`. Jobs: `client` (Node 24, `npm ci`, test, build, lint) and `server` (Node 24, `npm ci` in client and server, build, test, test:startup), plus a `git diff --check` step against the PR base. Cache npm per lockfile. Add no `check:architecture` yet (P3.T1 adds it).
+  - Done when: the workflow runs on this PR and both jobs pass. No source files changed.
+  - Depends on: —
+  - Notes:
+    - 2026-10-25 — Devin: added `.github/workflows/ci.yml` (only file changed besides this ledger). The `client` job runs `git diff --check HEAD^1 HEAD` on the PR merge commit, which checks the PR diff against its base. It runs on `pull_request` only, and push runs skip it. The `server` job runs `npm ci` in client then server. npm cache keyed per lockfile through `setup-node` `cache-dependency-path`. Concurrency cancels superseded runs. Actions pinned to `@v5` major tags. Local Node 24.22.1 run: client 65/65 tests, build, lint green. Server build, 29/29 tests, startup 3/3 green. Suggestion: pin actions to SHAs later if desired.
+    - 2026-10-25 — Manager: reviewed (CI green, scope ok); squash-merged PR #1.
+
+- [x] **P0.T2 — Update architecture rule docs for dependency-cruiser**
+  - Type: setup
+  - Branch: task/dependency-cruiser/p0-t2
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/2
+  - Files: `AGENTS.md`, `.devin/rules/clean-architecture.md`, `client/AGENTS.md`, `client/.devin/rules/client-architecture.md`, `server/AGENTS.md`, `server/.devin/rules/server-architecture.md`
+  - Context: Decisions dated 2026-10-25 below (the whole list).
+  - Do:
+    1. Trim migration-history narrative (S4/C2–C5 status paragraphs, "migration complete" repeats, the stale "C2 security/profile/session complete" header) to one line saying the feature-first layout is in place. Keep every actual rule.
+    2. Replace every "architecture checker tooling is deferred / do not add a parser dependency / no check:architecture script" statement with: boundaries are enforced by dependency-cruiser via `npm run check:architecture` per side; rules are error-level; never weaken a rule to pass; listed rules remain manual-review items.
+    3. Add these rules:
+       - (a) **Client:** no `src/lib/`. The `cn` helper lives in `components/ui/utils.ts`. Feature display copy lives in the owning feature, and App injects it into other features.
+       - (b) **Client:** `components/app/` holds only feature-neutral blocks with semantic props, never feature-named ones (e.g. no TaskRow).
+       - (c) **Server:** `dotenv` may be imported only by `server.ts` and `app/`. `process.env` is read only in `app/config.ts`.
+       - (d) **Server:** `server/tests/` may import `client/src/<feature>/data/{dtos,mappers}` for the contract test, nothing else from the client.
+       - (e) **Both:** imports from outside a module folder must go through that folder's `index.ts`. A module folder is `<feature>/<layer>/<sub>/` (e.g. `tasks/domain/models/`); for `app`, `foundation`, `shared` and `components` it is `<root>/<sub>/` (e.g. `components/ui/`). Imports inside the same module folder use relative paths. Barrels export only the folder's public API; internal pieces stay unexported.
+       - (f) **Both:** no orphan source files except entries (`client/src/main.tsx`, `server/src/server.ts`) and `*.d.ts`.
+    4. Update the Verification sections to add `npm run check:architecture`. Keep `git diff --check`.
+  - Done when: `grep -rniE "deferred|parser dependency|invent .*check:architecture" AGENTS.md client/AGENTS.md server/AGENTS.md .devin/rules client/.devin server/.devin` returns nothing. Rules (a)–(f) appear in the matching side's rules file. No source code changed. CI is green.
+  - Depends on: P0.T1
+  - Notes:
+    - 2026-10-25 — Devin: changed only the 6 listed docs. Migration narrative is trimmed to "feature-first layout is in place", with embedded rules kept. "Tooling deferred" lines are replaced by dependency-cruiser enforcement text. Rules: (a)/(b) in client rules §4.8–4.9 and client AGENTS §3. (c) in server rules §6 and server AGENTS §3. (d) in server rules §5.4 and server AGENTS §4. (e)/(f) in shared rules §7, client rules §6 and server rules §5. New shared rules §8 "Enforcement" lists the manual-review items. Verification sections add `npm run check:architecture`. Also: the client AGENTS tree now lists `components/app`. Done-when grep returns nothing; `git diff --check` is clean. Node/npm were unavailable locally, so client/server suites rely on CI (no source changed). Note: the docs reference `check:architecture` before P1 adds it; RULES.md "skip before P1" covers this.
+    - 2026-10-25 — Manager: reviewed (CI green, scope ok, grep clean, rules a–f placed); squash-merged PR #2.
+
+- [x] **P0.T3 — Archive the old ledger and remove the repo-local manager/worker skills**
+  - Type: setup
+  - Branch: task/dependency-cruiser/p0-t3
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/3
+  - Files: `plan-mui-shadcn-migration.md` → `plans/history/mui-shadcn-migration.md`, delete `.devin/skills/manager/`, `.devin/skills/worker/`
+  - Context: Execution now follows the Devin "Plan Worker" playbook and plans/RULES.md. The repo-local skills use the old `plan-<name>.md` convention and conflict with it. The user approved this deletion (Decision 2026-10-25).
+  - Do: `git mv` the MUI plan into `plans/history/` unchanged and delete the two skill folders. Leave `.devin/skills/mui-to-shadcn/` and `.devin/skills/clean-architecture-tasks-design/` untouched. Fix any doc links that pointed at the moved or deleted files.
+  - Done when: `ls .devin/skills` shows only `mui-to-shadcn` and `clean-architecture-tasks-design`. The plan exists in `plans/history/`. `grep -rn "plan-mui-shadcn-migration\|skills/worker\|skills/manager" --include=*.md .` returns no stale links. CI is green.
+  - Depends on: P0.T2
+  - Notes:
+    - 2026-10-25 — Devin: `git mv plan-mui-shadcn-migration.md plans/history/mui-shadcn-migration.md` (100% rename, content unchanged); `git rm -r .devin/skills/manager .devin/skills/worker` (each held only SKILL.md). `.devin/skills/mui-to-shadcn/` and `.devin/skills/clean-architecture-tasks-design/` untouched. No doc links needed fixing: a repo-wide grep (all file types) for `plan-mui-shadcn-migration`, `skills/worker`, `skills/manager`, `manager skill`, `worker skill` matched only the deleted skills themselves and this plan's P0.T3 task / Decisions entry. No client/server code changed, so side verify commands were not required; `git diff --check` clean.
+    - 2026-10-25 — Manager: reviewed (CI green, 100% rename, scope ok); squash-merged PR #3.
+
+## Phase 1 — Add dependency-cruiser (report only)
+Exit criteria: `npm run check:architecture` runs on both sides with the full rule set at error severity and produces the baseline violation report. It is not yet in CI.
+
+- [x] **P1.T1 — Client dependency-cruiser config**
+  - Type: setup
+  - Branch: task/dependency-cruiser/p1-t1
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/4
+  - Files: `client/package.json`, `client/package-lock.json`, `client/.dependency-cruiser.cjs`
+  - Context: `client/.devin/rules/client-architecture.md` (after P0.T2). Client TS is 6.x, so the `tsc` parser works. tsconfig paths alias `@/*` → `src/*` (`client/tsconfig.app.json`).
+  - Do: Add `dependency-cruiser` as a devDependency and script `"check:architecture": "depcruise src --config .dependency-cruiser.cjs"`. Point the config at `tsconfig.app.json` for alias resolution and set `tsPreCompilationDeps: true`. Every rule is `severity: 'error'`:
+    - no-circular
+    - not-to-unresolvable
+    - no-orphans (except `src/main.tsx` and `*.d.ts`)
+    - no non-package/dev deps in `src`
+    - domain → only own feature domain + `shared/domain`, no npm or Node core
+    - `domain/repositories` ↛ `domain/useCases`
+    - feature ↛ `app/`
+    - feature ↛ sibling feature
+    - presentation ↛ data
+    - data ↛ presentation
+    - presentation ↛ axios, zod, @tanstack/react-query
+    - `presentation/{screens,components}` ↛ domain
+    - radix-ui, lucide-react, class-variance-authority, clsx, tailwind-merge, sonner and lowercase shadcn files in `components/ui/` importable only from `components/ui/` and `components/app/`
+    - `components/`, `foundation/`, `shared/` ↛ features and App
+    - `foundation/` ↛ `shared/data`
+    - `shared/domain` ↛ anything outside `shared/domain`
+    - barrel-only cross-module-folder imports, per P0.T2 rule (e)
+
+    Give each rule a `comment` naming the doc rule it enforces. Do not fix any violations here.
+  - Done when: `npm run check:architecture` runs, and the PR body has its full violation output. No rule is set to warn or info. `comparisonData.ts` template strings are not reported. A deliberately added `import axios from 'axios'` in a domain file is reported (show this, then revert it). Existing client verify commands pass.
+  - Depends on: P0.T3
+  - Notes:
+    - 2026-10-25 — Devin: added `client/.dependency-cruiser.cjs`, `dependency-cruiser@18.6.0` (exact pin; 18.7.0 is under the 7-day minimum) and the `check:architecture` script. npm also pruned a stale optional-peer `yaml` lockfile entry. Config: `tsc` parser, `tsConfig: tsconfig.app.json`, `tsPreCompilationDeps: true`, all rules `error` with doc-section comments. A feature is any top-level `src/` folder except app/foundation/shared/components/assets, so `lib/` is checked as a feature. `no-orphans` uses native `orphan` plus `reachable: false` from `src/main.tsx` (native orphan misses files that import others). Barrel rule (e) is 3 rule objects that share one name, because back-references only flow from→to. Baseline: 213 errors (barrel 156, components/shared → `lib` 44, orphans 7, sibling → `lib` 4, ui-vendor in `lib/utils` 2), 0 layer-boundary hits. A temporary domain → axios import was reported. `comparisonData.ts` has 0 resolved deps. `npm test` 65/65, build and lint OK. Suggestion: a dedicated no-`src/lib` rule (doc rule (a)) was not added because it is not in Do.
+    - 2026-10-25 — Manager: reviewed config + baseline (213: barrel 156, lib-related 50, orphans 7; 0 layer-boundary); squash-merged PR #4. Baseline counts are the Done-when reference for Phase 2.
+
+- [x] **P1.T2 — Server dependency-cruiser config**
+  - Type: setup
+  - Branch: task/dependency-cruiser/p1-t2
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/5
+  - Files: `server/package.json`, `server/package-lock.json`, `server/.dependency-cruiser.cjs`
+  - Context: `server/.devin/rules/server-architecture.md` (after P0.T2). Server TypeScript 7 has no JS compiler API. Use dependency-cruiser's `parser: 'swc'` with `@swc/core` as a devDependency, or another parser setup that works without TS 7's API; record the choice in Notes. Keep TS 7 as the build compiler.
+  - Do: Add the devDependencies and script `"check:architecture": "depcruise src tests --config .dependency-cruiser.cjs"`. Every rule is `severity: 'error'`:
+    - no-circular
+    - not-to-unresolvable
+    - no-orphans (except `src/server.ts`, `tests/**`, `*.d.ts`)
+    - domain → only own feature domain + `shared/domain`, no npm or Node core
+    - `domain/ports` ↛ `domain/useCases`
+    - feature ↛ `app/`
+    - feature ↛ sibling feature
+    - presentation ↛ infrastructure
+    - infrastructure ↛ presentation
+    - express and zod only in feature presentation, `foundation/http`, `app/`
+    - better-sqlite3 only in feature infrastructure, `foundation/database`, `app/`
+    - bcrypt and jsonwebtoken only in `security/infrastructure/security`
+    - dotenv only in `server.ts` and `app/`
+    - `foundation/` ↛ features and App
+    - `shared/domain` ↛ anything outside it
+    - `src` ↛ `tests`
+    - `tests` → client only via `client/src/*/data/(dtos|mappers)`
+    - barrel-only cross-module-folder imports in `src` (rule e)
+
+    Each rule gets a `comment`. Fix nothing.
+  - Done when: `npm run check:architecture` runs, and the PR body has its full output. All rules are error-level. A deliberate `import express from 'express'` in a domain file is reported (shown, then reverted). Server verify commands pass.
+  - Depends on: P1.T1
+  - Notes:
+    - 2026-10-25 — Devin: added `server/.dependency-cruiser.cjs`, devDeps `dependency-cruiser@18.6.0` + `@swc/core@1.16.18` (exact pins; 18.7.0 and 1.16.20 are under the 7-day minimum) and the `check:architecture` script. Parser choice: `parser: 'swc'`, `tsPreCompilationDeps: true`, no `tsConfig` (no server path aliases); TS 7 stays the build compiler; depcruise prints a non-fatal `missing-typescript-transpiler` notice. 21 rule objects, all `error`, client rule names/two-object no-orphans/three-object barrel rule mirrored. Client tree is `doNotFollow`, so only the direct tests→client edge is judged. Library allowlists apply `from: ^src/` (tests/errors.test.ts imports express types) and include `@types/*`. APP = `src/app/` + `src/server.ts`. Baseline: 130 errors = barrel 129 (features 93, shared/foundation 36) + tests-to-client 1 (`tests/client-contract.test.ts → client/src/tasks/domain/models/enums.ts`, a real rule (d) violation not covered by any Phase 2 task); 0 layer, library or orphan hits. A temporary domain → express import was reported; other rules were probed in a throwaway copy. Build, 29/29 tests, 3/3 startup pass; `git diff --check` clean. Suggestion: add client-style `no-non-package-json`/`not-to-dev-dep` rules later.
+    - 2026-10-25 — Manager: reviewed (swc parser, all error-level, client tree doNotFollow); baseline 130 (barrel 129, tests→client domain 1); squash-merged PR #5. The tests→client hit is covered by new task P2.T11.
+
+## Phase 2 — Fix existing violations
+Exit criteria: `npm run check:architecture` reports 0 violations on both sides, with behaviour and visuals unchanged.
+
+- [x] **P2.T1 — Move the `cn` helper into components/ui**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t1
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/6
+  - Files: `client/src/lib/utils.ts` → `client/src/components/ui/utils.ts`, the ~48 importers under `client/src/components/{ui,app}/`, `client/components.json`
+  - Context: P0.T2 rule (a). Only `components/ui` and `components/app` use `cn`.
+  - Do: Move the file and update imports (relative inside `components/ui`, via `components/ui` barrel or allowed path from `components/app`). Set `components.json` `aliases.utils` to `@/components/ui/utils` and remove the `lib` alias.
+  - Done when: `src/lib/utils.ts` no longer exists. No import of `@/lib/utils` remains. The client verify commands pass, apart from `check:architecture` violations outside this task's scope.
+  - Depends on: P1.T2
+  - Notes:
+    - 2026-10-25 — Devin: `git mv src/lib/utils.ts src/components/ui/utils.ts` (content unchanged). 43 importers updated: 40 in `components/ui/` now import `./utils` (each file's quote style kept); the 3 in `components/app/` (Logo, StatCard, TaskRow) import `cn` from `../ui`, the barrel, which now ends with `export { cn } from './utils';`. `components.json`: `aliases.utils` → `@/components/ui/utils`, `lib` alias removed. No files outside the list. The plan's "~48 importers" was 43 in practice. `src/lib/task-labels.ts` is left for P2.T2. Client `check:architecture` 213 → 167: `ui-vendor-only-in-components-ui-app` 2 → 0, `shared-modules-not-to-features-or-app` 44 → 0; barrel 156, orphans 7 and sibling-feature 4 (all `lib/task-labels`) unchanged. The barrel and orphan hit lists are identical before and after. `npm test` 65/65, build, lint, `git diff --check` all pass. Note: `cn` is now public through `components/ui/index.ts`, so features could import it; P3.T1's planned `no-src-lib` rule does not cover that. The vendor allowlist still keeps clsx/tailwind-merge in components/ui.
+    - 2026-10-25 — Manager: reviewed (213 → 167 as expected, scope ok); squash-merged PR #6. cn-privacy question moved to P3.T1.
+
+- [x] **P2.T2 — Make task status labels tasks-owned and App-injected**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t2
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/7
+  - Files: `client/src/lib/task-labels.ts` (delete), `client/src/tasks/presentation/models/taskPresentation.ts` (or a new `tasks/presentation/models/taskLabels.ts`), `client/src/dashboard/presentation/models/DashboardViewState.ts`, `client/src/dashboard/presentation/context/DashboardCapabilitiesContext.ts`, `client/src/dashboard/presentation/components/{DashboardStats,DashboardProgress}.tsx`, `client/src/profile/presentation/context/ProfileUseCasesContext.ts`, `client/src/profile/presentation/components/UserProfileCard.tsx`, `client/src/app/composition/{useDashboardCapabilities,useUserUseCases}.ts`, affected `client/tests/*`
+  - Context: Today profile and dashboard import tasks display copy from `lib/task-labels.ts`, which is a hidden cross-feature dependency. Follow P0.T2 rule (a) and the `DashboardCapabilities` and profile task-counts pattern in `client/AGENTS.md` §2.
+  - Do: Move the labels into tasks presentation. Add display-ready label fields to the dashboard and profile consumer-owned contracts, owned by those features: e.g. dashboard counts carry `{ label, value }`, or the capability supplies `statusLabels: { completed, inProgress, todo }`. App fills them from the tasks labels. Dashboard and profile stop importing anything task-related. Delete `src/lib/`.
+  - Done when: `client/src/lib/` no longer exists. `grep -rn "task-labels\|@/lib" client/src` returns nothing. Rendered text is unchanged ("Done", "In progress", "To do"). The client verify commands pass, apart from `check:architecture` violations outside this task's scope.
+  - Depends on: P2.T1
+  - Notes:
+    - 2026-10-25 — Devin: `TASK_STATUS_LABELS` moved verbatim (same `Record<string, string>` type) into `tasks/presentation/models/taskPresentation.ts`, and `src/lib/` is deleted. Dashboard owns `DashboardStatusLabels { completed, inProgress, todo }` (`DashboardViewState.ts`); `DashboardCapabilities.statusLabels` goes to `DashboardStats`/`DashboardProgress` as a prop, and `legend` moved inside the component. Profile owns `ProfileStatusLabels { completed }` (`ProfileUseCasesContext.ts`); `ProfileUseCases.statusLabels` reaches `UserProfileCard` through a new `completedLabel` prop. App builds both as module-level constants from `TASK_STATUS_LABELS`, imported from `taskPresentation` (already imported by both App files, so no new edge). Outside the list, required to pass the fields down (1–2 lines each): `dashboard/presentation/{hooks/useDashboardViewModel.ts,screens/DashboardScreen.tsx}`, `profile/presentation/{hooks/useUserViewModel.ts,screens/ProfileScreen.tsx}`. No tests changed. Client `check:architecture` 167 → 163: sibling-feature 4 → 0; barrel 156 and orphans 7 unchanged, with identical hit lists. `npm test` 65/65, build, lint and `git diff --check` all pass. An SSR render of Stats/Progress/ProfileCard is byte-identical on base vs branch.
+    - 2026-10-25 — Manager: reviewed full diff (feature-owned label types, App-injected, SSR output identical, 167 → 163); squash-merged PR #7.
+
+- [x] **P2.T3 — Replace TaskRow with a feature-neutral components/app block**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t3
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/8
+  - Files: `client/src/components/app/TaskRow.tsx` → `client/src/components/app/ChecklistRow.tsx`, `client/src/dashboard/presentation/components/DashboardRecentTasks.tsx`
+  - Context: P0.T2 rule (b). Only dashboard uses it. Design reference: `.devin/skills/mui-to-shadcn/design-system/components/app/TaskRow.prompt.md`.
+  - Do: Rename it and replace task-specific prop names and copy with semantic ones (e.g. `title`, `meta`, `checked`, `chips: { label, tone }[]`, `onToggle`). Keep markup and classes identical. Dashboard maps its ViewState to those props.
+  - Done when: no file or export named `TaskRow` exists in `components/`. The rendered dashboard output in tests is unchanged. The client verify commands pass, apart from `check:architecture` violations outside this task's scope.
+  - Depends on: P2.T2
+  - Notes:
+    - 2026-10-25 — Devin: `git mv` TaskRow.tsx → `components/app/ChecklistRow.tsx`. Its props are closed and semantic: `title`, `description?`, `checked`, `toggleAriaLabel`, `chips: { label, tone: UiChipTone }[]`, `meta?`, `metaTone?: 'warning' | 'muted'`, `divider?`, `onToggle`. Markup, classes and `data-slot="task-row"` are unchanged. The `• ` priority prefix is now dashboard data. `DashboardRecentTasks` maps `dueDateTone` `amber → warning`, everything else `→ muted`; the block still gates emphasis on `!checked`. Line 1 keeps `// @ds TaskRow v2026-10-20`, and the comment calls ChecklistRow the neutral version of the DS block. The `../ui/UiCheckbox` and `../ui/UiChip` deep imports are left for P2.T8. Outside the list: one cell in `.devin/skills/mui-to-shadcn/component-map.md` (TaskRow repo path → ChecklistRow.tsx), so the design-sync map does not point at a deleted file. SSR render of `DashboardRecentTasks` (36 rows covering all branches, plus an empty list and a single row) is byte-identical on base vs branch: 96,955 bytes, same sha256. Client `check:architecture` 163 → 163 (barrel 156, orphans 7); the hit lists are identical apart from the 3 renamed paths. `npm test` 65/65, build, lint and `git diff --check` pass. Note: the dashboard still deep-imports `components/app/ChecklistRow` because there is no `components/app` barrel; that is left to the barrel tasks.
+    - 2026-10-25 — Manager: reviewed (closed semantic props, SSR byte-identical across 38 cases, 163 unchanged, component-map.md path fix accepted); squash-merged PR #8.
+
+- [x] **P2.T4 — Remove the orphaned Toast component**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t4
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/9
+  - Files: `client/src/components/feedback/Toast.tsx`
+  - Context: Nothing imports it; toasts go through `UiToastHost`/sonner. The user approved deleting confirmed orphans (Decision 2026-10-25).
+  - Do: Delete it after confirming with `npm run check:architecture` and grep that it has no importers. Barrel `index.ts` files reported as orphans are fixed by the barrel tasks, not here.
+  - Done when: the file is gone, `no-orphans` reports nothing except unused barrels, and the client verify commands pass.
+  - Depends on: P2.T3
+  - Notes:
+    - 2026-10-25 — Devin: Deleted `client/src/components/feedback/Toast.tsx` with `git rm`. It was a 12-line `UiSnackbar` wrapper. Confirmed it was an orphan with `check:architecture` (`no-orphans: src/components/feedback/Toast.tsx`). Grep across `client/src`, `client/tests`, `*.md`, `.devin/skills/` and `client/.devin` found no importers or references, other than this task's Files line, so no doc edits. Client `check:architecture` 163 → 162 (barrel 156 → 156, no-orphans 7 → 6). The violation-list diff is exactly that one line. The 6 remaining orphans are all unused barrels (`tasks/data/mappers`, `dashboard/presentation/{models,components}`, `comparison/presentation/{models,components}`, `app/router`). `npm ci`, `npm test` 65/65, build, lint and `git diff --check` pass. No files changed outside the list. Newly unused, not removed: `UiSnackbar` is now referenced only by its re-export in `components/ui/index.ts`. It is not an orphan, because the barrel is imported.
+    - 2026-10-25 — Manager: reviewed (single file deleted, 163 → 162, only the Toast orphan removed, no stray references); squash-merged PR #9. UiSnackbar kept, logged as an Open Question.
+
+- [x] **P2.T5 — Client barrels: security**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t5
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/10
+  - Files: `client/src/security/**/index.ts` (new), importers of security modules in `client/src/{security,app}/`, `client/tests/*`, `server/tests/client-contract.test.ts` (paths only, if needed)
+  - Context: P0.T2 rule (e). Follow the existing barrels in `client/src/tasks/{domain,data}/*/index.ts`.
+  - Do: Add `index.ts` to each security module folder that is imported from outside itself, exporting only its public API. Rewrite cross-folder imports to use the barrels.
+  - Done when: `npm run check:architecture` reports no barrel violations whose target is under `src/security/`. Server tests still pass. The client verify commands pass.
+  - Depends on: P2.T4
+  - Notes:
+    - 2026-10-25 — Devin: Added 8 barrels: `security/domain/{models,repositories,useCases}`, `security/data/{dtos,mappers,api,repositories}` and `security/presentation/screens`. Extended the existing `presentation/context` barrel with `AuthSessionContext` and `AuthUseCasesContext`. Each barrel uses named re-exports and exports only what outside importers use. `AccountDTO` and `accountSchema` stay internal. The mappers barrel exports `toDomain as authToDomain`, matching the tasks barrel, and its 2 importers now call `authToDomain`. Rewrote every cross-folder security import in `security/*` and `app/*`, and merged same-barrel duplicates. Imports inside a folder stay relative, and no file imports its own index. `AppRouter` now lazy-loads the screens through the barrel with `import('…/screens').then((m) => ({ default: m.LoginScreen }))`. As a result, Login and Register now ship as one 3.32 kB `screens` chunk instead of `LoginScreen` 1.31 kB + `RegisterScreen` 1.40 kB + `hooks` 0.87 kB. This is a bundle-only change; behaviour is unchanged. No tests changed; `client/tests` and the server contract test load files by path. Client `check:architecture` went 162 → 115: barrel 156 → 109, no-orphans 6 → 6. All 47 removed hits target `src/security/`, no hits were added, 0 security targets remain, and no new barrel is an orphan. Server `check:architecture` stays at 130. Client `npm ci`/test 65/65/build/lint pass; server build, 29/29 tests and startup 3/3 pass; `git diff --check` is clean. Left for P2.T8: the security files' deep imports of `components/app/Logo`, `shared/*` and `foundation/session/storage`.
+    - 2026-10-25 — Manager: reviewed (8 minimal barrels, no test changes, 162 → 115 with all 47 removed hits in security and none added, server green); squash-merged PR #10. The merged Login/Register lazy chunk was accepted as the convention.
+
+- [x] **P2.T6 — Client barrels: profile**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t6
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/11
+  - Files: `client/src/profile/**/index.ts`, importers in `client/src/{profile,app}/`, tests (paths only)
+  - Context: same as P2.T5. Lazy routes import screens through the feature's `presentation/screens` barrel (`import('…/screens').then((m) => ({ default: m.X }))`), so each feature ships one screens chunk (Decision 2026-10-25).
+  - Do: Same as P2.T5, for profile.
+  - Done when: no barrel violations target `src/profile/`. Client and server verify commands pass.
+  - Depends on: P2.T5
+  - Notes:
+    - 2026-10-25 — Devin: Added 10 barrels: `profile/domain/{models,repositories,useCases}`, `profile/data/{dtos,mappers,api,repositories}` and `profile/presentation/{components,models,screens}`. Extended the existing `presentation/context` barrel with `ProfileUseCasesContext`. Each barrel uses named re-exports and exports only what outside importers use. `ProfileStatusLabels` and `ProfileUseCases` stay internal. The mappers barrel exports `toDomain as profileToDomain`, and its only importer, `HttpProfileRepository`, now calls `profileToDomain`. The components barrel re-exports the 3 default-exported components by name. Rewrote every cross-folder profile import in `profile/*` and `app/*`, and merged same-barrel duplicates (`useUserUseCases.ts` repositories, `ProfileMapper.ts` dtos). Imports inside a folder stay relative, and no file imports its own index. `AppRouter` lazy-loads `ProfileScreen` through the screens barrel. The chunk is renamed `ProfileScreen-*.js` → `screens-*.js` and stays the same size, 4.55 kB (gzip 1.78 kB). No tests changed; the client tests and the server contract test load files by path, and no file moved. Client `check:architecture` went 115 → 82: barrel 109 → 76, no-orphans 6 → 6. All 33 removed hits target `src/profile/`, no hits were added, 0 profile targets remain, and no new barrel is an orphan. Server `check:architecture` stays at 130. Client `npm ci`/test 65/65/build/lint pass; server build, 29/29 tests and startup 3/3 pass; `git diff --check` is clean. No files changed outside the list. Left for P2.T8: profile's deep imports of `shared/domain/validation`, `shared/data/translateError` and `components/feedback/LoadingSpinner`.
+    - 2026-10-25 — Manager: reviewed (10 new barrels + 1 extended, no test changes, 115 → 82 with all 33 removed hits in profile and none added, chunk size unchanged, server green); squash-merged PR #11.
+
+- [x] **P2.T7 — Client barrels: tasks, dashboard, comparison**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t7
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/12
+  - Files: `client/src/{tasks,dashboard,comparison}/**/index.ts`, their importers, tests (paths only)
+  - Context: same as P2.T5, including the lazy-screens-via-barrel convention. Several barrels exist but nothing uses them yet (they show as orphans).
+  - Do: Same as P2.T5, for these three features, and make existing unused barrels the import path.
+  - Done when: no barrel or orphan violations target these features. Client and server verify commands pass.
+  - Depends on: P2.T6
+  - Notes:
+    - 2026-10-25 — Devin: Added 4 barrels: `tasks/presentation/{models,screens}`, `dashboard/presentation/screens` and `comparison/presentation/screens`. Each uses named re-exports and exports only what outside importers use; `TaskFormViewState`, `BadgeTone`, `DueDateTone`, `formatEnumLabel` and `toTaskStatus` stay internal. The existing barrels keep their exports and style. I added only `DashboardStatusLabels` to `dashboard/presentation/models`, because the dashboard context and components use it. `HttpTaskRepository` now imports from the `api`, `mappers` and `domain/repositories` barrels and calls `taskToDomain`. Same-barrel duplicates are merged. Imports inside a folder stay relative, and no file imports its own index. `AppRouter` lazy-loads all three screens through their screens barrels. No tests changed and no DTO or mapper file moved. Client `check:architecture` went 82 → 45: barrel 76 → 44, no-orphans 6 → 1 (`app/router/index.ts`, left for P2.T8). All 37 removed hits target `src/{tasks,dashboard,comparison}/`, no hits were added, and none remain targeting these features. Server stays at 130. One commit per feature. Chunks: tasks `TaskListScreen` 5.37 kB → `screens` 0.96 kB; dashboard 7.19 → 7.15 kB; comparison 40.44 → 40.44 kB; `LoadingSpinner` 0.16 kB merged into main; main `index` 673.65 → 677.78 kB (+1.02 kB gzip). Open question: `AppNavbar` now imports `TaskDialog` from the tasks components barrel, so `TaskFilters`, `TaskListContent`, `TaskListHeader` and `taskList/*` moved from the lazy tasks chunk into main. This is bundle-only. Fixing it would need a structural or config change (e.g. its own folder for `TaskDialog`, or `manualChunks`); I left that to the Manager. Unused exports kept in existing barrels: `tasks/domain/useCases` `validateTaskFilters`; `dashboard/presentation/models` `DashboardBadgeTone`, `DashboardDueDateTone`, `DashboardViewState`; `comparison/presentation/models` `ComparisonLayer`, `ComparisonConcept`; `comparison/presentation/components` `CodeBlock`. Client `npm ci`, test 65/65, build and lint pass; server build, 29/29 tests and startup 3/3 pass; `git diff --check` is clean. No files changed outside the list. Left for P2.T8: these features' deep imports of `shared/data/translateError`, `components/ui/SelectOption`, `components/feedback/LoadingSpinner` and `components/app/{StatCard,ChecklistRow}`.
+    - 2026-10-25 — Manager: reviewed (3 per-feature commits, no test changes, 82 → 45 with all 37 removed hits in-scope and none added, 5 orphans cleared); squash-merged PR #12. Main-bundle +1 kB gzip (TaskDialog via the components barrel) logged as an Open Question. Trimming the unused existing-barrel exports was added to P2.T8.
+
+- [x] **P2.T8 — Client barrels: app, foundation, shared, components**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t8
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/13
+  - Files: `client/src/{app,foundation,shared,components}/*/index.ts`, their importers, `client/tests/*` (paths only), plus the existing feature barrels listed in Do step 2
+  - Context: same as P2.T5. `components/ui/index.ts` already exists; the 7 direct `components/ui/Ui*` imports from outside it must switch to it.
+  - Do:
+    1. Same as P2.T5, for these module folders.
+    2. Trim unused exports from these pre-existing barrels, keeping a symbol only if something outside its folder imports it: `tasks/domain/useCases` (`validateTaskFilters`), `dashboard/presentation/models` (`DashboardBadgeTone`, `DashboardDueDateTone`, `DashboardViewState`), `comparison/presentation/models` (`ComparisonLayer`, `ComparisonConcept`), `comparison/presentation/components` (`CodeBlock`). Re-check every client barrel the same way and trim any other unused exports. Never remove the symbol itself, only its re-export. Leave `cn` in the `components/ui` barrel; P3.T1 handles it.
+  - Done when: client `npm run check:architecture` reports **0 violations**, every client barrel export has an importer outside its folder, and all client verify commands pass.
+  - Depends on: P2.T7
+  - Notes:
+    - 2026-10-25 — Devin: Added 9 barrels: `components/{app,feedback,layout}`, `foundation/{network,session}`, `shared/{domain,data}` and `app/providers`; extended `components/ui` (types `SelectOption`, `UiChipTone`; shadcn `Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle` for `StatCard`) and `app/composition` (`AppNavbar`, `accountToProfile`, `sessions`). Default exports are re-exported by name (`axiosClient`, `LoadingSpinner`, `Navbar`, `AppNavbar`); importers switched to named imports. `App.tsx` now imports `./app/router` and `./app/providers`, so `app/router/index.ts` is no longer an orphan. `components/app` uses the `../ui` barrel for `UiCheckbox`, `UiChip`, `UiChipTone` and the Card primitives; its `cn` import is unchanged (separate statement, for P3.T1). Same-barrel duplicates merged (`LoginUseCase`, `RegisterUserUseCase`, `TaskFilters`, `ChecklistRow`, `AuthProvider`). No cycles reported by depcruise, oxlint or the build. Trimmed re-exports with no importer outside their folder: `app/router` `ProtectedRoute`, `PublicRoute`; `foundation/theme` `ColorModeContext`, `ColorModePreference`, `ThemeMode`; `tasks/domain/useCases` `validateTaskFilters`, `GetTasksInput`; `tasks/presentation/context` `TaskUseCases`; `dashboard/presentation/models` `DashboardBadgeTone`, `DashboardDueDateTone`, `DashboardViewState`; `comparison/presentation/models` `ComparisonLayer`, `ComparisonConcept`; `comparison/presentation/components` `CodeBlock`. `components/ui` keeps its whole API per the Manager note, including unused `UiSnackbar`, `UiContainer`, `UiTablePagination`, `UiIconName`, `UiNavItem` and `cn`. Every other client barrel export (55 barrels) has an outside importer, checked with a TS-AST script. No tests changed. Client `check:architecture` 45 → 0 (barrel 44 → 0, no-orphans 1 → 0); server stays at 130. Client `npm ci`, test 65/65, build, lint pass; server build, 29/29 tests, startup 3/3 pass; `git diff --check` clean. Chunks: main `index` 677.78 → 679.58 kB (gzip 210.44 → 210.66); dashboard `screens` 7.15 → 5.24 kB, because `StatCard`/`ChecklistRow` now load via the `components/app` barrel that main already pulls in for `Logo`; other lazy chunks unchanged (0.96→0.95, 3.31, 4.50, 40.44→40.45). Open question: the ui barrel now exports the shadcn Card primitives (className passthrough), like `cn` today; P3.T1 may want to treat `components/app` → `components/ui/card.tsx` the same way as the `cn` edge. No files changed outside the list.
+    - 2026-10-25 — Manager: reviewed (9 new barrels, client 45 → 0, all removals with no additions, no cycles, trimming done except components/ui by design, server green); squash-merged PR #13. P3.T1 extended: shadcn Card primitives private like cn. Main-bundle shift of StatCard/ChecklistRow is folded into the existing chunking Open Question.
+
+- [x] **P2.T9 — Server barrels: security, profile, tasks**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t9
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/14
+  - Files: `server/src/{security,profile,tasks}/**/index.ts` (new), importers in `server/src/`, `server/tests/*` (paths only)
+  - Context: P0.T2 rule (e). There are no server barrels today (~95 cross-folder imports in features).
+  - Do: Add barrels for each feature module folder imported from outside itself and rewrite the imports, in one PR with one commit per feature (security, profile, tasks).
+  - Done when: no barrel violations target server feature folders, and the server verify commands pass, including `test:startup`.
+  - Depends on: P2.T8
+  - Notes:
+    - 2026-10-25 — Devin: added 31 `index.ts` barrels under `server/src/{security,profile,tasks}/<layer>/<sub>/` and rewrote every cross-folder `src/` import to use them, with one commit per feature (security, profile, tasks). Barrels use named re-exports only and `export type` for types. Each exports only the symbols that `src/` imports from outside its folder. Same-folder imports stay relative. Merged duplicate imports from the same barrel into one statement. No aliases were needed. No files outside scope changed. `server/tests/*` is unchanged because the barrel rule's `from` is `^src/`, so test deep imports aren't flagged. Server check:architecture 130 → 37 (barrel 129 → 36, tests→client 1 → 1). 93 hits removed, all targeting feature folders, and 0 added. The remaining hits target foundation/shared (P2.T10) and client (P2.T11). no-circular is 0. Compiled dist container and feature barrels load with no `undefined` exports. Build ok, test 29/29, test:startup 3/3, client check:architecture 0, `git diff --check` clean. Suggestion: tests still deep-import feature files; consider a later rule/task if tests should use barrels too.
+    - 2026-10-25 — Manager: reviewed (29 barrels in per-feature commits; server 130 → 37 with 93 in-scope removals and none added; no require cycles; startup/tests green; client still 0); squash-merged PR #14. Tests stay white-box (Decision).
+
+- [x] **P2.T10 — Server barrels: foundation, shared, app**
+  - Type: refactor
+  - Branch: task/dependency-cruiser/p2-t10
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/15
+  - Files: `server/src/{foundation/*,shared/domain}/index.ts`, `server/src/app/index.ts` if needed, importers, tests (paths only)
+  - Context: same as P2.T9. `server.ts` (entry) imports `app/*`.
+  - Do: Same as P2.T9, for these folders.
+  - Done when: server `npm run check:architecture` reports no barrel violations (only the `tests-to-client-only-dtos-mappers` hit owned by P2.T11 may remain), and the server verify commands pass.
+  - Depends on: P2.T9
+  - Notes:
+    - 2026-10-25 — Devin: added 4 barrels: `shared/domain` (`ConflictError, DomainError, NotFoundError, UnauthorizedError, ValidationError, normalizeOptionalText, normalizeUserName`), `foundation/http` (`errorMiddleware, parseRequest, requestLogger, requireUserId`), `foundation/database` (`createDatabase, runMigrations, seedDatabase`, type `DatabaseConnection`) and `foundation/persistence` (`normalizeSqliteTimestamp`). Rewrote 28 importers in `src/` and merged duplicate imports from the same barrel. `AuthenticatedIdentity` is not exported (no importer outside the folder); its `declare global` augmentation still applies. No `app/index.ts`: `MODULE_FOLDER` makes only `app/<sub>/` a module folder, and app's files sit directly in `app/`, so depcruise doesn't flag `server.ts → app/*`. Side effects: none of these modules runs anything at import time. Feature repositories import `DatabaseConnection` with `import type`, so their compiled JS doesn't load `foundation/database`. Requiring `dist/shared/domain` or `dist/foundation/http` loads no DB or config. `dist/server.js` require order is unchanged (dotenv → config → container → createApp → database). There are no standalone seed or migration scripts. Tests unchanged (white-box); contract test untouched (P2.T11). No files outside scope changed. Server check:architecture 37 → 1 (barrel 36 → 0, tests→client 1 → 1); 36 removed, 0 added; no-circular 0. Node 24: build ok, test 29/29, test:startup 3/3. Compiled smoke boot (fresh DB, then a reboot on the same DB) logs the same as before. Client check:architecture 0. `git diff --check` clean.
+    - 2026-10-25 — Manager: reviewed (4 minimal barrels; server 37 → 1 with 36 removals and none added; load order unchanged; compiled smoke boot identical; client still 0); squash-merged PR #15.
+
+- [x] **P2.T11 — Contract test stops importing client domain enums**
+  - Type: test
+  - Branch: task/dependency-cruiser/p2-t11
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/16
+  - Files: `server/tests/client-contract.test.ts`
+  - Context: P1.T2 baseline: `tests/client-contract.test.ts → ../client/src/tasks/domain/models/enums.ts` (`TaskPriority`, `TaskStatus`) violates server rule §5.4 (tests may import only `client/src/<feature>/data/{dtos,mappers}`).
+  - Do: Replace the enum imports with the API's string literals (`'TODO' | 'IN_PROGRESS' | 'COMPLETED'`, and the priority values). Keep every assertion's meaning. Import nothing else from client domain.
+  - Done when: server `npm run check:architecture` reports 0 `tests-to-client-only-dtos-mappers` hits, and the server verify commands pass with the same test count (29).
+  - Depends on: P2.T10
+  - Notes:
+    - 2026-10-25 — Devin: removed the `TaskPriority`/`TaskStatus` import from `server/tests/client-contract.test.ts`. The assertions and the query/body values use `'TODO'`, `'COMPLETED'` and `'HIGH'`. The `toCreateTaskDTO` input uses a type-only cast built from the mapper: `const HIGH_PRIORITY = 'HIGH' as Parameters<typeof toCreateTaskDTO>[0]['priority']`. Nothing is imported from client domain, client code is unchanged, and no files outside scope changed. Server check:architecture 1 → 0 (121 modules); client 0. Node 24: build ok, test 29/29 (incl. typecheck), test:startup 3/3, `git diff --check` clean.
+    - 2026-10-25 — Manager: reviewed and squash-merged PR #16. Diff matches the scope (one test file plus the ledger); the cast is type-only and no client domain import remains. CI is green on both jobs. Server 1 → 0, client 0. Phase 2 exit criteria met.
+
+## Phase 3 — Enforce in CI
+Exit criteria: CI fails any PR with an architecture violation, and the docs list the check as a required verify step.
+
+- [x] **P3.T1 — Gate CI on check:architecture**
+  - Type: setup
+  - Branch: task/dependency-cruiser/p3-t1
+  - Base: feat/dependency-cruiser
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/17
+  - Files: `.github/workflows/ci.yml`, `client/.dependency-cruiser.cjs`, `server/.dependency-cruiser.cjs`, `client/src/components/ui/index.ts`, `client/src/components/app/{Logo,StatCard,ChecklistRow}.tsx`
+  - Context: P0.T1 workflow; both sides now report 0 violations. Since P2.T8, the ui barrel also re-exports the raw shadcn `Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle` (from `components/ui/card.tsx`) for `StatCard`; they take `className`, so features must not get them.
+  - Do: Add a `npm run check:architecture` step to the client and server jobs. In `client/.dependency-cruiser.cjs`, add an error-level rule `no-src-lib` forbidding any dependency on `^src/lib/` (doc rule (a); suggested in P1.T1). In `server/.dependency-cruiser.cjs`, add the client's `no-non-package-json` and `not-to-dev-dep` rules for `src` (parity; suggested in P1.T2). Keep `cn` private (Decision 2026-10-25): remove `cn` from `client/src/components/ui/index.ts`, point the 3 `components/app/` importers at `../ui/utils`, allow exactly that edge (`components/app/` → `components/ui/utils.ts`) in the barrel rule, and add rule `cn-only-in-components-ui-app` forbidding any other import of `components/ui/utils.ts`. Do the same for the raw shadcn primitives (Decision 2026-10-25): remove the `Card*` re-exports from the ui barrel, point `StatCard` at `../ui/card`, allow `components/app/` → lowercase shadcn files in `components/ui/` (e.g. `card.tsx`) in the barrel rule, and add rule `shadcn-raw-only-in-components-ui-app` forbidding any other import of them.
+  - Done when: CI is green on this PR. In a throwaway commit on the task branch (reverted before review), a domain → axios import makes the client job fail; link that failed run in the PR.
+  - Depends on: P2.T11
+  - Notes:
+    - 2026-10-25 — Devin: CI runs `npm run check:architecture` right after `npm ci` in the client job, and after the server `npm ci` in the server job (the client `npm ci` still runs first). Client config 21 → 24 rules: `no-src-lib`, `cn-only-in-components-ui-app` (from pathNot `^src/components/(?:ui|app)/` to `^src/components/ui/utils\.ts$`), and a components/app variant of `barrel-only-cross-module-imports`. The `$1/$2` variant now excludes `^src/components/app/`, and the new variant also allows `CN_HELPER` and `SHADCN_PRIMITIVE`. Removed `cn` and `Card*` from the ui barrel. Logo/StatCard/ChecklistRow import `../ui/utils`, and StatCard imports `../ui/card`. No other importers in src/tests. Following the Manager note, I did not add `shadcn-raw-only-in-components-ui-app`, because `ui-vendor-only-in-components-ui-app` already covers `SHADCN_PRIMITIVE`. This differs from the Do text. Server config 21 → 23 rules: `no-non-package-json` and `not-to-dev-dep`, scoped to `^src/`, with 0 hits. Local throwaway checks (reverted): app→ui/card and feature→ui/card fail (ui-vendor + barrel). feature/components/feedback→ui/utils fails (cn rule + barrel). src/lib fails (no-src-lib). Dropping the exemption fails the 4 components/app edges. Server src→tsx fails not-to-dev-dep, and src→debug fails no-non-package-json. Failing CI proof: throwaway commit 93cbc5d (domain Task.ts → axios), reverted by a new commit. Client job failed at check:architecture with `domain-only-own-domain-and-shared-domain`: https://github.com/1984Rakesh/SampleWebApp/actions/runs/40180100922/job/121129151324. Node 24: client test 65/65, build, lint, check:architecture 0 (237 modules). Server build, test 29/29, test:startup 3/3, check:architecture 0 (121 modules). `git diff --check` clean.
+    - 2026-10-25 — Manager: reviewed and squash-merged PR #17. Both CI jobs run check:architecture; the throwaway domain → axios commit failed the client job (run 40180100922) and was reverted. cn and raw shadcn primitives are out of the ui barrel; only components/app may import them directly. Phase 3 exit criteria met (the verify docs already list the check since P0.T2).
+
+## Decisions
+- 2026-10-25 — Add dependency-cruiser per side (client uses its TS 6 parser; server needs a non-TS-7 parser) (user choice; TS 7 lacks a JS compiler API).
+- 2026-10-25 — All rules error-level from the start; fix violations in Phase 2 before CI gating (user choice; code is already nearly clean).
+- 2026-10-25 — Remove `client/src/lib/`: `cn` → `components/ui/utils.ts`; task labels tasks-owned and App-injected into dashboard/profile (user choice; strict feature isolation).
+- 2026-10-25 — `components/app` holds only feature-neutral blocks; TaskRow becomes generic (user choice).
+- 2026-10-25 — `dotenv` allowed in `server.ts` bootstrap and `app/`; `process.env` only in `app/config.ts` (user choice; no code change).
+- 2026-10-25 — Trim migration history from rule docs and replace the "tooling deferred" statements (user choice).
+- 2026-10-25 — Archive `plan-mui-shadcn-migration.md` to `plans/history/`; delete repo-local manager/worker skills; Devin follows the Plan Worker playbook (user choice).
+- 2026-10-25 — Enforce barrel-only cross-module-folder imports and no-orphans (user choice; the barrel rule touches ~340 imports, so it is split by feature).
+- 2026-10-25 — Server tests may import client `data/{dtos,mappers}` only, for the contract test (existing deliberate coupling).
+
+- 2026-10-25 — `cn` stays private to components/ui and components/app: not exported from the ui barrel; one narrow allowed edge from components/app (user choice; dependency-cruiser cannot see named imports through barrels).
+- 2026-10-25 — Worker sessions end as completed once their PR is open and the ledger shows `[r]`/`[!]`; they never wait for merge. Fix-ups get new sessions (user choice; applies to all worker tasks; added to RULES.md and the Plan Worker playbook).
+- 2026-10-25 — Lazy routes import screens through the feature's screens barrel, which gives one lazy chunk per feature; no depcruise exception for dynamic `import()` (user choice; keeps rule (e) strict, and the size difference is negligible).
+- 2026-10-25 — Raw shadcn primitives (lowercase files in `components/ui/`, which take `className`) stay private like `cn`: not in the ui barrel, imported directly only by `components/ui` and `components/app` (user choice; done in P3.T1).
+- 2026-10-25 — Tests (`client/tests`, `server/tests`) are white-box and may deep-import the source files they test; the barrel rule covers `src/` only. Don't extend it to tests (user choice).
+- 2026-10-25 — No separate `shadcn-raw-only-in-components-ui-app` rule: the existing `ui-vendor-only-in-components-ui-app` already forbids `SHADCN_PRIMITIVE` outside components/ui and components/app, and the barrel re-export was the only bypass (manager call in P3.T1; avoids a duplicate rule).
+
+## Open Questions
+- [x] Devin GitHub integration and repository connected (2026-10-25)
+
+- [ ] Feature components still use raw Tailwind classes (e.g. `DashboardRecentTasks.tsx` `px-6 pb-6`), against client §4.7. Audit and fix in a later ui-cleanup plan, not this one. (owner: manager; raised in P2.T3 review)
+
+- [ ] `components/ui/UiSnackbar.tsx` is unused since P2.T4 (only the ui barrel re-exports it). Decide keep or remove in the later ui-cleanup plan. (owner: manager; raised in P2.T4 review)
+
+- [ ] Main bundle is 677 kB (210 kB gzip). Since P2.T7, `AppNavbar` imports `TaskDialog` through the tasks components barrel, which pulls the task-list components into main (+1 kB gzip); P2.T8 also moved `StatCard`/`ChecklistRow` into main (+0.2 kB gzip) via the `components/app` barrel. Handle chunking (e.g. a `manualChunks` rule or giving TaskDialog its own folder) in a later performance plan. (owner: manager; raised in P2.T7 review)
+
+## Blockers
+- —
+
+## Change Log
+- 2026-10-25 — Manager: created plan after rules audit (import-graph audit: 0 layer violations; lib/, TaskRow, orphans and barrels need work).
+- 2026-10-25 — Manager: dispatched P0.T1 to Devin.
+- 2026-10-25 — Manager: P0.T1 merged (PR #1).
+- 2026-10-25 — Manager: dispatched P0.T2 to Devin.
+- 2026-10-25 — Manager: P0.T2 merged (PR #2).
+- 2026-10-25 — Manager: dispatched P0.T3 to Devin.
+- 2026-10-25 — Manager: P0.T3 merged (PR #3); Phase 0 complete.
+- 2026-10-25 — Manager: dispatched P1.T1 to Devin.
+- 2026-10-25 — Manager: P1.T1 merged (PR #4). Revised P3.T1 Do: add explicit `no-src-lib` client rule.
+- 2026-10-25 — Manager: dispatched P1.T2 to Devin.
+- 2026-10-25 — Manager: P1.T2 merged (PR #5); Phase 1 complete. Added P2.T11 (contract test enum import); P3.T1 now depends on P2.T11, also adds server parity rules, Files updated.
+- 2026-10-25 — Manager: dispatched P2.T1 to Devin.
+- 2026-10-25 — Manager: P2.T1 merged (PR #6). P3.T1 extended: keep cn private.
+- 2026-10-25 — Manager: dispatched P2.T2 to Devin.
+- 2026-10-25 — Manager: P2.T2 merged (PR #7).
+- 2026-10-25 — Manager: dispatched P2.T3 to Devin.
+- 2026-10-25 — Manager: P2.T3 merged (PR #8). Logged raw-Tailwind-in-features follow-up as an Open Question.
+- 2026-10-25 — Manager: dispatched P2.T4 to Devin.
+- 2026-10-25 — Manager: P2.T4 merged (PR #9). Logged unused UiSnackbar as an Open Question.
+- 2026-10-25 — Manager: new rule — worker sessions end at `[r]` without waiting for merge (RULES.md, playbook). Dispatched P2.T5 to Devin.
+- 2026-10-25 — Manager: P2.T5 merged (PR #10). Logged the lazy-screens-via-barrel convention as a Decision and in P2.T6/T7 Context.
+- 2026-10-25 — Manager: dispatched P2.T6 to Devin.
+- 2026-10-25 — Manager: P2.T6 merged (PR #11).
+- 2026-10-25 — Manager: dispatched P2.T7 to Devin.
+- 2026-10-25 — Manager: P2.T7 merged (PR #12). P2.T8 extended: trim unused barrel exports client-wide. Logged main-bundle chunking as an Open Question.
+- 2026-10-25 — Manager: dispatched P2.T8 to Devin.
+- 2026-10-25 — Manager: P2.T8 merged (PR #13); client at 0 violations. P3.T1 extended: shadcn raw primitives private.
+- 2026-10-25 — Manager: P2.T9 Do revised (no 40-file stop; one PR with per-feature commits, user choice). Dispatched P2.T9 to Devin.
+- 2026-10-25 — Manager: P2.T9 merged (PR #14). Decision: tests stay white-box.
+- 2026-10-25 — Manager: P2.T10 Done-when corrected; the tests→client hit belongs to P2.T11.
+- 2026-10-25 — Manager: dispatched P2.T10 to Devin.
+- 2026-10-25 — Manager: P2.T10 merged (PR #15). Dispatched P2.T11 to Devin.
+- 2026-10-25 — Manager: P2.T11 merged (PR #16); both sides at 0 violations. Dispatched P3.T1 to Devin.
+- 2026-10-25 — Manager: P3.T1 merged (PR #17). All tasks [x]; opening feat/dependency-cruiser → main.

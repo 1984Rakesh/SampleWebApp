@@ -1,6 +1,6 @@
 import type { AxiosInstance } from 'axios';
-import type { AuthResponseDTO, LoginRequestDTO, RegisterRequestDTO, RefreshTokenResponseDTO } from '../dtos/AuthDTO';
-import { atDataBoundary } from '../../../shared/data/translateError';
+import type { AuthResponseDTO, LoginRequestDTO, RegisterRequestDTO, RefreshTokenResponseDTO } from '../dtos';
+import { atDataBoundary } from '../../../shared/data';
 
 export function createAuthApi(client: AxiosInstance, refreshClient: AxiosInstance) {
   return {

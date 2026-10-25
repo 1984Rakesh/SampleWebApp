@@ -1,28 +1,25 @@
 import type { Router } from 'express';
-import { LoginUseCase } from '../security/domain/useCases/LoginUseCase';
-import { RefreshAccessTokenUseCase } from '../security/domain/useCases/RefreshAccessTokenUseCase';
-import { RegisterUserUseCase } from '../security/domain/useCases/RegisterUserUseCase';
-import { CreateTaskUseCase } from '../tasks/domain/useCases/CreateTaskUseCase';
-import { DeleteTaskUseCase } from '../tasks/domain/useCases/DeleteTaskUseCase';
-import { GetTasksUseCase } from '../tasks/domain/useCases/GetTasksUseCase';
-import { ToggleTaskStatusUseCase } from '../tasks/domain/useCases/ToggleTaskStatusUseCase';
-import { UpdateTaskUseCase } from '../tasks/domain/useCases/UpdateTaskUseCase';
-import { GetCurrentUserUseCase } from '../profile/domain/useCases/GetCurrentUserUseCase';
-import { UpdateProfileUseCase } from '../profile/domain/useCases/UpdateProfileUseCase';
-import { createDatabase, type DatabaseConnection } from '../foundation/database/connection';
-import { seedDatabase } from '../foundation/database/seed';
-import { SqliteTaskRepository } from '../tasks/infrastructure/repositories/SqliteTaskRepository';
-import { SqliteAccountRepository } from '../security/infrastructure/repositories/SqliteAccountRepository';
-import { SqliteProfileRepository } from '../profile/infrastructure/repositories/SqliteProfileRepository';
-import { BcryptPasswordHasher } from '../security/infrastructure/security/BcryptPasswordHasher';
-import { JwtTokenService } from '../security/infrastructure/security/JwtTokenService';
-import { createAuthController } from '../security/presentation/controllers/AuthController';
-import { createTaskController } from '../tasks/presentation/controllers/TaskController';
-import { createProfileController } from '../profile/presentation/controllers/ProfileController';
-import { createAuthMiddleware } from '../security/presentation/middleware/authMiddleware';
-import { createAuthRoutes } from '../security/presentation/routes/authRoutes';
-import { createTaskRoutes } from '../tasks/presentation/routes/taskRoutes';
-import { createProfileRoutes } from '../profile/presentation/routes/profileRoutes';
+import { LoginUseCase, RefreshAccessTokenUseCase, RegisterUserUseCase } from '../security/domain/useCases';
+import {
+  CreateTaskUseCase,
+  DeleteTaskUseCase,
+  GetTasksUseCase,
+  ToggleTaskStatusUseCase,
+  UpdateTaskUseCase,
+} from '../tasks/domain/useCases';
+import { GetCurrentUserUseCase, UpdateProfileUseCase } from '../profile/domain/useCases';
+import { createDatabase, seedDatabase, type DatabaseConnection } from '../foundation/database';
+import { SqliteTaskRepository } from '../tasks/infrastructure/repositories';
+import { SqliteAccountRepository } from '../security/infrastructure/repositories';
+import { SqliteProfileRepository } from '../profile/infrastructure/repositories';
+import { BcryptPasswordHasher, JwtTokenService } from '../security/infrastructure/security';
+import { createAuthController } from '../security/presentation/controllers';
+import { createTaskController } from '../tasks/presentation/controllers';
+import { createProfileController } from '../profile/presentation/controllers';
+import { createAuthMiddleware } from '../security/presentation/middleware';
+import { createAuthRoutes } from '../security/presentation/routes';
+import { createTaskRoutes } from '../tasks/presentation/routes';
+import { createProfileRoutes } from '../profile/presentation/routes';
 import type { AppConfig } from './config';
 
 export interface Container {

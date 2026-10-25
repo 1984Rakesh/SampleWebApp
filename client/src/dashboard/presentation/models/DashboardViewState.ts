@@ -24,6 +24,12 @@ export interface DashboardTaskCounts {
   completed: number;
 }
 
+export interface DashboardStatusLabels {
+  completed: string;
+  inProgress: string;
+  todo: string;
+}
+
 export interface DashboardViewState {
   eyebrow: string;
   greeting: string;

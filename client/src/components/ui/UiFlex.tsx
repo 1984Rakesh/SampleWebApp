@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 import { gapClass, pClass, pxClass, pyClass, ptClass, mtClass, mbClass, mlClass, mrClass } from './spacing';
 
 interface UiFlexProps {

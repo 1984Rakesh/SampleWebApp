@@ -1,4 +1,4 @@
-import type { Profile, ProfileChanges } from '../models/Profile';
+import type { Profile, ProfileChanges } from '../models';
 
 export interface ProfileRepository {
   findById(id: string): Promise<Profile | null>;

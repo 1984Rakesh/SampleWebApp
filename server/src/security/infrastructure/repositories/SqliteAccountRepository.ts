@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
 import Database from 'better-sqlite3';
-import { ConflictError } from '../../../shared/domain/errors';
-import type { AccountCredentials, AccountIdentity, NewAccount, SessionAccount } from '../../domain/models/Account';
-import type { AccountRepository } from '../../domain/ports/AccountRepository';
-import type { DatabaseConnection } from '../../../foundation/database/connection';
+import { ConflictError } from '../../../shared/domain';
+import type { AccountCredentials, AccountIdentity, NewAccount, SessionAccount } from '../../domain/models';
+import type { AccountRepository } from '../../domain/ports';
+import type { DatabaseConnection } from '../../../foundation/database';
 import {
   ACCOUNT_COLUMNS,
   rowToAccount,
@@ -12,7 +12,7 @@ import {
   type AccountRow,
   type AccountCredentialsRow,
   type AccountIdentityRow,
-} from '../persistence/AccountRow';
+} from '../persistence';
 
 export class SqliteAccountRepository implements AccountRepository {
   constructor(private readonly db: DatabaseConnection) {}

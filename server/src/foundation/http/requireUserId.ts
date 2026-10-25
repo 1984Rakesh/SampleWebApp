@@ -1,5 +1,5 @@
 import type { Request } from 'express';
-import { UnauthorizedError } from '../../shared/domain/errors';
+import { UnauthorizedError } from '../../shared/domain';
 
 export interface AuthenticatedIdentity {
   userId: string;

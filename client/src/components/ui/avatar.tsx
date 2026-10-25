@@ -1,7 +1,7 @@
 // @ds Avatar v2026-10-20
 import * as React from "react"
 import { Avatar as AvatarPrimitive } from "radix-ui"
-import { cn } from "@/lib/utils"
+import { cn } from "./utils"
 function Avatar({
   className,
   size = "default",

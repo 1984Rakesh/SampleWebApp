@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 import { gapClass, mtClass, mbClass } from './spacing';
 
 type Breakpoint = 'sm' | 'md' | 'lg';

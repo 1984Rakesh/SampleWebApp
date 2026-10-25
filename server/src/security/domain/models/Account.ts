@@ -1,4 +1,4 @@
-import { ValidationError } from '../../../shared/domain/errors';
+import { ValidationError } from '../../../shared/domain';
 
 export interface AccountIdentity {
   id: string;

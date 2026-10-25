@@ -1,10 +1,10 @@
-import type { createProfileApi } from '../api/ProfileApi';
-import type { ProfileRepository } from '../../domain/repositories/ProfileRepository';
-import { toDomain, toUpdateProfileDTO } from '../mappers/ProfileMapper';
+import type { createProfileApi } from '../api';
+import type { ProfileRepository } from '../../domain/repositories';
+import { profileToDomain, toUpdateProfileDTO } from '../mappers';
 
 export function createProfileRepository(api: ReturnType<typeof createProfileApi>): ProfileRepository {
   return {
-    getCurrentUser: async () => toDomain(await api.getCurrentUser()),
-    updateProfile: async (input) => toDomain(await api.updateProfile(toUpdateProfileDTO(input))),
+    getCurrentUser: async () => profileToDomain(await api.getCurrentUser()),
+    updateProfile: async (input) => profileToDomain(await api.updateProfile(toUpdateProfileDTO(input))),
   };
 }

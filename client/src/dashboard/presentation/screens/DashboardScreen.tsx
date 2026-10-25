@@ -1,12 +1,10 @@
 import { useDashboardViewModel } from '../hooks';
-import DashboardProgress from '../components/DashboardProgress';
-import DashboardRecentTasks from '../components/DashboardRecentTasks';
-import DashboardStats from '../components/DashboardStats';
-import LoadingSpinner from '../../../components/feedback/LoadingSpinner';
+import { DashboardProgress, DashboardRecentTasks, DashboardStats } from '../components';
+import { LoadingSpinner } from '../../../components/feedback';
 import { UiAlert, UiAsideGrid, UiFlex, UiPage, UiScreen, UiText } from '../../../components/ui';
 
 export default function DashboardScreen() {
-  const { dashboard, isLoading, errorMessage, toggleTaskStatus } = useDashboardViewModel();
+  const { dashboard, statusLabels, isLoading, errorMessage, toggleTaskStatus } = useDashboardViewModel();
   if (isLoading) return <UiPage><LoadingSpinner size="lg" text="Loading dashboard..." /></UiPage>;
 
   return (
@@ -18,10 +16,10 @@ export default function DashboardScreen() {
           <UiText tone="muted">{dashboard.summary}</UiText>
         </UiFlex>
         {errorMessage && <UiAlert type="error" gutterBottom>{errorMessage}</UiAlert>}
-        <DashboardStats counts={dashboard.counts} total={dashboard.total} dueToday={dashboard.dueToday} dueThisWeek={dashboard.dueThisWeek} />
+        <DashboardStats counts={dashboard.counts} statusLabels={statusLabels} total={dashboard.total} dueToday={dashboard.dueToday} dueThisWeek={dashboard.dueThisWeek} />
         <UiAsideGrid template="rail" gap={3}>
           <DashboardRecentTasks tasks={dashboard.recentTasks} onToggle={toggleTaskStatus} />
-          <DashboardProgress counts={dashboard.counts} total={dashboard.total} percent={dashboard.completionPercent} />
+          <DashboardProgress counts={dashboard.counts} statusLabels={statusLabels} total={dashboard.total} percent={dashboard.completionPercent} />
         </UiAsideGrid>
       </UiFlex>
     </UiScreen>

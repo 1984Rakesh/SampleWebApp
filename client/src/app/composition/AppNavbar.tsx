@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../../components/layout/Navbar';
+import { Navbar } from '../../components/layout';
 import { useColorMode } from '../../foundation/theme';
-import { useAuth } from '../../security/presentation/context/AuthSessionContext';
-import TaskDialog from '../../tasks/presentation/components/TaskDialog';
+import { useAuth } from '../../security/presentation/context';
+import { TaskDialog } from '../../tasks/presentation/components';
 
 const links = [
   { to: '/dashboard', label: 'Dashboard' },

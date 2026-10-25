@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from './dialog';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 const maxWidthClassMap = {
   xs: 'sm:max-w-md',

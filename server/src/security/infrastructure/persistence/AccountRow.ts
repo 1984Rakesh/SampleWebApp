@@ -1,5 +1,5 @@
-import type { AccountCredentials, AccountIdentity, SessionAccount } from '../../domain/models/Account';
-import { normalizeSqliteTimestamp } from '../../../foundation/persistence/normalizeSqliteTimestamp';
+import type { AccountCredentials, AccountIdentity, SessionAccount } from '../../domain/models';
+import { normalizeSqliteTimestamp } from '../../../foundation/persistence';
 
 export interface AccountIdentityRow {
   id: string;

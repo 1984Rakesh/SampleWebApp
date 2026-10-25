@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "npm run test:typecheck && tsx --test tests/*.test.ts",
     "test:startup": "npm run build && npm run test:typecheck && tsx --test tests/startup.smoke.ts",
-    "test:typecheck": "tsc --ignoreConfig --noEmit --target ES2022 --module commonjs --esModuleInterop --strict --skipLibCheck --noUnusedLocals --noUnusedParameters tests/*.ts"
+    "test:typecheck": "tsc --ignoreConfig --noEmit --target ES2022 --module commonjs --esModuleInterop --strict --skipLibCheck --noUnusedLocals --noUnusedParameters tests/*.ts",
+    "check:architecture": "depcruise src tests --config .dependency-cruiser.cjs"
   },
   "keywords": [],
   "author": "",
@@ -24,12 +25,14 @@
     "zod": "^4.6.6"
   },
   "devDependencies": {
+    "@swc/core": "1.16.18",
     "@types/bcrypt": "^6.0.0",
     "@types/better-sqlite3": "^9.6.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.6.5",
+    "dependency-cruiser": "18.6.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }

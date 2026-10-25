@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 interface UiContainerProps {
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '5xl' | '6xl';

@@ -2,7 +2,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
 import { Card } from './card';
 import { Button } from './button';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 export function UiTableContainer({ children }: { children: React.ReactNode }) {
   return <Card className="gap-0 py-0 overflow-hidden">{children}</Card>;

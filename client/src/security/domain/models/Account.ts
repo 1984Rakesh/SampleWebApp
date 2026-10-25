@@ -1,4 +1,4 @@
-import { isValidEmail } from '../../../shared/domain/validation';
+import { isValidEmail } from '../../../shared/domain';
 
 export interface Account {
   id: string;

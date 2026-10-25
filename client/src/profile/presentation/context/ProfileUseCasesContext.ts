@@ -1,9 +1,14 @@
 import { createContext, useContext } from 'react';
-import type { Profile, UpdateProfileInput } from '../../domain/models/Profile';
+import type { Profile, UpdateProfileInput } from '../../domain/models';
+
+export interface ProfileStatusLabels {
+  completed: string;
+}
 
 export interface ProfileUseCases {
   useCurrentUserQuery(): { data: Profile | undefined; isLoading: boolean; error: Error | null };
   useTaskCounts(): { created: number; completed: number; isLoading: boolean };
+  statusLabels: ProfileStatusLabels;
   updateProfile(input: UpdateProfileInput): Promise<Profile>;
   isUpdating: boolean;
 }

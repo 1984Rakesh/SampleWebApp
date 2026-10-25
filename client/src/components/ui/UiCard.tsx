@@ -1,6 +1,6 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 interface UiCardProps {
   children: React.ReactNode;

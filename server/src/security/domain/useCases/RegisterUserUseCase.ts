@@ -1,9 +1,6 @@
-import type { AuthResult, RegisterUserInput } from '../models/Auth';
-import { normalizeEmail, validatePassword } from '../models/Account';
-import { normalizeUserName } from '../../../shared/domain/normalizeUserName';
-import type { PasswordHasher } from '../ports/PasswordHasher';
-import type { TokenService } from '../ports/TokenService';
-import type { AccountRepository } from '../ports/AccountRepository';
+import { normalizeEmail, validatePassword, type AuthResult, type RegisterUserInput } from '../models';
+import { normalizeUserName } from '../../../shared/domain';
+import type { PasswordHasher, TokenService, AccountRepository } from '../ports';
 
 export class RegisterUserUseCase {
   constructor(

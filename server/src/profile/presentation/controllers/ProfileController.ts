@@ -1,10 +1,8 @@
 import type { Request, Response } from 'express';
-import type { GetCurrentUserUseCase } from '../../domain/useCases/GetCurrentUserUseCase';
-import type { UpdateProfileUseCase } from '../../domain/useCases/UpdateProfileUseCase';
-import { parseRequest } from '../../../foundation/http/parseRequest';
-import { requireUserId } from '../../../foundation/http/requireUserId';
-import { profileToResponse } from '../mappers/ProfileDtoMapper';
-import { updateProfileBodySchema } from '../schemas/ProfileDto';
+import type { GetCurrentUserUseCase, UpdateProfileUseCase } from '../../domain/useCases';
+import { parseRequest, requireUserId } from '../../../foundation/http';
+import { profileToResponse } from '../mappers';
+import { updateProfileBodySchema } from '../schemas';
 
 export interface ProfileControllerDependencies {
   getCurrentUser: GetCurrentUserUseCase;

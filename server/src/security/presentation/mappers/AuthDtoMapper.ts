@@ -1,5 +1,5 @@
-import type { AuthResult } from '../../domain/models/Auth';
-import type { AuthResponse } from '../schemas/AuthDto';
+import type { AuthResult } from '../../domain/models';
+import type { AuthResponse } from '../schemas';
 
 export function authResultToResponse({ account, tokens }: AuthResult): AuthResponse {
   return {

@@ -1,8 +1,8 @@
-import { AccountModel, type Account } from '../../security/domain/models/Account';
-import type { SessionRepository } from '../../security/domain/repositories/SessionRepository';
-import { ProfileModel, type Profile } from '../../profile/domain/models/Profile';
-import type { ProfileRepository } from '../../profile/domain/repositories/ProfileRepository';
-import { UnauthorizedError } from '../../shared/domain/errors';
+import { AccountModel, type Account } from '../../security/domain/models';
+import type { SessionRepository } from '../../security/domain/repositories';
+import { ProfileModel, type Profile } from '../../profile/domain/models';
+import type { ProfileRepository } from '../../profile/domain/repositories';
+import { UnauthorizedError } from '../../shared/domain';
 
 export function accountToProfile(account: Account): Profile {
   return new ProfileModel(account.id, account.name, account.email, account.avatar, account.bio, account.createdAt);

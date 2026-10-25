@@ -1,10 +1,8 @@
-import axiosClient, { configureAuthentication, createHttpClient } from '../../foundation/network/axiosClient';
-import { browserStorage } from '../../foundation/session/storage';
-import { BrowserSessionRepository } from '../../security/data/repositories/BrowserSessionRepository';
-import { createAuthApi, isAuthenticationRequest } from '../../security/data/api/AuthApi';
-import { createAuthRepository } from '../../security/data/repositories/HttpAuthRepository';
-import { refreshAccessTokenUseCase } from '../../security/domain/useCases/RefreshAccessTokenUseCase';
-import { signOutUseCase } from '../../security/domain/useCases/SignOutUseCase';
+import { axiosClient, configureAuthentication, createHttpClient } from '../../foundation/network';
+import { browserStorage } from '../../foundation/session';
+import { BrowserSessionRepository, createAuthRepository } from '../../security/data/repositories';
+import { createAuthApi, isAuthenticationRequest } from '../../security/data/api';
+import { refreshAccessTokenUseCase, signOutUseCase } from '../../security/domain/useCases';
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 axiosClient.defaults.baseURL = baseURL;

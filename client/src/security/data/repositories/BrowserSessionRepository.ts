@@ -1,9 +1,8 @@
-import type { AuthSession } from '../../domain/models/AuthSession';
-import type { Account } from '../../domain/models/Account';
-import type { SessionRepository } from '../../domain/repositories/SessionRepository';
-import type { KeyValueStorage } from '../../../foundation/session/storage';
-import { toDomain } from '../mappers/AuthMapper';
-import { UnauthorizedError } from '../../../shared/domain/errors';
+import type { Account, AuthSession } from '../../domain/models';
+import type { SessionRepository } from '../../domain/repositories';
+import type { KeyValueStorage } from '../../../foundation/session';
+import { authToDomain } from '../mappers';
+import { UnauthorizedError } from '../../../shared/domain';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
@@ -28,7 +27,7 @@ export class BrowserSessionRepository implements SessionRepository {
       return null;
     }
     try {
-      this.snapshot = toDomain({ accessToken, refreshToken, user: JSON.parse(user) });
+      this.snapshot = authToDomain({ accessToken, refreshToken, user: JSON.parse(user) });
       return this.snapshot;
     } catch {
       this.clear(false);
@@ -37,7 +36,7 @@ export class BrowserSessionRepository implements SessionRepository {
   };
 
   saveSession(session: AuthSession): void {
-    const valid = toDomain(session);
+    const valid = authToDomain(session);
     this.storage.setItem(ACCESS_TOKEN_KEY, valid.accessToken);
     this.storage.setItem(REFRESH_TOKEN_KEY, valid.refreshToken);
     this.storage.setItem(USER_KEY, JSON.stringify(valid.user));

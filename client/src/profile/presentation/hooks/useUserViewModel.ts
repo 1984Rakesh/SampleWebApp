@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useUserUseCases } from '../context';
-import type { UpdateProfileInput } from '../../domain/models/Profile';
-import { toUserProfileViewState } from '../models/userPresentation';
+import type { UpdateProfileInput } from '../../domain/models';
+import { toUserProfileViewState } from '../models';
 
 const toErrorMessage = (error: unknown, fallback: string) => error instanceof Error ? error.message : fallback;
 
@@ -35,6 +35,7 @@ export function useUserViewModel() {
   return {
     profile,
     taskCounts: { created: taskCounts.created, completed: taskCounts.completed },
+    statusLabels: userUseCases.statusLabels,
     isLoading: userQuery.isLoading || taskCounts.isLoading,
     errorMessage: userQuery.error ? toErrorMessage(userQuery.error, 'Failed to load profile') : undefined,
     isEditing: true,

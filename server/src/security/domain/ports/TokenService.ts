@@ -1,4 +1,4 @@
-import type { AuthTokens, TokenPayload } from '../models/Auth';
+import type { AuthTokens, TokenPayload } from '../models';
 
 export interface TokenService {
   issueTokens(payload: TokenPayload): Promise<AuthTokens>;

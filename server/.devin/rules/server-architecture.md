@@ -5,7 +5,7 @@ trigger: always_on
 
 # Server Clean Architecture Rules (Express + SQLite)
 
-These extend the [shared rules](../../../.devin/rules/clean-architecture.md). See [server agent instructions](../../AGENTS.md) for the current tree, migration status and verification commands.
+These extend the [shared rules](../../../.devin/rules/clean-architecture.md). See [server agent instructions](../../AGENTS.md) for the current tree and verification commands.
 
 ## 1. Module and Layer Dependencies
 
@@ -16,7 +16,7 @@ Feature presentation → Feature domain ← Feature infrastructure
 
 App is the composition tier, not part of foundation. Foundation exposes reusable technical capabilities and never imports App or features. Shared domain contains only framework-free common errors/value rules. Feature domains never import foundation.
 
-S4 server acceptance is complete. All server business code lives in `src/security/`, `src/profile/`, and `src/tasks/`, supported by `src/foundation/` and `src/shared/domain/`. Legacy source roots and stale generated output have been removed with approval; do not recreate top-level domain/infrastructure/presentation roots or add artificial client-only counterparts. The client feature-first migration is complete; all client features own their layers under `client/src/<feature>/`.
+The feature-first layout is in place: server business code lives in `src/security/`, `src/profile/` and `src/tasks/`, supported by `src/foundation/` and `src/shared/domain/`. Do not recreate top-level domain/infrastructure/presentation roots or add artificial client-only counterparts.
 
 | Module | Allowed internal dependencies | Forbidden dependencies |
 | :--- | :--- | :--- |
@@ -56,8 +56,15 @@ Cross-feature capabilities use consumer-owned ports injected in App; do not impo
 5. Foundation error middleware maps ValidationError/UnauthorizedError/NotFoundError/ConflictError to 400/401/404/409, malformed JSON to 400, and unexpected errors to 500 with `{ error: 'Internal server error' }`. All error responses use `{ error: string }`.
 6. Preserve `/api/auth`, `/api/users`, `/api/tasks`, existing camelCase JSON, ISO UTC timestamps and 200/201/204 success behavior during reorganization.
 
-## 5. App and Verification
+## 5. Module Folders, Barrels and Orphans
 
-Only `app/config.ts` reads process.env; missing/default production JWT secrets must fail configuration. Only `app/container.ts` constructs repositories, security adapters, use cases, controllers and routers. `app/createApp.ts` mounts middleware/routes; `server.ts` invokes configuration/composition/migrations, awaits App-wired seed, then listens. Keep dist/server.js as the package entry.
+1. A module folder is `<feature>/<layer>/<sub>/` (e.g. `tasks/domain/models/`). For `app`, `foundation` and `shared` it is `<root>/<sub>/` (e.g. `foundation/http/`).
+2. Imports from outside a module folder must go through that folder's `index.ts`. Imports inside the same module folder use relative paths. Barrels export only the folder's public API; internal pieces stay unexported.
+3. No orphan source files. The only exceptions are the entry `src/server.ts` and `*.d.ts` files.
+4. `src` never imports `tests`. `server/tests/` may import `client/src/<feature>/data/{dtos,mappers}` for the contract test, and nothing else from the client.
 
-Run server build, `npm test` (including strict test typechecking), `npm run test:startup` (compiled entry smoke tests), and repository `git diff --check`. The compatibility test uses the unchanged client's validators/mappers without adding a production dependency on client code. Use only disposable databases in tests; startup smoke tests must explicitly set DB_PATH=:memory:, isolate environment/dotenv loading, use ephemeral ports, and stop their child processes. AST import-boundary tooling is deferred by explicit user choice; do not claim a checker script exists or add a parser dependency without approval. Audit domain purity, inward port dependencies, App-only composition, foundation independence and feature isolation manually until tooling is approved.
+## 6. App and Verification
+
+Only `app/config.ts` reads process.env; missing/default production JWT secrets must fail configuration. `dotenv` may be imported only by `server.ts` and `app/`. Only `app/container.ts` constructs repositories, security adapters, use cases, controllers and routers. `app/createApp.ts` mounts middleware/routes; `server.ts` invokes configuration/composition/migrations, awaits App-wired seed, then listens. Keep dist/server.js as the package entry.
+
+Run server build, `npm test` (including strict test typechecking), `npm run test:startup` (compiled entry smoke tests), `npm run check:architecture`, and repository `git diff --check`. The compatibility test uses the unchanged client's validators/mappers without adding a production dependency on client code. Use only disposable databases in tests; startup smoke tests must explicitly set DB_PATH=:memory:, isolate environment/dotenv loading, use ephemeral ports, and stop their child processes. Boundaries (domain purity, inward port dependencies, feature isolation, foundation independence, library allowlists, barrels, orphans) are enforced by dependency-cruiser (`server/.dependency-cruiser.cjs`) via `npm run check:architecture`; every rule is error-level. Never weaken or ignore a rule to make it pass. App-only composition, error translation, tri-state patches and normalize-then-validate remain manual-review items.

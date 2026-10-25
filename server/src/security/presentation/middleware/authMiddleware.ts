@@ -1,6 +1,6 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { UnauthorizedError } from '../../../shared/domain/errors';
-import type { TokenService } from '../../domain/ports/TokenService';
+import { UnauthorizedError } from '../../../shared/domain';
+import type { TokenService } from '../../domain/ports';
 
 export function createAuthMiddleware(tokenService: TokenService): RequestHandler {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {

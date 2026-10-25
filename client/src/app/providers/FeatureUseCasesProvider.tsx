@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import { AuthUseCasesContext } from '../../security/presentation/context/AuthUseCasesContext';
-import { ProfileUseCasesContext } from '../../profile/presentation/context/ProfileUseCasesContext';
-import { TaskUseCasesContext } from '../../tasks/presentation/context/TaskUseCasesContext';
-import { DashboardCapabilitiesContext } from '../../dashboard/presentation/context/DashboardCapabilitiesContext';
+import { AuthUseCasesContext } from '../../security/presentation/context';
+import { ProfileUseCasesContext } from '../../profile/presentation/context';
+import { TaskUseCasesContext } from '../../tasks/presentation/context';
+import { DashboardCapabilitiesContext } from '../../dashboard/presentation/context';
 import { useAuthUseCases, useDashboardCapabilities, useTaskUseCases, useUserUseCases } from '../composition';
 
 export function FeatureUseCasesProvider({ children }: { children: ReactNode }) {

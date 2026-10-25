@@ -2,15 +2,15 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute, PublicRoute } from './routeGuards';
 import { UiPage, UiText } from '../../components/ui';
-import AppNavbar from '../composition/AppNavbar';
+import { AppNavbar } from '../composition';
 
 // Placeholder screens - will be implemented in Phase 9
-const LoginScreen = React.lazy(() => import('../../security/presentation/screens/LoginScreen'));
-const RegisterScreen = React.lazy(() => import('../../security/presentation/screens/RegisterScreen'));
-const DashboardScreen = React.lazy(() => import('../../dashboard/presentation/screens/DashboardScreen'));
-const ProfileScreen = React.lazy(() => import('../../profile/presentation/screens/ProfileScreen'));
-const TaskListScreen = React.lazy(() => import('../../tasks/presentation/screens/TaskListScreen'));
-const ComparisonScreen = React.lazy(() => import('../../comparison/presentation/screens/ComparisonScreen'));
+const LoginScreen = React.lazy(() => import('../../security/presentation/screens').then((m) => ({ default: m.LoginScreen })));
+const RegisterScreen = React.lazy(() => import('../../security/presentation/screens').then((m) => ({ default: m.RegisterScreen })));
+const DashboardScreen = React.lazy(() => import('../../dashboard/presentation/screens').then((m) => ({ default: m.DashboardScreen })));
+const ProfileScreen = React.lazy(() => import('../../profile/presentation/screens').then((m) => ({ default: m.ProfileScreen })));
+const TaskListScreen = React.lazy(() => import('../../tasks/presentation/screens').then((m) => ({ default: m.TaskListScreen })));
+const ComparisonScreen = React.lazy(() => import('../../comparison/presentation/screens').then((m) => ({ default: m.ComparisonScreen })));
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,9 +1,16 @@
 import type { Task } from '../../domain/models';
 import { TaskModel, TaskStatus, TaskPriority } from '../../domain/models';
-import { TASK_STATUS_LABELS } from '@/lib/task-labels';
-import type { SelectOption } from '../../../components/ui/SelectOption';
+import type { SelectOption } from '../../../components/ui';
 import type { TaskFormData } from './TaskFormViewState';
 import type { BadgeTone, DueDateTone, TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
+
+// Display labels for backend TaskStatus values. The API enum strings
+// (TODO / IN_PROGRESS / COMPLETED) stay unchanged; only UI copy uses these.
+export const TASK_STATUS_LABELS: Record<string, string> = {
+  TODO: 'To do',
+  IN_PROGRESS: 'In progress',
+  COMPLETED: 'Done',
+};
 
 const STATUS_TONES: Record<TaskStatus, BadgeTone> = {
   [TaskStatus.TODO]: 'neutral',

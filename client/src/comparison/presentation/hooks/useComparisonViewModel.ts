@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { comparisonData } from '../models/comparisonData';
+import { comparisonData } from '../models';
 
 const firstConceptOf = (layerName: string) =>
   Object.keys(comparisonData[layerName]?.concepts ?? {})[0] ?? '';

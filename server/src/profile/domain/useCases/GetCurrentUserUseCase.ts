@@ -1,6 +1,6 @@
-import { NotFoundError } from '../../../shared/domain/errors';
-import type { Profile } from '../models/Profile';
-import type { ProfileRepository } from '../ports/ProfileRepository';
+import { NotFoundError } from '../../../shared/domain';
+import type { Profile } from '../models';
+import type { ProfileRepository } from '../ports';
 
 export class GetCurrentUserUseCase {
   constructor(private readonly profiles: ProfileRepository) {}

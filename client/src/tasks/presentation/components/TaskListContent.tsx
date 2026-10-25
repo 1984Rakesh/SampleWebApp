@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import LoadingSpinner from '../../../components/feedback/LoadingSpinner';
+import { LoadingSpinner } from '../../../components/feedback';
 import { UiAlert, UiButton, UiCard, UiFlex, UiText } from '../../../components/ui';
 import TaskTable from './taskList/TaskTable';
 import DeleteTaskDialog from './taskList/DeleteTaskDialog';
-import type { TaskItemViewState } from '../models/TaskListViewState';
+import type { TaskItemViewState } from '../models';
 
 interface TaskListContentProps { tasks: TaskItemViewState[]; total: number; isLoading: boolean; errorMessage?: string; onEdit: (id: string) => void; onDelete: (id: string) => void; onToggleStatus: (id: string) => void }
 
