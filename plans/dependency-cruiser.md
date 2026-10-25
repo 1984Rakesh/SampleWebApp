@@ -3,8 +3,8 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P1 — Add dependency-cruiser (report only)
-- Next task: P1.T1
-- Last updated: 2026-10-25 by Manager (P0.T1 merged)
+- Next task: P1.T1 (in progress, Devin)
+- Last updated: 2026-10-25 by Manager (P0 complete)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -76,7 +76,7 @@ Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server 
 ## Phase 1 — Add dependency-cruiser (report only)
 Exit criteria: `npm run check:architecture` runs on both sides with the full rule set at error severity and produces the baseline violation report. It is not yet in CI.
 
-- [ ] **P1.T1 — Client dependency-cruiser config**
+- [~] **P1.T1 — Client dependency-cruiser config**
   - Type: setup
   - Branch: task/dependency-cruiser/p1-t1
   - Base: feat/dependency-cruiser
@@ -302,3 +302,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P0.T2 merged (PR #2).
 - 2026-10-25 — Manager: dispatched P0.T3 to Devin.
 - 2026-10-25 — Manager: P0.T3 merged (PR #3); Phase 0 complete.
+- 2026-10-25 — Manager: dispatched P1.T1 to Devin.
