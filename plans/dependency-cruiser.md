@@ -188,17 +188,18 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: `git mv` TaskRow.tsx → `components/app/ChecklistRow.tsx`. Its props are closed and semantic: `title`, `description?`, `checked`, `toggleAriaLabel`, `chips: { label, tone: UiChipTone }[]`, `meta?`, `metaTone?: 'warning' | 'muted'`, `divider?`, `onToggle`. Markup, classes and `data-slot="task-row"` are unchanged. The `• ` priority prefix is now dashboard data. `DashboardRecentTasks` maps `dueDateTone` `amber → warning`, everything else `→ muted`; the block still gates emphasis on `!checked`. Line 1 keeps `// @ds TaskRow v2026-10-20`, and the comment calls ChecklistRow the neutral version of the DS block. The `../ui/UiCheckbox` and `../ui/UiChip` deep imports are left for P2.T8. Outside the list: one cell in `.devin/skills/mui-to-shadcn/component-map.md` (TaskRow repo path → ChecklistRow.tsx), so the design-sync map does not point at a deleted file. SSR render of `DashboardRecentTasks` (36 rows covering all branches, plus an empty list and a single row) is byte-identical on base vs branch: 96,955 bytes, same sha256. Client `check:architecture` 163 → 163 (barrel 156, orphans 7); the hit lists are identical apart from the 3 renamed paths. `npm test` 65/65, build, lint and `git diff --check` pass. Note: the dashboard still deep-imports `components/app/ChecklistRow` because there is no `components/app` barrel; that is left to the barrel tasks.
     - 2026-10-25 — Manager: reviewed (closed semantic props, SSR byte-identical across 38 cases, 163 unchanged, component-map.md path fix accepted); squash-merged PR #8.
 
-- [~] **P2.T4 — Remove the orphaned Toast component**
+- [r] **P2.T4 — Remove the orphaned Toast component**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t4
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/9
   - Files: `client/src/components/feedback/Toast.tsx`
   - Context: Nothing imports it; toasts go through `UiToastHost`/sonner. The user approved deleting confirmed orphans (Decision 2026-10-25).
   - Do: Delete it after confirming with `npm run check:architecture` and grep that it has no importers. Barrel `index.ts` files reported as orphans are fixed by the barrel tasks, not here.
   - Done when: the file is gone, `no-orphans` reports nothing except unused barrels, and the client verify commands pass.
   - Depends on: P2.T3
   - Notes:
+    - 2026-10-25 — Devin: Deleted `client/src/components/feedback/Toast.tsx` with `git rm`. It was a 12-line `UiSnackbar` wrapper. Confirmed it was an orphan with `check:architecture` (`no-orphans: src/components/feedback/Toast.tsx`). Grep across `client/src`, `client/tests`, `*.md`, `.devin/skills/` and `client/.devin` found no importers or references, other than this task's Files line, so no doc edits. Client `check:architecture` 163 → 162 (barrel 156 → 156, no-orphans 7 → 6). The violation-list diff is exactly that one line. The 6 remaining orphans are all unused barrels (`tasks/data/mappers`, `dashboard/presentation/{models,components}`, `comparison/presentation/{models,components}`, `app/router`). `npm ci`, `npm test` 65/65, build, lint and `git diff --check` pass. No files changed outside the list. Newly unused, not removed: `UiSnackbar` is now referenced only by its re-export in `components/ui/index.ts`. It is not an orphan, because the barrel is imported.
 
 - [ ] **P2.T5 — Client barrels: security**
   - Type: refactor
