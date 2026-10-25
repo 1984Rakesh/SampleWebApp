@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "test": "node --test --test-concurrency=1 tests/*.test.mjs",
     "preview": "vite preview",
-    "check:architecture": "depcruise src --config .dependency-cruiser.cjs"
+    "check:architecture": "depcruise src --config .dependency-cruiser.cjs",
+    "verify": "node --test --test-concurrency=1 --test-reporter=dot tests/*.test.mjs && tsc -b && vite build --logLevel warn && oxlint --quiet && npm run check:architecture"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.2.8",
