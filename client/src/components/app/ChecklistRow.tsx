@@ -4,20 +4,18 @@ import { Badge, Checkbox, cn } from '../ui';
 // ChecklistRow is the feature-neutral version of the DS TaskRow block: round
 // checkbox, title, optional description, chips and trailing meta text.
 // Mirrors design-system components/app/TaskRow.jsx.
-export type ChecklistRowChipTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+export type ChecklistRowChipVariant =
+  | 'status-todo'
+  | 'status-progress'
+  | 'status-done'
+  | 'priority-high'
+  | 'priority-medium'
+  | 'priority-low';
 
 export interface ChecklistRowChip {
   label: string;
-  tone: ChecklistRowChipTone;
+  variant: ChecklistRowChipVariant;
 }
-
-const chipVariants = {
-  neutral: 'status-todo',
-  info: 'status-progress',
-  success: 'status-done',
-  warning: 'priority-medium',
-  danger: 'priority-high',
-} as const;
 
 export type ChecklistRowMetaTone = 'warning' | 'muted';
 
@@ -53,7 +51,7 @@ export function ChecklistRow({
         <div className={cn('text-base leading-[22px] font-semibold', checked && 'text-muted-foreground line-through')}>{title}</div>
         {description ? <div className="text-sm leading-5 text-muted-foreground">{description}</div> : null}
         <div className="mt-2 flex flex-wrap gap-2">
-          {chips.map((chip, index) => <Badge key={index} variant={chipVariants[chip.tone]}>{chip.label}</Badge>)}
+          {chips.map((chip, index) => <Badge key={index} variant={chip.variant}>{chip.label}</Badge>)}
         </div>
       </div>
       {meta ? (
