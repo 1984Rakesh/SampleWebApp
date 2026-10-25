@@ -2,9 +2,9 @@
 
 ## Status
 - Feature branch: feat/dependency-cruiser
-- Current phase: P1 — Add dependency-cruiser (report only)
-- Next task: P1.T2 (in progress, Devin)
-- Last updated: 2026-10-25 by Manager (P1.T1 merged)
+- Current phase: P2 — Fix existing violations
+- Next task: P2.T1
+- Last updated: 2026-10-25 by Manager (P1 complete)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -109,7 +109,7 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
     - 2026-10-25 — Devin: added `client/.dependency-cruiser.cjs`, `dependency-cruiser@18.6.0` (exact pin; 18.7.0 is under the 7-day minimum) and the `check:architecture` script. npm also pruned a stale optional-peer `yaml` lockfile entry. Config: `tsc` parser, `tsConfig: tsconfig.app.json`, `tsPreCompilationDeps: true`, all rules `error` with doc-section comments. A feature is any top-level `src/` folder except app/foundation/shared/components/assets, so `lib/` is checked as a feature. `no-orphans` uses native `orphan` plus `reachable: false` from `src/main.tsx` (native orphan misses files that import others). Barrel rule (e) is 3 rule objects that share one name, because back-references only flow from→to. Baseline: 213 errors (barrel 156, components/shared → `lib` 44, orphans 7, sibling → `lib` 4, ui-vendor in `lib/utils` 2), 0 layer-boundary hits. A temporary domain → axios import was reported. `comparisonData.ts` has 0 resolved deps. `npm test` 65/65, build and lint OK. Suggestion: a dedicated no-`src/lib` rule (doc rule (a)) was not added because it is not in Do.
     - 2026-10-25 — Manager: reviewed config + baseline (213: barrel 156, lib-related 50, orphans 7; 0 layer-boundary); squash-merged PR #4. Baseline counts are the Done-when reference for Phase 2.
 
-- [r] **P1.T2 — Server dependency-cruiser config**
+- [x] **P1.T2 — Server dependency-cruiser config**
   - Type: setup
   - Branch: task/dependency-cruiser/p1-t2
   - Base: feat/dependency-cruiser
@@ -141,6 +141,7 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
   - Depends on: P1.T1
   - Notes:
     - 2026-10-25 — Devin: added `server/.dependency-cruiser.cjs`, devDeps `dependency-cruiser@18.6.0` + `@swc/core@1.16.18` (exact pins; 18.7.0 and 1.16.20 are under the 7-day minimum) and the `check:architecture` script. Parser choice: `parser: 'swc'`, `tsPreCompilationDeps: true`, no `tsConfig` (no server path aliases); TS 7 stays the build compiler; depcruise prints a non-fatal `missing-typescript-transpiler` notice. 21 rule objects, all `error`, client rule names/two-object no-orphans/three-object barrel rule mirrored. Client tree is `doNotFollow`, so only the direct tests→client edge is judged. Library allowlists apply `from: ^src/` (tests/errors.test.ts imports express types) and include `@types/*`. APP = `src/app/` + `src/server.ts`. Baseline: 130 errors = barrel 129 (features 93, shared/foundation 36) + tests-to-client 1 (`tests/client-contract.test.ts → client/src/tasks/domain/models/enums.ts`, a real rule (d) violation not covered by any Phase 2 task); 0 layer, library or orphan hits. A temporary domain → express import was reported; other rules were probed in a throwaway copy. Build, 29/29 tests, 3/3 startup pass; `git diff --check` clean. Suggestion: add client-style `no-non-package-json`/`not-to-dev-dep` rules later.
+    - 2026-10-25 — Manager: reviewed (swc parser, all error-level, client tree doNotFollow); baseline 130 (barrel 129, tests→client domain 1); squash-merged PR #5. The tests→client hit is covered by new task P2.T11.
 
 ## Phase 2 — Fix existing violations
 Exit criteria: `npm run check:architecture` reports 0 violations on both sides, with behaviour and visuals unchanged.
@@ -265,6 +266,18 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Depends on: P2.T9
   - Notes:
 
+- [ ] **P2.T11 — Contract test stops importing client domain enums**
+  - Type: test
+  - Branch: task/dependency-cruiser/p2-t11
+  - Base: feat/dependency-cruiser
+  - PR: —
+  - Files: `server/tests/client-contract.test.ts`
+  - Context: P1.T2 baseline: `tests/client-contract.test.ts → ../client/src/tasks/domain/models/enums.ts` (`TaskPriority`, `TaskStatus`) violates server rule §5.4 (tests may import only `client/src/<feature>/data/{dtos,mappers}`).
+  - Do: Replace the enum imports with the API's string literals (`'TODO' | 'IN_PROGRESS' | 'COMPLETED'`, and the priority values). Keep every assertion's meaning. Import nothing else from client domain.
+  - Done when: server `npm run check:architecture` reports 0 `tests-to-client-only-dtos-mappers` hits, and the server verify commands pass with the same test count (29).
+  - Depends on: P2.T10
+  - Notes:
+
 ## Phase 3 — Enforce in CI
 Exit criteria: CI fails any PR with an architecture violation, and the docs list the check as a required verify step.
 
@@ -273,11 +286,11 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
   - Branch: task/dependency-cruiser/p3-t1
   - Base: feat/dependency-cruiser
   - PR: —
-  - Files: `.github/workflows/ci.yml`
+  - Files: `.github/workflows/ci.yml`, `client/.dependency-cruiser.cjs`, `server/.dependency-cruiser.cjs`
   - Context: P0.T1 workflow; both sides now report 0 violations.
-  - Do: Add a `npm run check:architecture` step to the client and server jobs. In `client/.dependency-cruiser.cjs`, add an error-level rule `no-src-lib` forbidding any dependency on `^src/lib/` (doc rule (a); suggested in P1.T1).
+  - Do: Add a `npm run check:architecture` step to the client and server jobs. In `client/.dependency-cruiser.cjs`, add an error-level rule `no-src-lib` forbidding any dependency on `^src/lib/` (doc rule (a); suggested in P1.T1). In `server/.dependency-cruiser.cjs`, add the client's `no-non-package-json` and `not-to-dev-dep` rules for `src` (parity; suggested in P1.T2).
   - Done when: CI is green on this PR. In a throwaway commit on the task branch (reverted before review), a domain → axios import makes the client job fail; link that failed run in the PR.
-  - Depends on: P2.T10
+  - Depends on: P2.T11
   - Notes:
 
 ## Decisions
@@ -308,3 +321,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: dispatched P1.T1 to Devin.
 - 2026-10-25 — Manager: P1.T1 merged (PR #4). Revised P3.T1 Do: add explicit `no-src-lib` client rule.
 - 2026-10-25 — Manager: dispatched P1.T2 to Devin.
+- 2026-10-25 — Manager: P1.T2 merged (PR #5); Phase 1 complete. Added P2.T11 (contract test enum import); P3.T1 now depends on P2.T11, also adds server parity rules, Files updated.
