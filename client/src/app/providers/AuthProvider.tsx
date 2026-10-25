@@ -4,8 +4,7 @@ import type { AuthSession } from '../../security/domain/models';
 import { signOutUseCase } from '../../security/domain/useCases';
 import { AuthSessionContext } from '../../security/presentation/context';
 import { cacheProfile } from '../../profile/data/repositories';
-import { sessions } from '../composition/securityRuntime';
-import { accountToProfile } from '../composition/profileSession';
+import { accountToProfile, sessions } from '../composition';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();

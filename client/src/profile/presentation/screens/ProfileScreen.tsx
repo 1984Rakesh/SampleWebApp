@@ -1,5 +1,5 @@
 import { useUserViewModel } from '../hooks';
-import LoadingSpinner from '../../../components/feedback/LoadingSpinner';
+import { LoadingSpinner } from '../../../components/feedback';
 import { ProfileAppearance, ProfileEditForm, UserProfileCard } from '../components';
 import { UiAlert, UiAsideGrid, UiFlex, UiPage, UiScreen, UiText } from '../../../components/ui';
 

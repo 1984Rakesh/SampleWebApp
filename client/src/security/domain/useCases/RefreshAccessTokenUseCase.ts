@@ -1,5 +1,5 @@
 import type { AuthRepository, SessionRepository } from '../repositories';
-import { UnauthorizedError } from '../../../shared/domain/errors';
+import { UnauthorizedError } from '../../../shared/domain';
 
 export async function refreshAccessTokenUseCase(auth: AuthRepository, sessions: SessionRepository): Promise<string> {
   const session = sessions.getSession();

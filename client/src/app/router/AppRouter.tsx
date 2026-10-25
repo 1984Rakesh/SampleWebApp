@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute, PublicRoute } from './routeGuards';
 import { UiPage, UiText } from '../../components/ui';
-import AppNavbar from '../composition/AppNavbar';
+import { AppNavbar } from '../composition';
 
 // Placeholder screens - will be implemented in Phase 9
 const LoginScreen = React.lazy(() => import('../../security/presentation/screens').then((m) => ({ default: m.LoginScreen })));

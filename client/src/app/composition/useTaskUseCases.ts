@@ -1,4 +1,4 @@
-import axiosClient from '../../foundation/network/axiosClient';
+import { axiosClient } from '../../foundation/network';
 import { createTaskApi } from '../../tasks/data/api';
 import { createTaskRepository, useTaskRepository } from '../../tasks/data/repositories';
 import {

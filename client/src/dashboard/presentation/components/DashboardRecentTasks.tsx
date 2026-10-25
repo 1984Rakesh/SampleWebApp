@@ -1,5 +1,5 @@
 import type { DashboardTaskItem } from '../models';
-import { ChecklistRow } from '../../../components/app/ChecklistRow';
+import { ChecklistRow } from '../../../components/app';
 import { UiButton, UiCard, UiCardHeader, UiIcon, UiText } from '../../../components/ui';
 
 interface DashboardRecentTasksProps { tasks: DashboardTaskItem[]; onToggle: (id: string) => void }

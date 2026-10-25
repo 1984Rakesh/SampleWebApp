@@ -1,4 +1,4 @@
-import axiosClient from '../../foundation/network/axiosClient';
+import { axiosClient } from '../../foundation/network';
 import { createProfileApi } from '../../profile/data/api';
 import { createProfileRepository, useProfileRepository } from '../../profile/data/repositories';
 import { updateProfileUseCase } from '../../profile/domain/useCases';

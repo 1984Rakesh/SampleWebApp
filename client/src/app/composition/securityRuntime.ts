@@ -1,5 +1,5 @@
-import axiosClient, { configureAuthentication, createHttpClient } from '../../foundation/network/axiosClient';
-import { browserStorage } from '../../foundation/session/storage';
+import { axiosClient, configureAuthentication, createHttpClient } from '../../foundation/network';
+import { browserStorage } from '../../foundation/session';
 import { BrowserSessionRepository, createAuthRepository } from '../../security/data/repositories';
 import { createAuthApi, isAuthenticationRequest } from '../../security/data/api';
 import { refreshAccessTokenUseCase, signOutUseCase } from '../../security/domain/useCases';

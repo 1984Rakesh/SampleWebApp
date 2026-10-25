@@ -1,7 +1,7 @@
 import {
   UiAppBar, UiAvatar, UiButton, UiFlex, UiIconButton, UiNavButton, UiResponsive, UiText, UiToolbar,
 } from '../../ui';
-import { Logo } from '../../app/Logo';
+import { Logo } from '../../app';
 import type { NavbarProps } from './NavbarViewState';
 
 type Props = Pick<NavbarProps, 'view' | 'onOpenNavigation' | 'onToggleTheme' | 'onLogout' | 'onCreateTask'>;

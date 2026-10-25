@@ -1,6 +1,6 @@
 import type { AxiosInstance } from 'axios';
 import type { TaskDTO, CreateTaskDTO, UpdateTaskDTO, GetTasksParams } from '../dtos';
-import { atDataBoundary } from '../../../shared/data/translateError';
+import { atDataBoundary } from '../../../shared/data';
 
 export function createTaskApi(client: AxiosInstance) {
   return {

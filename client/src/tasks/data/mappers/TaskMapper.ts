@@ -3,7 +3,7 @@ import type { TaskDTO, CreateTaskDTO, UpdateTaskDTO } from '../dtos';
 import type { Task } from '../../domain/models';
 import { TaskModel } from '../../domain/models';
 import type { CreateTaskInput, UpdateTaskInput } from '../../domain/useCases';
-import { translateError } from '../../../shared/data/translateError';
+import { translateError } from '../../../shared/data';
 
 export function toDomain(dto: TaskDTO): Task {
   // Normalize current and legacy transport fields before domain validation.
