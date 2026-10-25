@@ -1,6 +1,5 @@
 import { useComparisonViewModel } from '../hooks';
-import LayerMap from '../components/LayerMap';
-import ComparisonPanel from '../components/ComparisonPanel';
+import { ComparisonPanel, LayerMap } from '../components';
 import {
   UiButton,
   UiCard,

@@ -4,7 +4,7 @@ import { createProfileRepository, useProfileRepository } from '../../profile/dat
 import { updateProfileUseCase } from '../../profile/domain/useCases';
 import type { UpdateProfileInput } from '../../profile/domain/models';
 import { useAuth } from '../../security/presentation/context';
-import { TASK_STATUS_LABELS, toTaskCounts } from '../../tasks/presentation/models/taskPresentation';
+import { TASK_STATUS_LABELS, toTaskCounts } from '../../tasks/presentation/models';
 import { sessions } from './securityRuntime';
 import { bindProfileSession } from './profileSession';
 import { useTaskUseCases } from './useTaskUseCases';

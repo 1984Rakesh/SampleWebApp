@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { DashboardStatusLabels, DashboardTaskCounts, DashboardTaskItem } from '../models/DashboardViewState';
+import type { DashboardStatusLabels, DashboardTaskCounts, DashboardTaskItem } from '../models';
 
 export interface DashboardCapabilities {
   profileName: string;

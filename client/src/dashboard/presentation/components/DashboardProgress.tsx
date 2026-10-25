@@ -1,4 +1,4 @@
-import type { DashboardStatusLabels, DashboardTaskCounts } from '../models/DashboardViewState';
+import type { DashboardStatusLabels, DashboardTaskCounts } from '../models';
 import { UiAvatar, UiCard, UiCardContent, UiCardHeader, UiFlex, UiIcon, UiProgress, UiSwatch, UiText } from '../../../components/ui';
 
 interface DashboardProgressProps { counts: DashboardTaskCounts; statusLabels: DashboardStatusLabels; total: number; percent: number }

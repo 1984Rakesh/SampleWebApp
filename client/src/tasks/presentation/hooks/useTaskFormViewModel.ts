@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTaskUseCases } from '../context';
-import type { TaskFormData, TaskFormFieldErrors } from '../models/TaskFormViewState';
-import { buildPriorityOptions, toTaskFormData, toTaskPriority } from '../models/taskPresentation';
+import { buildPriorityOptions, toTaskFormData, toTaskPriority, type TaskFormData, type TaskFormFieldErrors } from '../models';
 
 export function useTaskFormViewModel(editingTaskId?: string, initialData?: TaskFormData) {
   const taskUseCases = useTaskUseCases();

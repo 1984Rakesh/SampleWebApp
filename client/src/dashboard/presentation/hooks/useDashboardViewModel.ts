@@ -1,5 +1,5 @@
 import { useDashboardCapabilities } from '../context';
-import { toDashboardViewState } from '../models/dashboardPresentation';
+import { toDashboardViewState } from '../models';
 
 export function useDashboardViewModel() {
   const capabilities = useDashboardCapabilities();

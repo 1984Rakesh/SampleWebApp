@@ -1,4 +1,4 @@
-import type { DashboardStatusLabels, DashboardTaskCounts } from '../models/DashboardViewState';
+import type { DashboardStatusLabels, DashboardTaskCounts } from '../models';
 import { StatCard } from '../../../components/app/StatCard';
 import { UiGrid, UiGridItem } from '../../../components/ui';
 
