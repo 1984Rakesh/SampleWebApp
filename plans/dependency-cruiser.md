@@ -248,7 +248,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t8
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/13
   - Files: `client/src/{app,foundation,shared,components}/*/index.ts`, their importers, `client/tests/*` (paths only), plus the existing feature barrels listed in Do step 2
   - Context: same as P2.T5. `components/ui/index.ts` already exists; the 7 direct `components/ui/Ui*` imports from outside it must switch to it.
   - Do:
