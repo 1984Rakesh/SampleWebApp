@@ -1,5 +1,5 @@
 // @ds TaskRow v2026-10-20
-import { cn } from '../ui';
+import { cn } from '../ui/utils';
 import { UiCheckbox, UiChip, type UiChipTone } from '../ui';
 
 // ChecklistRow is the feature-neutral version of the DS TaskRow block: round
