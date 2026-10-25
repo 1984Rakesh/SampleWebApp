@@ -1,19 +1,21 @@
 import type { Request, Response } from 'express';
-import type { CreateTaskUseCase } from '../../domain/useCases/CreateTaskUseCase';
-import type { DeleteTaskUseCase } from '../../domain/useCases/DeleteTaskUseCase';
-import type { GetTasksUseCase } from '../../domain/useCases/GetTasksUseCase';
-import type { ToggleTaskStatusUseCase } from '../../domain/useCases/ToggleTaskStatusUseCase';
-import type { UpdateTaskUseCase } from '../../domain/useCases/UpdateTaskUseCase';
+import type {
+  CreateTaskUseCase,
+  DeleteTaskUseCase,
+  GetTasksUseCase,
+  ToggleTaskStatusUseCase,
+  UpdateTaskUseCase,
+} from '../../domain/useCases';
 import { parseRequest } from '../../../foundation/http/parseRequest';
 import { requireUserId } from '../../../foundation/http/requireUserId';
-import { taskToResponse } from '../mappers/TaskDtoMapper';
+import { taskToResponse } from '../mappers';
 import {
   createTaskBodySchema,
   listTasksQuerySchema,
   taskIdParamsSchema,
   updateTaskBodySchema,
   updateTaskStatusBodySchema,
-} from '../schemas/TaskDto';
+} from '../schemas';
 
 export interface TaskControllerDependencies {
   getTasks: GetTasksUseCase;

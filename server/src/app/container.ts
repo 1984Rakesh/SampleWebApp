@@ -1,23 +1,25 @@
 import type { Router } from 'express';
 import { LoginUseCase, RefreshAccessTokenUseCase, RegisterUserUseCase } from '../security/domain/useCases';
-import { CreateTaskUseCase } from '../tasks/domain/useCases/CreateTaskUseCase';
-import { DeleteTaskUseCase } from '../tasks/domain/useCases/DeleteTaskUseCase';
-import { GetTasksUseCase } from '../tasks/domain/useCases/GetTasksUseCase';
-import { ToggleTaskStatusUseCase } from '../tasks/domain/useCases/ToggleTaskStatusUseCase';
-import { UpdateTaskUseCase } from '../tasks/domain/useCases/UpdateTaskUseCase';
+import {
+  CreateTaskUseCase,
+  DeleteTaskUseCase,
+  GetTasksUseCase,
+  ToggleTaskStatusUseCase,
+  UpdateTaskUseCase,
+} from '../tasks/domain/useCases';
 import { GetCurrentUserUseCase, UpdateProfileUseCase } from '../profile/domain/useCases';
 import { createDatabase, type DatabaseConnection } from '../foundation/database/connection';
 import { seedDatabase } from '../foundation/database/seed';
-import { SqliteTaskRepository } from '../tasks/infrastructure/repositories/SqliteTaskRepository';
+import { SqliteTaskRepository } from '../tasks/infrastructure/repositories';
 import { SqliteAccountRepository } from '../security/infrastructure/repositories';
 import { SqliteProfileRepository } from '../profile/infrastructure/repositories';
 import { BcryptPasswordHasher, JwtTokenService } from '../security/infrastructure/security';
 import { createAuthController } from '../security/presentation/controllers';
-import { createTaskController } from '../tasks/presentation/controllers/TaskController';
+import { createTaskController } from '../tasks/presentation/controllers';
 import { createProfileController } from '../profile/presentation/controllers';
 import { createAuthMiddleware } from '../security/presentation/middleware';
 import { createAuthRoutes } from '../security/presentation/routes';
-import { createTaskRoutes } from '../tasks/presentation/routes/taskRoutes';
+import { createTaskRoutes } from '../tasks/presentation/routes';
 import { createProfileRoutes } from '../profile/presentation/routes';
 import type { AppConfig } from './config';
 

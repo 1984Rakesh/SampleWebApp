@@ -1,5 +1,5 @@
 import { NotFoundError } from '../../../shared/domain/errors';
-import type { TaskRepository } from '../ports/TaskRepository';
+import type { TaskRepository } from '../ports';
 
 export interface DeleteTaskInput {
   id: string;

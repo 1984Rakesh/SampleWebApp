@@ -4,7 +4,7 @@ import {
   TASK_STATUSES,
   type TaskPriority,
   type TaskStatus,
-} from '../../domain/models/Task';
+} from '../../domain/models';
 
 const statusSchema = z.enum(TASK_STATUSES, { error: 'Invalid status' });
 const prioritySchema = z.enum(TASK_PRIORITIES, { error: 'Invalid priority' });
