@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P0 — CI and rule docs
-- Next task: P0.T2 (in progress, Devin)
+- Next task: P0.T3
 - Last updated: 2026-10-25 by Manager (P0.T1 merged)
 
 ## Goal
@@ -35,7 +35,7 @@ Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server 
     - 2026-10-25 — Devin: added `.github/workflows/ci.yml` (only file changed besides this ledger). The `client` job runs `git diff --check HEAD^1 HEAD` on the PR merge commit, which checks the PR diff against its base. It runs on `pull_request` only, and push runs skip it. The `server` job runs `npm ci` in client then server. npm cache keyed per lockfile through `setup-node` `cache-dependency-path`. Concurrency cancels superseded runs. Actions pinned to `@v5` major tags. Local Node 24.22.1 run: client 65/65 tests, build, lint green. Server build, 29/29 tests, startup 3/3 green. Suggestion: pin actions to SHAs later if desired.
     - 2026-10-25 — Manager: reviewed (CI green, scope ok); squash-merged PR #1.
 
-- [r] **P0.T2 — Update architecture rule docs for dependency-cruiser**
+- [x] **P0.T2 — Update architecture rule docs for dependency-cruiser**
   - Type: setup
   - Branch: task/dependency-cruiser/p0-t2
   - Base: feat/dependency-cruiser
@@ -57,6 +57,7 @@ Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server 
   - Depends on: P0.T1
   - Notes:
     - 2026-10-25 — Devin: changed only the 6 listed docs. Migration narrative is trimmed to "feature-first layout is in place", with embedded rules kept. "Tooling deferred" lines are replaced by dependency-cruiser enforcement text. Rules: (a)/(b) in client rules §4.8–4.9 and client AGENTS §3. (c) in server rules §6 and server AGENTS §3. (d) in server rules §5.4 and server AGENTS §4. (e)/(f) in shared rules §7, client rules §6 and server rules §5. New shared rules §8 "Enforcement" lists the manual-review items. Verification sections add `npm run check:architecture`. Also: the client AGENTS tree now lists `components/app`. Done-when grep returns nothing; `git diff --check` is clean. Node/npm were unavailable locally, so client/server suites rely on CI (no source changed). Note: the docs reference `check:architecture` before P1 adds it; RULES.md "skip before P1" covers this.
+    - 2026-10-25 — Manager: reviewed (CI green, scope ok, grep clean, rules a–f placed); squash-merged PR #2.
 
 - [ ] **P0.T3 — Archive the old ledger and remove the repo-local manager/worker skills**
   - Type: setup
@@ -296,3 +297,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: dispatched P0.T1 to Devin.
 - 2026-10-25 — Manager: P0.T1 merged (PR #1).
 - 2026-10-25 — Manager: dispatched P0.T2 to Devin.
+- 2026-10-25 — Manager: P0.T2 merged (PR #2).
