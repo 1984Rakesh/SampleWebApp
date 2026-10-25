@@ -3,8 +3,8 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P0 — CI and rule docs
-- Next task: P0.T1 (in progress, Devin)
-- Last updated: 2026-10-25 by Manager
+- Next task: P0.T2
+- Last updated: 2026-10-25 by Manager (P0.T1 merged)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -21,7 +21,7 @@ Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `c
 ## Phase 0 — CI and rule docs
 Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server verify commands in GitHub Actions. Rule docs state the agreed rules, no longer defer tooling, and the old ledger/skills are archived.
 
-- [r] **P0.T1 — Add GitHub Actions CI**
+- [x] **P0.T1 — Add GitHub Actions CI**
   - Type: setup
   - Branch: task/dependency-cruiser/p0-t1
   - Base: feat/dependency-cruiser
@@ -33,6 +33,7 @@ Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server 
   - Depends on: —
   - Notes:
     - 2026-10-25 — Devin: added `.github/workflows/ci.yml` (only file changed besides this ledger). The `client` job runs `git diff --check HEAD^1 HEAD` on the PR merge commit, which checks the PR diff against its base. It runs on `pull_request` only, and push runs skip it. The `server` job runs `npm ci` in client then server. npm cache keyed per lockfile through `setup-node` `cache-dependency-path`. Concurrency cancels superseded runs. Actions pinned to `@v5` major tags. Local Node 24.22.1 run: client 65/65 tests, build, lint green. Server build, 29/29 tests, startup 3/3 green. Suggestion: pin actions to SHAs later if desired.
+    - 2026-10-25 — Manager: reviewed (CI green, scope ok); squash-merged PR #1.
 
 - [ ] **P0.T2 — Update architecture rule docs for dependency-cruiser**
   - Type: setup
@@ -292,3 +293,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 ## Change Log
 - 2026-10-25 — Manager: created plan after rules audit (import-graph audit: 0 layer violations; lib/, TaskRow, orphans and barrels need work).
 - 2026-10-25 — Manager: dispatched P0.T1 to Devin.
+- 2026-10-25 — Manager: P0.T1 merged (PR #1).
