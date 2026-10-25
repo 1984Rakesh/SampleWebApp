@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { AuthSession } from '../../security/domain/models';
 import { signOutUseCase } from '../../security/domain/useCases';
 import { AuthSessionContext } from '../../security/presentation/context';
-import { cacheProfile } from '../../profile/data/repositories/ReactQueryProfileRepository';
+import { cacheProfile } from '../../profile/data/repositories';
 import { sessions } from '../composition/securityRuntime';
 import { accountToProfile } from '../composition/profileSession';
 

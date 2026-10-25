@@ -1,8 +1,6 @@
 import { useUserViewModel } from '../hooks';
 import LoadingSpinner from '../../../components/feedback/LoadingSpinner';
-import ProfileAppearance from '../components/ProfileAppearance';
-import ProfileEditForm from '../components/ProfileEditForm';
-import UserProfileCard from '../components/UserProfileCard';
+import { ProfileAppearance, ProfileEditForm, UserProfileCard } from '../components';
 import { UiAlert, UiAsideGrid, UiFlex, UiPage, UiScreen, UiText } from '../../../components/ui';
 
 export default function ProfileScreen() {

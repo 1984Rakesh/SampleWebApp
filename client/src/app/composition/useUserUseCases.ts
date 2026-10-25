@@ -1,9 +1,8 @@
 import axiosClient from '../../foundation/network/axiosClient';
-import { createProfileApi } from '../../profile/data/api/ProfileApi';
-import { createProfileRepository } from '../../profile/data/repositories/HttpProfileRepository';
-import { useProfileRepository } from '../../profile/data/repositories/ReactQueryProfileRepository';
-import { updateProfileUseCase } from '../../profile/domain/useCases/UpdateProfileUseCase';
-import type { UpdateProfileInput } from '../../profile/domain/models/Profile';
+import { createProfileApi } from '../../profile/data/api';
+import { createProfileRepository, useProfileRepository } from '../../profile/data/repositories';
+import { updateProfileUseCase } from '../../profile/domain/useCases';
+import type { UpdateProfileInput } from '../../profile/domain/models';
 import { useAuth } from '../../security/presentation/context';
 import { TASK_STATUS_LABELS, toTaskCounts } from '../../tasks/presentation/models/taskPresentation';
 import { sessions } from './securityRuntime';

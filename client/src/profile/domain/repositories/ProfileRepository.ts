@@ -1,4 +1,4 @@
-import type { Profile, UpdateProfileInput } from '../models/Profile';
+import type { Profile, UpdateProfileInput } from '../models';
 
 export interface ProfileRepository {
   getCurrentUser(): Promise<Profile>;

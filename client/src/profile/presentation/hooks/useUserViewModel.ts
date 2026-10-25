@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useUserUseCases } from '../context';
-import type { UpdateProfileInput } from '../../domain/models/Profile';
-import { toUserProfileViewState } from '../models/userPresentation';
+import type { UpdateProfileInput } from '../../domain/models';
+import { toUserProfileViewState } from '../models';
 
 const toErrorMessage = (error: unknown, fallback: string) => error instanceof Error ? error.message : fallback;
 
