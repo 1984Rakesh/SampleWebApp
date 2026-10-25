@@ -16,6 +16,7 @@ const MODULE_BARREL = `^${MODULE_FOLDER}index\\.tsx?$`;
 const UI_VENDOR =
   '(?:^|/)node_modules/(?:radix-ui|@radix-ui/[^/]+|lucide-react|class-variance-authority|clsx|tailwind-merge|sonner)/';
 const SHADCN_PRIMITIVE = '^src/components/ui/[a-z][^/]*\\.tsx$';
+const CN_HELPER = '^src/components/ui/utils\\.ts$';
 const BARREL_COMMENT =
   'shared §7 / client §6.2: imports from outside a module folder must go through its index.ts barrel.';
 
@@ -64,6 +65,13 @@ module.exports = {
       comment: 'client §7 Verification: src must not depend on devDependencies (they are absent at runtime).',
       from: { path: '^src/' },
       to: { dependencyTypes: ['npm-dev'], dependencyTypesNot: ['type-only'], pathNot: ['node_modules/@types/'] },
+    },
+    {
+      name: 'no-src-lib',
+      severity: 'error',
+      comment: 'client §1, §4.8: no src/lib/; cn lives in components/ui/utils.ts and display copy in the owning feature.',
+      from: {},
+      to: { path: '^src/lib/' },
     },
     {
       name: 'domain-only-own-domain-and-shared-domain',
@@ -134,6 +142,14 @@ module.exports = {
       to: { path: [UI_VENDOR, SHADCN_PRIMITIVE] },
     },
     {
+      name: 'cn-only-in-components-ui-app',
+      severity: 'error',
+      comment:
+        'shared §2 No Leaky Abstractions / client §4.7, §4.8: the cn class helper (components/ui/utils.ts) is private to components/ui and components/app.',
+      from: { pathNot: '^src/components/(?:ui|app)/' },
+      to: { path: CN_HELPER },
+    },
+    {
       name: 'shared-modules-not-to-features-or-app',
       severity: 'error',
       comment:
@@ -159,8 +175,15 @@ module.exports = {
       name: 'barrel-only-cross-module-imports',
       severity: 'error',
       comment: BARREL_COMMENT,
-      from: { path: '^src/(app|foundation|shared|components)/([^/]+)/' },
+      from: { path: '^src/(app|foundation|shared|components)/([^/]+)/', pathNot: '^src/components/app/' },
       to: { path: MODULE_FILE, pathNot: [MODULE_BARREL, '^src/$1/$2/'] },
+    },
+    {
+      name: 'barrel-only-cross-module-imports',
+      severity: 'error',
+      comment: `${BARREL_COMMENT} Exception: components/app may import the private cn helper and raw shadcn primitives from components/ui directly.`,
+      from: { path: '^src/components/app/' },
+      to: { path: MODULE_FILE, pathNot: [MODULE_BARREL, '^src/components/app/', CN_HELPER, SHADCN_PRIMITIVE] },
     },
     {
       name: 'barrel-only-cross-module-imports',

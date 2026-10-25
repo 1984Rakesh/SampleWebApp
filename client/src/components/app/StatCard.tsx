@@ -1,8 +1,8 @@
 // @ds StatCard v2026-10-20
 import type { ReactNode } from 'react';
 import { CircleCheck, Clock, List, type LucideIcon } from 'lucide-react';
-import { cn } from '../ui';
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui';
+import { cn } from '../ui/utils';
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 
 const TONES: Record<'done' | 'inprogress' | 'todo', [string, LucideIcon]> = {
   done: ['bg-status-done text-status-done-foreground', CircleCheck],

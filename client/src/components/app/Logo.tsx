@@ -1,6 +1,6 @@
 // @ds Logo v2026-10-20
 import { Check } from 'lucide-react';
-import { cn } from '../ui';
+import { cn } from '../ui/utils';
 
 /** Brand mark: bg-primary rounded square with a check + Bricolage wordmark. */
 export interface LogoProps {

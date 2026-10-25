@@ -53,6 +53,20 @@ module.exports = {
       to: { path: '^src/', pathNot: '\\.d\\.ts$', reachable: false },
     },
     {
+      name: 'no-non-package-json',
+      severity: 'error',
+      comment: 'server §6 App and Verification: src may only use npm packages declared in package.json dependencies.',
+      from: { path: '^src/' },
+      to: { dependencyTypes: ['npm-no-pkg', 'npm-unknown'] },
+    },
+    {
+      name: 'not-to-dev-dep',
+      severity: 'error',
+      comment: 'server §6 App and Verification: src must not depend on devDependencies (they are absent at runtime).',
+      from: { path: '^src/' },
+      to: { dependencyTypes: ['npm-dev'], dependencyTypesNot: ['type-only'], pathNot: ['node_modules/@types/'] },
+    },
+    {
       name: 'domain-only-own-domain-and-shared-domain',
       severity: 'error',
       comment:
