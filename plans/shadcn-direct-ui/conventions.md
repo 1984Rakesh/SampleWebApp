@@ -24,7 +24,8 @@ Follows plans/RULES.md. Rules below apply to every task in this plan.
 - A new file must be imported in the same task (no-orphans rule).
 
 ## shadcn CLI
-- Run `npx shadcn@4.22.0` (pinned) from `client/`.
+- Avoid rerunning the CLI; edit the vendored files directly. If a task must run it, use `npx shadcn@4.22.0` (pinned) from `client/`.
+- The CLI adds an npm package `cn` and rewrites the helper import to `from "cn"` (since P1.T2a): remove that dependency from package.json/lockfile and restore `import { cn } from "./utils"`.
 - If the CLI adds `next-themes`, revert it (package.json and lockfile); sonner uses `useColorMode` from `@/foundation/theme`.
 - Revert any CLI edits to `src/index.css` and `components.json`; the theme tokens are owned by P1.T1.
 - Imports between files in `components/ui` stay relative (`./utils`, `./button`); remove any `"use client"` directive (`rsc: false`).
