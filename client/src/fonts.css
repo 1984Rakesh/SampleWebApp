@@ -1,8 +1,6 @@
-/* Self-hosted webfonts (fontsource). Mapped to Tailwind font-sans / font-heading. */
+/* Self-hosted webfonts (fontsource). Mapped to Tailwind font-sans / font-display / font-heading in index.css. */
 @import "@fontsource-variable/bricolage-grotesque/index.css";
 @import "@fontsource/dm-sans/400.css";
 @import "@fontsource/dm-sans/500.css";
 @import "@fontsource/dm-sans/600.css";
 @import "@fontsource/dm-sans/700.css";
-
-:root{--font-display:'Bricolage Grotesque Variable','Bricolage Grotesque','DM Sans',sans-serif;--font-body:'DM Sans',system-ui,sans-serif}
