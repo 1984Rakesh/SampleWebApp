@@ -1,7 +1,5 @@
-// @ds Card v2026-10-20
 import * as React from "react"
-
-import { cn } from "./utils"
+import { cn } from "@/components/ui/utils"
 
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -33,7 +31,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-title"
-      className={cn("font-heading leading-none font-semibold tracking-tight", className)}
+      className={cn("leading-none font-semibold", className)}
       {...props}
     />
   )

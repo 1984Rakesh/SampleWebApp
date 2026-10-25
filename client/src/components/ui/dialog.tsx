@@ -1,29 +1,34 @@
-// @ds Dialog v2026-10-20
 import * as React from "react"
+import { cn } from "@/components/ui/utils"
 import { XIcon } from "lucide-react"
 import { Dialog as DialogPrimitive } from "radix-ui"
-import { cn } from "./utils"
+
 import { Button } from "@/components/ui/button"
+
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
+
 function DialogTrigger({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 }
+
 function DialogPortal({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
+
 function DialogClose({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
 }
+
 function DialogOverlay({
   className,
   ...props
@@ -39,6 +44,7 @@ function DialogOverlay({
     />
   )
 }
+
 function DialogContent({
   className,
   children,
@@ -72,6 +78,7 @@ function DialogContent({
     </DialogPortal>
   )
 }
+
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -81,6 +88,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
     />
   )
 }
+
 function DialogFooter({
   className,
   showCloseButton = false,
@@ -107,6 +115,7 @@ function DialogFooter({
     </div>
   )
 }
+
 function DialogTitle({
   className,
   ...props
@@ -114,11 +123,12 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("font-heading text-lg leading-none font-semibold tracking-tight", className)}
+      className={cn("text-lg leading-none font-semibold", className)}
       {...props}
     />
   )
 }
+
 function DialogDescription({
   className,
   ...props
@@ -131,6 +141,7 @@ function DialogDescription({
     />
   )
 }
+
 export {
   Dialog,
   DialogClose,

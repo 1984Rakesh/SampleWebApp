@@ -7,8 +7,10 @@ import {
 } from "lucide-react"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { useColorMode } from "@/foundation/theme"
+
 const Toaster = ({ ...props }: ToasterProps) => {
   const { resolvedMode } = useColorMode()
+
   return (
     <Sonner
       theme={resolvedMode}
@@ -32,4 +34,5 @@ const Toaster = ({ ...props }: ToasterProps) => {
     />
   )
 }
+
 export { Toaster }
