@@ -76,11 +76,11 @@ Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server 
 ## Phase 1 — Add dependency-cruiser (report only)
 Exit criteria: `npm run check:architecture` runs on both sides with the full rule set at error severity and produces the baseline violation report. It is not yet in CI.
 
-- [~] **P1.T1 — Client dependency-cruiser config**
+- [r] **P1.T1 — Client dependency-cruiser config**
   - Type: setup
   - Branch: task/dependency-cruiser/p1-t1
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/4
   - Files: `client/package.json`, `client/package-lock.json`, `client/.dependency-cruiser.cjs`
   - Context: `client/.devin/rules/client-architecture.md` (after P0.T2). Client TS is 6.x, so the `tsc` parser works. tsconfig paths alias `@/*` → `src/*` (`client/tsconfig.app.json`).
   - Do: Add `dependency-cruiser` as a devDependency and script `"check:architecture": "depcruise src --config .dependency-cruiser.cjs"`. Point the config at `tsconfig.app.json` for alias resolution and set `tsPreCompilationDeps: true`. Every rule is `severity: 'error'`:
@@ -106,6 +106,7 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
   - Done when: `npm run check:architecture` runs, and the PR body has its full violation output. No rule is set to warn or info. `comparisonData.ts` template strings are not reported. A deliberately added `import axios from 'axios'` in a domain file is reported (show this, then revert it). Existing client verify commands pass.
   - Depends on: P0.T3
   - Notes:
+    - 2026-10-25 — Devin: added `client/.dependency-cruiser.cjs`, `dependency-cruiser@18.6.0` (exact pin; 18.7.0 is under the 7-day minimum) and the `check:architecture` script. npm also pruned a stale optional-peer `yaml` lockfile entry. Config: `tsc` parser, `tsConfig: tsconfig.app.json`, `tsPreCompilationDeps: true`, all rules `error` with doc-section comments. A feature is any top-level `src/` folder except app/foundation/shared/components/assets, so `lib/` is checked as a feature. `no-orphans` uses native `orphan` plus `reachable: false` from `src/main.tsx` (native orphan misses files that import others). Barrel rule (e) is 3 rule objects that share one name, because back-references only flow from→to. Baseline: 213 errors (barrel 156, components/shared → `lib` 44, orphans 7, sibling → `lib` 4, ui-vendor in `lib/utils` 2), 0 layer-boundary hits. A temporary domain → axios import was reported. `comparisonData.ts` has 0 resolved deps. `npm test` 65/65, build and lint OK. Suggestion: a dedicated no-`src/lib` rule (doc rule (a)) was not added because it is not in Do.
 
 - [ ] **P1.T2 — Server dependency-cruiser config**
   - Type: setup
