@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T8
+- Next task: P2.T8 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P2.T7 merged)
 
 ## Goal
@@ -244,7 +244,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: Added 4 barrels: `tasks/presentation/{models,screens}`, `dashboard/presentation/screens` and `comparison/presentation/screens`. Each uses named re-exports and exports only what outside importers use; `TaskFormViewState`, `BadgeTone`, `DueDateTone`, `formatEnumLabel` and `toTaskStatus` stay internal. The existing barrels keep their exports and style. I added only `DashboardStatusLabels` to `dashboard/presentation/models`, because the dashboard context and components use it. `HttpTaskRepository` now imports from the `api`, `mappers` and `domain/repositories` barrels and calls `taskToDomain`. Same-barrel duplicates are merged. Imports inside a folder stay relative, and no file imports its own index. `AppRouter` lazy-loads all three screens through their screens barrels. No tests changed and no DTO or mapper file moved. Client `check:architecture` went 82 → 45: barrel 76 → 44, no-orphans 6 → 1 (`app/router/index.ts`, left for P2.T8). All 37 removed hits target `src/{tasks,dashboard,comparison}/`, no hits were added, and none remain targeting these features. Server stays at 130. One commit per feature. Chunks: tasks `TaskListScreen` 5.37 kB → `screens` 0.96 kB; dashboard 7.19 → 7.15 kB; comparison 40.44 → 40.44 kB; `LoadingSpinner` 0.16 kB merged into main; main `index` 673.65 → 677.78 kB (+1.02 kB gzip). Open question: `AppNavbar` now imports `TaskDialog` from the tasks components barrel, so `TaskFilters`, `TaskListContent`, `TaskListHeader` and `taskList/*` moved from the lazy tasks chunk into main. This is bundle-only. Fixing it would need a structural or config change (e.g. its own folder for `TaskDialog`, or `manualChunks`); I left that to the Manager. Unused exports kept in existing barrels: `tasks/domain/useCases` `validateTaskFilters`; `dashboard/presentation/models` `DashboardBadgeTone`, `DashboardDueDateTone`, `DashboardViewState`; `comparison/presentation/models` `ComparisonLayer`, `ComparisonConcept`; `comparison/presentation/components` `CodeBlock`. Client `npm ci`, test 65/65, build and lint pass; server build, 29/29 tests and startup 3/3 pass; `git diff --check` is clean. No files changed outside the list. Left for P2.T8: these features' deep imports of `shared/data/translateError`, `components/ui/SelectOption`, `components/feedback/LoadingSpinner` and `components/app/{StatCard,ChecklistRow}`.
     - 2026-10-25 — Manager: reviewed (3 per-feature commits, no test changes, 82 → 45 with all 37 removed hits in-scope and none added, 5 orphans cleared); squash-merged PR #12. Main-bundle +1 kB gzip (TaskDialog via the components barrel) logged as an Open Question. Trimming the unused existing-barrel exports was added to P2.T8.
 
-- [ ] **P2.T8 — Client barrels: app, foundation, shared, components**
+- [~] **P2.T8 — Client barrels: app, foundation, shared, components**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t8
   - Base: feat/dependency-cruiser
@@ -362,3 +362,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T6 merged (PR #11).
 - 2026-10-25 — Manager: dispatched P2.T7 to Devin.
 - 2026-10-25 — Manager: P2.T7 merged (PR #12). P2.T8 extended: trim unused barrel exports client-wide. Logged main-bundle chunking as an Open Question.
+- 2026-10-25 — Manager: dispatched P2.T8 to Devin.
