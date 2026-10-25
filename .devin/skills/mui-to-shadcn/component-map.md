@@ -33,7 +33,7 @@ DS root = `.devin/skills/mui-to-shadcn/design-system/`. Repo paths are under `cl
 | TaskBadge | components/app/TaskBadge.jsx | client/src/components/ui/UiChip.tsx | tone-based `UiChip` on shadcn Badge; status/priority tones applied in feature mappers |
 | TaskProgress | components/app/TaskProgress.jsx | client/src/components/ui/UiProgress.tsx | segmented status bar; used by dashboard `DashboardProgress` |
 | StatCard | components/app/StatCard.jsx | client/src/components/app/StatCard.tsx | port |
-| TaskRow | components/app/TaskRow.jsx | client/src/components/app/TaskRow.tsx | port |
+| TaskRow | components/app/TaskRow.jsx | client/src/components/app/ChecklistRow.tsx | port |
 | TaskTable | components/app/TaskTable.jsx | client/src/tasks/presentation/components/taskList/TaskTable.tsx | feature-owned (tasks); ViewState-driven, Ui* composition |
 | AppHeader | components/app/AppHeader.jsx | client/src/components/layout/Navbar.tsx (+ `navbar/NavbarToolbar.tsx`, `navbar/NavbarDrawer.tsx`); App wiring in `client/src/app/composition/AppNavbar.tsx` | shared prop-driven shell; App owns state |
 
