@@ -1,4 +1,4 @@
-import { ValidationError } from '../../../shared/domain/errors';
+import { ValidationError } from '../../../shared/domain';
 
 export const TASK_STATUSES = ['TODO', 'IN_PROGRESS', 'COMPLETED'] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];

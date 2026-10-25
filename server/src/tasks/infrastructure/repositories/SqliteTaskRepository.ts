@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import type { NewTask, Task, TaskChanges, TaskFilters } from '../../domain/models';
 import type { TaskRepository } from '../../domain/ports';
-import type { DatabaseConnection } from '../../../foundation/database/connection';
+import type { DatabaseConnection } from '../../../foundation/database';
 import { rowToTask, type TaskRow } from '../persistence';
 
 export class SqliteTaskRepository implements TaskRepository {

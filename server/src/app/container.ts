@@ -8,8 +8,7 @@ import {
   UpdateTaskUseCase,
 } from '../tasks/domain/useCases';
 import { GetCurrentUserUseCase, UpdateProfileUseCase } from '../profile/domain/useCases';
-import { createDatabase, type DatabaseConnection } from '../foundation/database/connection';
-import { seedDatabase } from '../foundation/database/seed';
+import { createDatabase, seedDatabase, type DatabaseConnection } from '../foundation/database';
 import { SqliteTaskRepository } from '../tasks/infrastructure/repositories';
 import { SqliteAccountRepository } from '../security/infrastructure/repositories';
 import { SqliteProfileRepository } from '../profile/infrastructure/repositories';

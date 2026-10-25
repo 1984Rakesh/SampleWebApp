@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import { ValidationError } from '../../shared/domain/errors';
+import { ValidationError } from '../../shared/domain';
 
 export function parseRequest<TSchema extends z.ZodType>(
   schema: TSchema,

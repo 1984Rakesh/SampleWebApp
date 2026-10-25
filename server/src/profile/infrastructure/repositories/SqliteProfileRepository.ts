@@ -1,6 +1,6 @@
 import type { Profile, ProfileChanges } from '../../domain/models';
 import type { ProfileRepository } from '../../domain/ports';
-import type { DatabaseConnection } from '../../../foundation/database/connection';
+import type { DatabaseConnection } from '../../../foundation/database';
 import { PROFILE_COLUMNS, rowToProfile, type ProfileRow } from '../persistence';
 
 export class SqliteProfileRepository implements ProfileRepository {

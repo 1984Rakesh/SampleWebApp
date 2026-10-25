@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
 import Database from 'better-sqlite3';
-import { ConflictError } from '../../../shared/domain/errors';
+import { ConflictError } from '../../../shared/domain';
 import type { AccountCredentials, AccountIdentity, NewAccount, SessionAccount } from '../../domain/models';
 import type { AccountRepository } from '../../domain/ports';
-import type { DatabaseConnection } from '../../../foundation/database/connection';
+import type { DatabaseConnection } from '../../../foundation/database';
 import {
   ACCOUNT_COLUMNS,
   rowToAccount,
