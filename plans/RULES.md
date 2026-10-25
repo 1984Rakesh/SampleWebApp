@@ -60,4 +60,5 @@ git diff --check
 
 ## Ledger rules
 - **Worker (Devin):** in the plan file, edit only your own task: status `[~]`→`[r]` (or `[!]` + a Blockers line), the PR field, and dated Notes. Never set `[x]`, never edit other tasks, structure, Decisions or this file.
+- **Worker session ends at `[r]`/`[!]`:** once the PR is open, CI checked and the ledger pushed, the worker replies once with its report and ends its session as completed. It never waits for review, approval or merge; review findings come back as a new fix-up task (`<ID>a`) in a new session.
 - **Manager (Claude):** sets `[x]` after merge, adds or changes tasks, Decisions, Open Questions and the Change Log; owns this file.

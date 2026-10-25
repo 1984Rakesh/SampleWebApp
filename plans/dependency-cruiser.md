@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T5
+- Next task: P2.T5 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P2.T4 merged)
 
 ## Goal
@@ -202,7 +202,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: Deleted `client/src/components/feedback/Toast.tsx` with `git rm`. It was a 12-line `UiSnackbar` wrapper. Confirmed it was an orphan with `check:architecture` (`no-orphans: src/components/feedback/Toast.tsx`). Grep across `client/src`, `client/tests`, `*.md`, `.devin/skills/` and `client/.devin` found no importers or references, other than this task's Files line, so no doc edits. Client `check:architecture` 163 → 162 (barrel 156 → 156, no-orphans 7 → 6). The violation-list diff is exactly that one line. The 6 remaining orphans are all unused barrels (`tasks/data/mappers`, `dashboard/presentation/{models,components}`, `comparison/presentation/{models,components}`, `app/router`). `npm ci`, `npm test` 65/65, build, lint and `git diff --check` pass. No files changed outside the list. Newly unused, not removed: `UiSnackbar` is now referenced only by its re-export in `components/ui/index.ts`. It is not an orphan, because the barrel is imported.
     - 2026-10-25 — Manager: reviewed (single file deleted, 163 → 162, only the Toast orphan removed, no stray references); squash-merged PR #9. UiSnackbar kept, logged as an Open Question.
 
-- [ ] **P2.T5 — Client barrels: security**
+- [~] **P2.T5 — Client barrels: security**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t5
   - Base: feat/dependency-cruiser
@@ -313,6 +313,7 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Server tests may import client `data/{dtos,mappers}` only, for the contract test (existing deliberate coupling).
 
 - 2026-10-25 — `cn` stays private to components/ui and components/app: not exported from the ui barrel; one narrow allowed edge from components/app (user choice; dependency-cruiser cannot see named imports through barrels).
+- 2026-10-25 — Worker sessions end as completed once their PR is open and the ledger shows `[r]`/`[!]`; they never wait for merge. Fix-ups get new sessions (user choice; applies to all worker tasks; added to RULES.md and the Plan Worker playbook).
 
 ## Open Questions
 - [x] Devin GitHub integration and repository connected (2026-10-25)
@@ -344,3 +345,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T3 merged (PR #8). Logged raw-Tailwind-in-features follow-up as an Open Question.
 - 2026-10-25 — Manager: dispatched P2.T4 to Devin.
 - 2026-10-25 — Manager: P2.T4 merged (PR #9). Logged unused UiSnackbar as an Open Question.
+- 2026-10-25 — Manager: new rule — worker sessions end at `[r]` without waiting for merge (RULES.md, playbook). Dispatched P2.T5 to Devin.
