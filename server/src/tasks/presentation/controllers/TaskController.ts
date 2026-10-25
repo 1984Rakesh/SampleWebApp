@@ -6,8 +6,7 @@ import type {
   ToggleTaskStatusUseCase,
   UpdateTaskUseCase,
 } from '../../domain/useCases';
-import { parseRequest } from '../../../foundation/http/parseRequest';
-import { requireUserId } from '../../../foundation/http/requireUserId';
+import { parseRequest, requireUserId } from '../../../foundation/http';
 import { taskToResponse } from '../mappers';
 import {
   createTaskBodySchema,

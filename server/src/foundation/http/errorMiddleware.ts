@@ -5,7 +5,7 @@ import {
   NotFoundError,
   UnauthorizedError,
   ValidationError,
-} from '../../shared/domain/errors';
+} from '../../shared/domain';
 
 function statusForDomainError(error: DomainError): number {
   if (error instanceof ValidationError) return 400;

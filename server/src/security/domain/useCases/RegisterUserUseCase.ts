@@ -1,5 +1,5 @@
 import { normalizeEmail, validatePassword, type AuthResult, type RegisterUserInput } from '../models';
-import { normalizeUserName } from '../../../shared/domain/normalizeUserName';
+import { normalizeUserName } from '../../../shared/domain';
 import type { PasswordHasher, TokenService, AccountRepository } from '../ports';
 
 export class RegisterUserUseCase {

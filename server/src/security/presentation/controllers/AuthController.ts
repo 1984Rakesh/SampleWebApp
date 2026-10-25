@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import type { LoginUseCase, RefreshAccessTokenUseCase, RegisterUserUseCase } from '../../domain/useCases';
-import { parseRequest } from '../../../foundation/http/parseRequest';
+import { parseRequest } from '../../../foundation/http';
 import { authResultToResponse } from '../mappers';
 import {
   loginBodySchema,

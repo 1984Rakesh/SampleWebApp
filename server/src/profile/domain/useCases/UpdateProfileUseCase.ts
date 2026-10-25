@@ -1,6 +1,4 @@
-import { NotFoundError } from '../../../shared/domain/errors';
-import { normalizeOptionalText } from '../../../shared/domain/normalizeOptionalText';
-import { normalizeUserName } from '../../../shared/domain/normalizeUserName';
+import { NotFoundError, normalizeOptionalText, normalizeUserName } from '../../../shared/domain';
 import type { Profile, ProfileChanges, UpdateProfileInput } from '../models';
 import type { ProfileRepository } from '../ports';
 

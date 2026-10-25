@@ -1,4 +1,4 @@
-import { UnauthorizedError } from '../../../shared/domain/errors';
+import { UnauthorizedError } from '../../../shared/domain';
 import type { TokenService, AccountRepository } from '../ports';
 
 export class RefreshAccessTokenUseCase {

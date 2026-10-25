@@ -1,5 +1,4 @@
-import { NotFoundError } from '../../../shared/domain/errors';
-import { normalizeOptionalText } from '../../../shared/domain/normalizeOptionalText';
+import { NotFoundError, normalizeOptionalText } from '../../../shared/domain';
 import { normalizeTaskTitle, type Task, type TaskChanges } from '../models';
 import type { TaskRepository } from '../ports';
 

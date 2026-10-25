@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
 import type { GetCurrentUserUseCase, UpdateProfileUseCase } from '../../domain/useCases';
-import { parseRequest } from '../../../foundation/http/parseRequest';
-import { requireUserId } from '../../../foundation/http/requireUserId';
+import { parseRequest, requireUserId } from '../../../foundation/http';
 import { profileToResponse } from '../mappers';
 import { updateProfileBodySchema } from '../schemas';
 

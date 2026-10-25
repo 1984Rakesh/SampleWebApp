@@ -1,4 +1,4 @@
-import { NotFoundError } from '../../../shared/domain/errors';
+import { NotFoundError } from '../../../shared/domain';
 import type { Task, TaskStatus } from '../models';
 import type { TaskRepository } from '../ports';
 

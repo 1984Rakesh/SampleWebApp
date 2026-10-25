@@ -5,7 +5,7 @@ import {
   type TaskPriority,
   type TaskStatus,
 } from '../../domain/models';
-import { normalizeSqliteTimestamp } from '../../../foundation/persistence/normalizeSqliteTimestamp';
+import { normalizeSqliteTimestamp } from '../../../foundation/persistence';
 
 export interface TaskRow {
   id: string;

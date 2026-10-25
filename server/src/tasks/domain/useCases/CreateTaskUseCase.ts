@@ -6,7 +6,7 @@ import {
   type TaskPriority,
 } from '../models';
 import type { TaskRepository } from '../ports';
-import { normalizeOptionalText } from '../../../shared/domain/normalizeOptionalText';
+import { normalizeOptionalText } from '../../../shared/domain';
 
 export interface CreateTaskInput {
   userId: string;

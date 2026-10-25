@@ -274,17 +274,18 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: added 31 `index.ts` barrels under `server/src/{security,profile,tasks}/<layer>/<sub>/` and rewrote every cross-folder `src/` import to use them, with one commit per feature (security, profile, tasks). Barrels use named re-exports only and `export type` for types. Each exports only the symbols that `src/` imports from outside its folder. Same-folder imports stay relative. Merged duplicate imports from the same barrel into one statement. No aliases were needed. No files outside scope changed. `server/tests/*` is unchanged because the barrel rule's `from` is `^src/`, so test deep imports aren't flagged. Server check:architecture 130 → 37 (barrel 129 → 36, tests→client 1 → 1). 93 hits removed, all targeting feature folders, and 0 added. The remaining hits target foundation/shared (P2.T10) and client (P2.T11). no-circular is 0. Compiled dist container and feature barrels load with no `undefined` exports. Build ok, test 29/29, test:startup 3/3, client check:architecture 0, `git diff --check` clean. Suggestion: tests still deep-import feature files; consider a later rule/task if tests should use barrels too.
     - 2026-10-25 — Manager: reviewed (29 barrels in per-feature commits; server 130 → 37 with 93 in-scope removals and none added; no require cycles; startup/tests green; client still 0); squash-merged PR #14. Tests stay white-box (Decision).
 
-- [~] **P2.T10 — Server barrels: foundation, shared, app**
+- [r] **P2.T10 — Server barrels: foundation, shared, app**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t10
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/15
   - Files: `server/src/{foundation/*,shared/domain}/index.ts`, `server/src/app/index.ts` if needed, importers, tests (paths only)
   - Context: same as P2.T9. `server.ts` (entry) imports `app/*`.
   - Do: Same as P2.T9, for these folders.
   - Done when: server `npm run check:architecture` reports no barrel violations (only the `tests-to-client-only-dtos-mappers` hit owned by P2.T11 may remain), and the server verify commands pass.
   - Depends on: P2.T9
   - Notes:
+    - 2026-10-25 — Devin: added 4 barrels: `shared/domain` (`ConflictError, DomainError, NotFoundError, UnauthorizedError, ValidationError, normalizeOptionalText, normalizeUserName`), `foundation/http` (`errorMiddleware, parseRequest, requestLogger, requireUserId`), `foundation/database` (`createDatabase, runMigrations, seedDatabase`, type `DatabaseConnection`) and `foundation/persistence` (`normalizeSqliteTimestamp`). Rewrote 28 importers in `src/` and merged duplicate imports from the same barrel. `AuthenticatedIdentity` is not exported (no importer outside the folder); its `declare global` augmentation still applies. No `app/index.ts`: `MODULE_FOLDER` makes only `app/<sub>/` a module folder, and app's files sit directly in `app/`, so depcruise doesn't flag `server.ts → app/*`. Side effects: none of these modules runs anything at import time. Feature repositories import `DatabaseConnection` with `import type`, so their compiled JS doesn't load `foundation/database`. Requiring `dist/shared/domain` or `dist/foundation/http` loads no DB or config. `dist/server.js` require order is unchanged (dotenv → config → container → createApp → database). There are no standalone seed or migration scripts. Tests unchanged (white-box); contract test untouched (P2.T11). No files outside scope changed. Server check:architecture 37 → 1 (barrel 36 → 0, tests→client 1 → 1); 36 removed, 0 added; no-circular 0. Node 24: build ok, test 29/29, test:startup 3/3. Compiled smoke boot (fresh DB, then a reboot on the same DB) logs the same as before. Client check:architecture 0. `git diff --check` clean.
 
 - [ ] **P2.T11 — Contract test stops importing client domain enums**
   - Type: test

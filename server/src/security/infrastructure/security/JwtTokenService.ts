@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { UnauthorizedError } from '../../../shared/domain/errors';
+import { UnauthorizedError } from '../../../shared/domain';
 import type { AuthTokens, TokenPayload } from '../../domain/models';
 import type { TokenService } from '../../domain/ports';
 

@@ -1,4 +1,4 @@
-import { UnauthorizedError } from '../../../shared/domain/errors';
+import { UnauthorizedError } from '../../../shared/domain';
 import { normalizeEmail, type AuthResult, type LoginInput } from '../models';
 import type { PasswordHasher, TokenService, AccountRepository } from '../ports';
 

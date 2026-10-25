@@ -1,4 +1,4 @@
-import { NotFoundError } from '../../../shared/domain/errors';
+import { NotFoundError } from '../../../shared/domain';
 import type { Profile } from '../models';
 import type { ProfileRepository } from '../ports';
 
