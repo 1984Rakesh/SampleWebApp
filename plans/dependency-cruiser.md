@@ -35,11 +35,11 @@ Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server 
     - 2026-10-25 — Devin: added `.github/workflows/ci.yml` (only file changed besides this ledger). The `client` job runs `git diff --check HEAD^1 HEAD` on the PR merge commit, which checks the PR diff against its base. It runs on `pull_request` only, and push runs skip it. The `server` job runs `npm ci` in client then server. npm cache keyed per lockfile through `setup-node` `cache-dependency-path`. Concurrency cancels superseded runs. Actions pinned to `@v5` major tags. Local Node 24.22.1 run: client 65/65 tests, build, lint green. Server build, 29/29 tests, startup 3/3 green. Suggestion: pin actions to SHAs later if desired.
     - 2026-10-25 — Manager: reviewed (CI green, scope ok); squash-merged PR #1.
 
-- [~] **P0.T2 — Update architecture rule docs for dependency-cruiser**
+- [r] **P0.T2 — Update architecture rule docs for dependency-cruiser**
   - Type: setup
   - Branch: task/dependency-cruiser/p0-t2
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/2
   - Files: `AGENTS.md`, `.devin/rules/clean-architecture.md`, `client/AGENTS.md`, `client/.devin/rules/client-architecture.md`, `server/AGENTS.md`, `server/.devin/rules/server-architecture.md`
   - Context: Decisions dated 2026-10-25 below (the whole list).
   - Do:
@@ -56,6 +56,7 @@ Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server 
   - Done when: `grep -rniE "deferred|parser dependency|invent .*check:architecture" AGENTS.md client/AGENTS.md server/AGENTS.md .devin/rules client/.devin server/.devin` returns nothing. Rules (a)–(f) appear in the matching side's rules file. No source code changed. CI is green.
   - Depends on: P0.T1
   - Notes:
+    - 2026-10-25 — Devin: changed only the 6 listed docs. Migration narrative is trimmed to "feature-first layout is in place", with embedded rules kept. "Tooling deferred" lines are replaced by dependency-cruiser enforcement text. Rules: (a)/(b) in client rules §4.8–4.9 and client AGENTS §3. (c) in server rules §6 and server AGENTS §3. (d) in server rules §5.4 and server AGENTS §4. (e)/(f) in shared rules §7, client rules §6 and server rules §5. New shared rules §8 "Enforcement" lists the manual-review items. Verification sections add `npm run check:architecture`. Also: the client AGENTS tree now lists `components/app`. Done-when grep returns nothing; `git diff --check` is clean. Node/npm were unavailable locally, so client/server suites rely on CI (no source changed). Note: the docs reference `check:architecture` before P1 adds it; RULES.md "skip before P1" covers this.
 
 - [ ] **P0.T3 — Archive the old ledger and remove the repo-local manager/worker skills**
   - Type: setup

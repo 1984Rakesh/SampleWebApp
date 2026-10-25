@@ -7,7 +7,7 @@ trigger: always_on
 
 These rules govern the entire repository. Layer-specific rules live alongside each application:
 
-- [`client/.devin/rules/client-architecture.md`](../../client/.devin/rules/client-architecture.md) — React client feature/App/shared UI rules (C2 security/profile/session complete).
+- [`client/.devin/rules/client-architecture.md`](../../client/.devin/rules/client-architecture.md) — React client feature/App/shared UI rules.
 - [`server/.devin/rules/server-architecture.md`](../../server/.devin/rules/server-architecture.md) — Express + SQLite feature, foundation and App rules.
 - [`AGENTS.md`](../../AGENTS.md), [`client/AGENTS.md`](../../client/AGENTS.md), and [`server/AGENTS.md`](../../server/AGENTS.md) — Operational instructions and remediation workflows for coding agents.
 
@@ -25,7 +25,7 @@ Inside a feature: Presentation → Domain ← Data / Infrastructure
 
 - **App Owns Composition**: App binds features, injects dependencies and adapts cross-feature contracts. Foundation exposes reusable technical capabilities and never imports features or App. Features never import App; inject consumer-owned capabilities rather than using an App service locator or importing sibling feature internals.
 - **Feature-First Organization**: Features live directly under `src/` with their own layers as applicable. Server features are security/profile/tasks; client also has dashboard/comparison. Foundation, shared domain and client shared components do not require artificial feature layers. No empty server counterparts for client-only features.
-- **Migration Status (complete, server and client accepted)**: Server security/profile/tasks each own their layers under `server/src/<feature>/`; generic utilities live under `server/src/foundation/`; common errors/name/optional-text normalization live under `server/src/shared/domain/`. Security account and profile contracts, persistence and DTOs are separate despite using the same users table. No server business code remains in top-level layer-first roots. Server audit, disposable-data regression tests, compiled startup/production-config/CORS checks and unchanged-client mapper compatibility pass. Obsolete empty source roots and stale generated output were removed with explicit approval and dist rebuilt. Client migration is complete: all features (security, profile, tasks, dashboard, comparison) own their layers under `client/src/<feature>/`; dashboard and comparison are presentation-only. Separate account/profile models, DTOs and consumer contexts are wired and mapped in App. Foundation network/storage/theme has no feature/App imports; security owns session validation and auth lifecycle policy. App injects cross-feature capabilities (`DashboardCapabilities`, profile task-counts) rather than allowing feature implementation imports; shared/data owns common outer-boundary error translation, never domain policy.
+- **Layout**: The feature-first layout is in place on server and client. Generic server utilities live under `server/src/foundation/`; common errors/name/optional-text normalization live under `server/src/shared/domain/`. Do not recreate top-level layer-first roots. Security account and profile contracts, persistence and DTOs stay separate despite sharing the users table; App maps them. Client dashboard and comparison are presentation-only. Security owns session validation and auth lifecycle policy. App injects cross-feature capabilities (`DashboardCapabilities`, profile task-counts) rather than allowing feature implementation imports; client shared/data owns common outer-boundary error translation, never domain policy.
 
 - **Domain Independence**: The `domain/` layer is framework-agnostic and independently testable. It must never import UI frameworks, HTTP clients, ORMs/database drivers, validation libraries (such as Zod), or concrete adapter implementations.
 - **One-Way Dependencies Within Domain**: Within `domain/`, `useCases/` depend on `repositories/` (or `ports/`) and `models/`. Repository/port contracts must depend only on `domain/models/`—never upward on `domain/useCases/`.
@@ -107,3 +107,19 @@ Both sides depend on this contract; update both sides together whenever it chang
 - **Repository Implementations**: Prefix or suffix with the backing technology (`SqliteTaskRepository.ts`, `ReactQueryTaskRepository.ts`).
 - **Type Ownership**: Define shared types in the narrowest layer that owns their meaning (`domain/models/` for domain value types, `data/dtos/` or `presentation/schemas/` for DTOs, `presentation/models/` for `ViewState`).
 - **Component Decomposition**: When a presentational component grows into multiple distinct render regions, extract each region into its own prop-driven component under the owning feature's presentation components (`client/src/<feature>/presentation/components/`) rather than growing a single file. The entry component stays a thin orchestrator owning shared UI state and prop wiring.
+
+---
+
+## 7. Module Folders, Barrels and Orphans
+
+- **Module Folders**: A module folder is `<feature>/<layer>/<sub>/` (e.g. `tasks/domain/models/`). For `app`, `foundation`, `shared` and `components` it is `<root>/<sub>/` (e.g. `components/ui/`).
+- **Barrel-Only Cross-Folder Imports**: Imports from outside a module folder must go through that folder's `index.ts`. Imports inside the same module folder use relative paths. Barrels export only the folder's public API; internal pieces stay unexported.
+- **No Orphans**: Every source file must be imported by something. The only exceptions are entries (`client/src/main.tsx`, `server/src/server.ts`) and `*.d.ts` files.
+
+---
+
+## 8. Enforcement
+
+- Boundaries are enforced by dependency-cruiser on each side (`client/.dependency-cruiser.cjs`, `server/.dependency-cruiser.cjs`) via `npm run check:architecture`. Every rule is error-level.
+- Never weaken, downgrade or `ignore` a rule to make the check pass. Fix the violation or raise it as a blocker.
+- The tool does not check everything. These remain manual-review items: component-library prop leakage, ViewState versus entity rendering, tri-state patch semantics, boundary error translation, normalize-then-validate and use-case coverage. Passing builds, tests and `check:architecture` do not replace that review.
