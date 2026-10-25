@@ -150,7 +150,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t1
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/6
   - Files: `client/src/lib/utils.ts` → `client/src/components/ui/utils.ts`, the ~48 importers under `client/src/components/{ui,app}/`, `client/components.json`
   - Context: P0.T2 rule (a). Only `components/ui` and `components/app` use `cn`.
   - Do: Move the file and update imports (relative inside `components/ui`, via `components/ui` barrel or allowed path from `components/app`). Set `components.json` `aliases.utils` to `@/components/ui/utils` and remove the `lib` alias.
