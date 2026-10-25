@@ -3,8 +3,8 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T1 (in progress, Devin)
-- Last updated: 2026-10-25 by Manager (P1 complete)
+- Next task: P2.T2
+- Last updated: 2026-10-25 by Manager (P2.T1 merged)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -146,7 +146,7 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
 ## Phase 2 — Fix existing violations
 Exit criteria: `npm run check:architecture` reports 0 violations on both sides, with behaviour and visuals unchanged.
 
-- [r] **P2.T1 — Move the `cn` helper into components/ui**
+- [x] **P2.T1 — Move the `cn` helper into components/ui**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t1
   - Base: feat/dependency-cruiser
@@ -158,6 +158,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Depends on: P1.T2
   - Notes:
     - 2026-10-25 — Devin: `git mv src/lib/utils.ts src/components/ui/utils.ts` (content unchanged). 43 importers updated: 40 in `components/ui/` now import `./utils` (each file's quote style kept); the 3 in `components/app/` (Logo, StatCard, TaskRow) import `cn` from `../ui`, the barrel, which now ends with `export { cn } from './utils';`. `components.json`: `aliases.utils` → `@/components/ui/utils`, `lib` alias removed. No files outside the list. The plan's "~48 importers" was 43 in practice. `src/lib/task-labels.ts` is left for P2.T2. Client `check:architecture` 213 → 167: `ui-vendor-only-in-components-ui-app` 2 → 0, `shared-modules-not-to-features-or-app` 44 → 0; barrel 156, orphans 7 and sibling-feature 4 (all `lib/task-labels`) unchanged. The barrel and orphan hit lists are identical before and after. `npm test` 65/65, build, lint, `git diff --check` all pass. Note: `cn` is now public through `components/ui/index.ts`, so features could import it; P3.T1's planned `no-src-lib` rule does not cover that. The vendor allowlist still keeps clsx/tailwind-merge in components/ui.
+    - 2026-10-25 — Manager: reviewed (213 → 167 as expected, scope ok); squash-merged PR #6. cn-privacy question moved to P3.T1.
 
 - [ ] **P2.T2 — Make task status labels tasks-owned and App-injected**
   - Type: refactor
@@ -287,9 +288,9 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
   - Branch: task/dependency-cruiser/p3-t1
   - Base: feat/dependency-cruiser
   - PR: —
-  - Files: `.github/workflows/ci.yml`, `client/.dependency-cruiser.cjs`, `server/.dependency-cruiser.cjs`
+  - Files: `.github/workflows/ci.yml`, `client/.dependency-cruiser.cjs`, `server/.dependency-cruiser.cjs`, `client/src/components/ui/index.ts`, `client/src/components/app/{Logo,StatCard,ChecklistRow}.tsx`
   - Context: P0.T1 workflow; both sides now report 0 violations.
-  - Do: Add a `npm run check:architecture` step to the client and server jobs. In `client/.dependency-cruiser.cjs`, add an error-level rule `no-src-lib` forbidding any dependency on `^src/lib/` (doc rule (a); suggested in P1.T1). In `server/.dependency-cruiser.cjs`, add the client's `no-non-package-json` and `not-to-dev-dep` rules for `src` (parity; suggested in P1.T2).
+  - Do: Add a `npm run check:architecture` step to the client and server jobs. In `client/.dependency-cruiser.cjs`, add an error-level rule `no-src-lib` forbidding any dependency on `^src/lib/` (doc rule (a); suggested in P1.T1). In `server/.dependency-cruiser.cjs`, add the client's `no-non-package-json` and `not-to-dev-dep` rules for `src` (parity; suggested in P1.T2). Keep `cn` private (Decision 2026-10-25): remove `cn` from `client/src/components/ui/index.ts`, point the 3 `components/app/` importers at `../ui/utils`, allow exactly that edge (`components/app/` → `components/ui/utils.ts`) in the barrel rule, and add rule `cn-only-in-components-ui-app` forbidding any other import of `components/ui/utils.ts`.
   - Done when: CI is green on this PR. In a throwaway commit on the task branch (reverted before review), a domain → axios import makes the client job fail; link that failed run in the PR.
   - Depends on: P2.T11
   - Notes:
@@ -304,6 +305,8 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Archive `plan-mui-shadcn-migration.md` to `plans/history/`; delete repo-local manager/worker skills; Devin follows the Plan Worker playbook (user choice).
 - 2026-10-25 — Enforce barrel-only cross-module-folder imports and no-orphans (user choice; the barrel rule touches ~340 imports, so it is split by feature).
 - 2026-10-25 — Server tests may import client `data/{dtos,mappers}` only, for the contract test (existing deliberate coupling).
+
+- 2026-10-25 — `cn` stays private to components/ui and components/app: not exported from the ui barrel; one narrow allowed edge from components/app (user choice; dependency-cruiser cannot see named imports through barrels).
 
 ## Open Questions
 - [x] Devin GitHub integration and repository connected (2026-10-25)
@@ -324,3 +327,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: dispatched P1.T2 to Devin.
 - 2026-10-25 — Manager: P1.T2 merged (PR #5); Phase 1 complete. Added P2.T11 (contract test enum import); P3.T1 now depends on P2.T11, also adds server parity rules, Files updated.
 - 2026-10-25 — Manager: dispatched P2.T1 to Devin.
+- 2026-10-25 — Manager: P2.T1 merged (PR #6). P3.T1 extended: keep cn private.
