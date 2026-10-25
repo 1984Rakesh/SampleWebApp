@@ -1,5 +1,5 @@
 import type { DashboardTaskItem } from '../models/DashboardViewState';
-import { TaskRow } from '../../../components/app/TaskRow';
+import { ChecklistRow } from '../../../components/app/ChecklistRow';
 import { UiButton, UiCard, UiCardHeader, UiIcon, UiText } from '../../../components/ui';
 
 interface DashboardRecentTasksProps { tasks: DashboardTaskItem[]; onToggle: (id: string) => void }
@@ -15,18 +15,18 @@ export default function DashboardRecentTasks({ tasks, onToggle }: DashboardRecen
       {tasks.length === 0 ? (
         <div className="px-6 pb-6"><UiText variant="body2" tone="muted">No tasks yet. Create your first task.</UiText></div>
       ) : tasks.map((task, index) => (
-        <TaskRow
+        <ChecklistRow
           key={task.id}
           title={task.title}
           description={task.description}
-          isCompleted={task.isCompleted}
+          checked={task.isCompleted}
           toggleAriaLabel={task.toggleAriaLabel}
-          statusLabel={task.statusLabel}
-          statusTone={task.statusTone}
-          priorityLabel={task.priorityLabel}
-          priorityTone={task.priorityTone}
-          dueDateLabel={task.dueDateLabel}
-          dueDateTone={task.dueDateTone}
+          chips={[
+            { label: task.statusLabel, tone: task.statusTone },
+            { label: `• ${task.priorityLabel}`, tone: task.priorityTone },
+          ]}
+          meta={task.dueDateLabel}
+          metaTone={task.dueDateTone === 'amber' ? 'warning' : 'muted'}
           divider={index > 0}
           onToggle={() => onToggle(task.id)}
         />
