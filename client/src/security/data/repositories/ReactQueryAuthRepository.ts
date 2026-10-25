@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import type { AuthRepository } from '../../domain/repositories/AuthRepository';
+import type { AuthRepository } from '../../domain/repositories';
 
 export function useAuthRepository(source: AuthRepository) {
   const login = useMutation({ mutationFn: source.login });

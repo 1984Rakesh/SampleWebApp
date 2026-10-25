@@ -1,5 +1,5 @@
-import type { AuthSession, LoginInput } from '../models/AuthSession';
-import type { AuthRepository } from '../repositories/AuthRepository';
+import type { AuthSession, LoginInput } from '../models';
+import type { AuthRepository } from '../repositories';
 import { normalizeEmail } from '../../../shared/domain/validation';
 import { ValidationError } from '../../../shared/domain/errors';
 

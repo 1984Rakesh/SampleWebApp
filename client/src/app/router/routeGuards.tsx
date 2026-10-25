@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { UiPage, UiText } from '../../components/ui';
-import { useAuth } from '../../security/presentation/context/AuthSessionContext';
+import { useAuth } from '../../security/presentation/context';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();

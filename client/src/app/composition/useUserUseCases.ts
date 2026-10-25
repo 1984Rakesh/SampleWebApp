@@ -4,7 +4,7 @@ import { createProfileRepository } from '../../profile/data/repositories/HttpPro
 import { useProfileRepository } from '../../profile/data/repositories/ReactQueryProfileRepository';
 import { updateProfileUseCase } from '../../profile/domain/useCases/UpdateProfileUseCase';
 import type { UpdateProfileInput } from '../../profile/domain/models/Profile';
-import { useAuth } from '../../security/presentation/context/AuthSessionContext';
+import { useAuth } from '../../security/presentation/context';
 import { TASK_STATUS_LABELS, toTaskCounts } from '../../tasks/presentation/models/taskPresentation';
 import { sessions } from './securityRuntime';
 import { bindProfileSession } from './profileSession';

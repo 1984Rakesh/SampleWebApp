@@ -202,17 +202,18 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: Deleted `client/src/components/feedback/Toast.tsx` with `git rm`. It was a 12-line `UiSnackbar` wrapper. Confirmed it was an orphan with `check:architecture` (`no-orphans: src/components/feedback/Toast.tsx`). Grep across `client/src`, `client/tests`, `*.md`, `.devin/skills/` and `client/.devin` found no importers or references, other than this task's Files line, so no doc edits. Client `check:architecture` 163 → 162 (barrel 156 → 156, no-orphans 7 → 6). The violation-list diff is exactly that one line. The 6 remaining orphans are all unused barrels (`tasks/data/mappers`, `dashboard/presentation/{models,components}`, `comparison/presentation/{models,components}`, `app/router`). `npm ci`, `npm test` 65/65, build, lint and `git diff --check` pass. No files changed outside the list. Newly unused, not removed: `UiSnackbar` is now referenced only by its re-export in `components/ui/index.ts`. It is not an orphan, because the barrel is imported.
     - 2026-10-25 — Manager: reviewed (single file deleted, 163 → 162, only the Toast orphan removed, no stray references); squash-merged PR #9. UiSnackbar kept, logged as an Open Question.
 
-- [~] **P2.T5 — Client barrels: security**
+- [r] **P2.T5 — Client barrels: security**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t5
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/10
   - Files: `client/src/security/**/index.ts` (new), importers of security modules in `client/src/{security,app}/`, `client/tests/*`, `server/tests/client-contract.test.ts` (paths only, if needed)
   - Context: P0.T2 rule (e). Follow the existing barrels in `client/src/tasks/{domain,data}/*/index.ts`.
   - Do: Add `index.ts` to each security module folder that is imported from outside itself, exporting only its public API. Rewrite cross-folder imports to use the barrels.
   - Done when: `npm run check:architecture` reports no barrel violations whose target is under `src/security/`. Server tests still pass. The client verify commands pass.
   - Depends on: P2.T4
   - Notes:
+    - 2026-10-25 — Devin: Added 8 barrels: `security/domain/{models,repositories,useCases}`, `security/data/{dtos,mappers,api,repositories}` and `security/presentation/screens`. Extended the existing `presentation/context` barrel with `AuthSessionContext` and `AuthUseCasesContext`. Each barrel uses named re-exports and exports only what outside importers use. `AccountDTO` and `accountSchema` stay internal. The mappers barrel exports `toDomain as authToDomain`, matching the tasks barrel, and its 2 importers now call `authToDomain`. Rewrote every cross-folder security import in `security/*` and `app/*`, and merged same-barrel duplicates. Imports inside a folder stay relative, and no file imports its own index. `AppRouter` now lazy-loads the screens through the barrel with `import('…/screens').then((m) => ({ default: m.LoginScreen }))`. As a result, Login and Register now ship as one 3.32 kB `screens` chunk instead of `LoginScreen` 1.31 kB + `RegisterScreen` 1.40 kB + `hooks` 0.87 kB. This is a bundle-only change; behaviour is unchanged. No tests changed; `client/tests` and the server contract test load files by path. Client `check:architecture` went 162 → 115: barrel 156 → 109, no-orphans 6 → 6. All 47 removed hits target `src/security/`, no hits were added, 0 security targets remain, and no new barrel is an orphan. Server `check:architecture` stays at 130. Client `npm ci`/test 65/65/build/lint pass; server build, 29/29 tests and startup 3/3 pass; `git diff --check` is clean. Left for P2.T8: the security files' deep imports of `components/app/Logo`, `shared/*` and `foundation/session/storage`.
 
 - [ ] **P2.T6 — Client barrels: profile**
   - Type: refactor

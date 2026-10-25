@@ -1,5 +1,4 @@
-import type { AuthSession } from '../models/AuthSession';
-import type { Account } from '../models/Account';
+import type { Account, AuthSession } from '../models';
 
 export interface SessionRepository {
   getSession(): AuthSession | null;
