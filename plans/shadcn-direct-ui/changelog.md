@@ -3,3 +3,4 @@
 - 2026-10-25 — P1.T1 merged as PR #19 (84e5e84); radius scale now DS (md 12px, lg 16px, xl 20px).
 - 2026-10-25 — P1.T2 dispatched to Devin.
 - 2026-10-25 — P1.T2 merged as PR #20 (5d14cf4); shadcn CLI 4.22.0. Relative-import and "use client" clean-up added to P1.T3 notes.
+- 2026-10-25 — Added P1.T2a (shadcn CLI alias, quiet `verify` script; P1.T3 now depends on it) and P2.T4 (trim AGENTS.md files); RULES.md verify/push rules and conventions.md shadcn CLI section added after Devin session review.

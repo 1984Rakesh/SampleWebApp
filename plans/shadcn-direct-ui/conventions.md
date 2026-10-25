@@ -23,6 +23,12 @@ Follows plans/RULES.md. Rules below apply to every task in this plan.
 - Task-specific UI (task table, task badges mapping, task dialog) stays in `tasks/presentation/components`; dashboard uses its own display contracts plus generic `components/app` pieces (StatCard, ChecklistRow). No new cross-feature imports.
 - A new file must be imported in the same task (no-orphans rule).
 
+## shadcn CLI
+- Run `npx shadcn@4.22.0` (pinned) from `client/`.
+- If the CLI adds `next-themes`, revert it (package.json and lockfile); sonner uses `useColorMode` from `@/foundation/theme`.
+- Revert any CLI edits to `src/index.css` and `components.json`; the theme tokens are owned by P1.T1.
+- Imports between files in `components/ui` stay relative (`./utils`, `./button`); remove any `"use client"` directive (`rsc: false`).
+
 ## Ui* → shadcn mapping (Phase 3)
 - `UiFlex`, `UiStack`, `UiGrid`/`UiGridItem`, `UiPage`, `UiScreen`, `UiContainer`, `UiAsideGrid`, `UiResponsive` → `div`/`section`/`main` + Tailwind flex/grid classes.
 - `UiText` → `h1`–`h3`/`p`/`span` + DS type classes. `UiCode` → `pre`/`code` + Tailwind.

@@ -1,7 +1,7 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
 - Current phase: P1 — DS tokens and primitives
-- Next task: P1.T3
+- Next task: P1.T2a
 - Last updated: 2026-10-25
 
 ## Goal
@@ -13,13 +13,15 @@ Legend: `[ ]` todo · `[~]` in progress · `[r]` in review · `[x]` merged · `[
 Exit criteria: theme CSS carries the DS tokens; regenerated shadcn primitives with DS variants exported from `components/ui`; existing screens (still on wrappers) render; client checks green.
 - [x] P1.T1 — Adopt DS theme tokens · ui · PR #19 · deps —
 - [x] P1.T2 — Regenerate shadcn primitives · ui · PR #20 · deps P1.T1
-- [ ] P1.T3 — DS variants on primitives · ui · PR — · deps P1.T2
+- [ ] P1.T2a — shadcn CLI alias and quiet verify script · setup · PR — · deps P1.T2
+- [ ] P1.T3 — DS variants on primitives · ui · PR — · deps P1.T2a
 
 ## Phase 2 — Rules and shared components
 Exit criteria: dependency-cruiser and docs allow direct shadcn in feature presentation/App; `components/app` and navbar/feedback use primitives only.
 - [ ] P2.T1 — Allow direct shadcn imports (rules + docs) · setup · PR — · deps P1.T3
 - [ ] P2.T2 — Rebuild components/app on primitives · ui · PR — · deps P2.T1
 - [ ] P2.T3 — AppHeader, navbar and feedback · ui · PR — · deps P2.T2
+- [ ] P2.T4 — Trim AGENTS.md files to pointers · setup · PR — · deps P2.T1
 
 ## Phase 3 — Screens use shadcn directly
 Exit criteria: `grep -rE "\bUi[A-Z]" client/src --include='*.ts*' | grep -v '^client/src/components/ui/'` is empty; client checks green.

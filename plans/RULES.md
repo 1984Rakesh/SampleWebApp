@@ -39,8 +39,8 @@ Inside feature:  Presentation → Domain ← Data (client) / Infrastructure (ser
 ## Verify commands
 Run for every side you modify, and paste the results into the PR:
 ```bash
-# Client
-cd client && npm ci && npm test && npm run build && npm run lint && npm run check:architecture
+# Client (npm ci once per session; after later edits rerun only npm run verify)
+cd client && npm ci && npm run verify
 
 # Server
 cd server && npm ci && npm run build && npm test && npm run test:startup && npm run check:architecture
@@ -48,7 +48,7 @@ cd server && npm ci && npm run build && npm test && npm run test:startup && npm 
 # Repository
 git diff --check
 ```
-`check:architecture` exists only once plan `dependency-cruiser` P1 has merged; skip it before then. If a client DTO/mapper moves, also run the server suite, because `server/tests/client-contract.test.ts` imports client code.
+Before P1.T2a merges, `npm run verify` does not exist; use `npm test && npm run build && npm run lint && npm run check:architecture`. `check:architecture` exists only once plan `dependency-cruiser` P1 has merged; skip it before then. If a client DTO/mapper moves, also run the server suite, because `server/tests/client-contract.test.ts` imports client code.
 
 ## Task types
 - **setup**: tooling, CI, config, docs. No behaviour or visual change to the app.
@@ -60,5 +60,6 @@ git diff --check
 
 ## Ledger rules
 - **Worker (Devin):** in the plan file, edit only your own task: status `[~]`→`[r]` (or `[!]` + a Blockers line), the PR field, and dated Notes. Never set `[x]`, never edit other tasks, structure, Decisions or this file.
+- **One push:** commit the code and the task-file (ledger) update, then push them together in a single `git push`, so CI runs once.
 - **Worker session ends at `[r]`/`[!]`:** once the PR is open, CI checked and the ledger pushed, the worker replies once with its report and ends its session as completed. It never waits for review, approval or merge; review findings come back as a new fix-up task (`<ID>a`) in a new session.
 - **Manager (Claude):** sets `[x]` after merge, adds or changes tasks, Decisions, Open Questions and the Change Log; owns this file.
