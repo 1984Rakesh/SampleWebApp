@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T1
+- Next task: P2.T1 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P1 complete)
 
 ## Goal
@@ -146,7 +146,7 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
 ## Phase 2 — Fix existing violations
 Exit criteria: `npm run check:architecture` reports 0 violations on both sides, with behaviour and visuals unchanged.
 
-- [ ] **P2.T1 — Move the `cn` helper into components/ui**
+- [~] **P2.T1 — Move the `cn` helper into components/ui**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t1
   - Base: feat/dependency-cruiser
@@ -322,3 +322,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P1.T1 merged (PR #4). Revised P3.T1 Do: add explicit `no-src-lib` client rule.
 - 2026-10-25 — Manager: dispatched P1.T2 to Devin.
 - 2026-10-25 — Manager: P1.T2 merged (PR #5); Phase 1 complete. Added P2.T11 (contract test enum import); P3.T1 now depends on P2.T11, also adds server parity rules, Files updated.
+- 2026-10-25 — Manager: dispatched P2.T1 to Devin.
