@@ -21,7 +21,7 @@ Exit criteria: dependency-cruiser and docs allow direct shadcn in feature presen
 - [ ] P2.T1 — Allow direct shadcn imports (rules + docs) · setup · PR — · deps P1.T3
 - [ ] P2.T2 — Rebuild components/app on primitives · ui · PR — · deps P2.T1
 - [ ] P2.T3 — AppHeader, navbar and feedback · ui · PR — · deps P2.T2
-- [ ] P2.T4 — Trim AGENTS.md files to pointers · setup · PR — · deps P2.T1
+- [-] P2.T4 — Trim AGENTS.md files to pointers · setup · dropped (done by Manager 2026-10-25)
 
 ## Phase 3 — Screens use shadcn directly
 Exit criteria: `grep -rE "\bUi[A-Z]" client/src --include='*.ts*' | grep -v '^client/src/components/ui/'` is empty; client checks green.

@@ -5,3 +5,4 @@
 - 2026-10-25 — Tests for wrappers are replaced before wrappers are deleted (P4.T1 before P4.T2) so every PR stays green
 - 2026-10-25 — plans/RULES.md architecture bullet about vendored UI is updated by the Manager after P2.T1 merges
 - 2026-10-25 — Cut Devin waste: root `client/tsconfig.json` gets `@/*` paths so the shadcn CLI resolves the alias; client verify runs via a quiet `npm run verify`; code and ledger commits are pushed together; AGENTS.md trimming waits until after P2.T1 → P1.T2a, P2.T4, RULES.md
+- 2026-10-25 — Rule files stay `always_on` but are generic and compact; AGENTS.md files hold only pointers, workflow, verify and test safety; section numbers are frozen because dependency-cruiser comments cite them (supersedes "trim after P2.T1") → P2.T4 dropped
