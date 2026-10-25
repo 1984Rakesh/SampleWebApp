@@ -2,9 +2,9 @@
 
 ## Status
 - Feature branch: feat/dependency-cruiser
-- Current phase: P2 — Fix existing violations
-- Next task: P3.T1 (in progress, Devin)
-- Last updated: 2026-10-25 by Manager (P2.T11 merged)
+- Current phase: Done — all phases complete
+- Next task: — (feature PR feat/dependency-cruiser → main, for the user to merge)
+- Last updated: 2026-10-25 by Manager (P3.T1 merged; plan complete)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -305,7 +305,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
 ## Phase 3 — Enforce in CI
 Exit criteria: CI fails any PR with an architecture violation, and the docs list the check as a required verify step.
 
-- [r] **P3.T1 — Gate CI on check:architecture**
+- [x] **P3.T1 — Gate CI on check:architecture**
   - Type: setup
   - Branch: task/dependency-cruiser/p3-t1
   - Base: feat/dependency-cruiser
@@ -317,6 +317,7 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
   - Depends on: P2.T11
   - Notes:
     - 2026-10-25 — Devin: CI runs `npm run check:architecture` right after `npm ci` in the client job, and after the server `npm ci` in the server job (the client `npm ci` still runs first). Client config 21 → 24 rules: `no-src-lib`, `cn-only-in-components-ui-app` (from pathNot `^src/components/(?:ui|app)/` to `^src/components/ui/utils\.ts$`), and a components/app variant of `barrel-only-cross-module-imports`. The `$1/$2` variant now excludes `^src/components/app/`, and the new variant also allows `CN_HELPER` and `SHADCN_PRIMITIVE`. Removed `cn` and `Card*` from the ui barrel. Logo/StatCard/ChecklistRow import `../ui/utils`, and StatCard imports `../ui/card`. No other importers in src/tests. Following the Manager note, I did not add `shadcn-raw-only-in-components-ui-app`, because `ui-vendor-only-in-components-ui-app` already covers `SHADCN_PRIMITIVE`. This differs from the Do text. Server config 21 → 23 rules: `no-non-package-json` and `not-to-dev-dep`, scoped to `^src/`, with 0 hits. Local throwaway checks (reverted): app→ui/card and feature→ui/card fail (ui-vendor + barrel). feature/components/feedback→ui/utils fails (cn rule + barrel). src/lib fails (no-src-lib). Dropping the exemption fails the 4 components/app edges. Server src→tsx fails not-to-dev-dep, and src→debug fails no-non-package-json. Failing CI proof: throwaway commit 93cbc5d (domain Task.ts → axios), reverted by a new commit. Client job failed at check:architecture with `domain-only-own-domain-and-shared-domain`: https://github.com/1984Rakesh/SampleWebApp/actions/runs/40180100922/job/121129151324. Node 24: client test 65/65, build, lint, check:architecture 0 (237 modules). Server build, test 29/29, test:startup 3/3, check:architecture 0 (121 modules). `git diff --check` clean.
+    - 2026-10-25 — Manager: reviewed and squash-merged PR #17. Both CI jobs run check:architecture; the throwaway domain → axios commit failed the client job (run 40180100922) and was reverted. cn and raw shadcn primitives are out of the ui barrel; only components/app may import them directly. Phase 3 exit criteria met (the verify docs already list the check since P0.T2).
 
 ## Decisions
 - 2026-10-25 — Add dependency-cruiser per side (client uses its TS 6 parser; server needs a non-TS-7 parser) (user choice; TS 7 lacks a JS compiler API).
@@ -334,6 +335,7 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Lazy routes import screens through the feature's screens barrel, which gives one lazy chunk per feature; no depcruise exception for dynamic `import()` (user choice; keeps rule (e) strict, and the size difference is negligible).
 - 2026-10-25 — Raw shadcn primitives (lowercase files in `components/ui/`, which take `className`) stay private like `cn`: not in the ui barrel, imported directly only by `components/ui` and `components/app` (user choice; done in P3.T1).
 - 2026-10-25 — Tests (`client/tests`, `server/tests`) are white-box and may deep-import the source files they test; the barrel rule covers `src/` only. Don't extend it to tests (user choice).
+- 2026-10-25 — No separate `shadcn-raw-only-in-components-ui-app` rule: the existing `ui-vendor-only-in-components-ui-app` already forbids `SHADCN_PRIMITIVE` outside components/ui and components/app, and the barrel re-export was the only bypass (manager call in P3.T1; avoids a duplicate rule).
 
 ## Open Questions
 - [x] Devin GitHub integration and repository connected (2026-10-25)
@@ -381,3 +383,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: dispatched P2.T10 to Devin.
 - 2026-10-25 — Manager: P2.T10 merged (PR #15). Dispatched P2.T11 to Devin.
 - 2026-10-25 — Manager: P2.T11 merged (PR #16); both sides at 0 violations. Dispatched P3.T1 to Devin.
+- 2026-10-25 — Manager: P3.T1 merged (PR #17). All tasks [x]; opening feat/dependency-cruiser → main.
