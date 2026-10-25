@@ -1,6 +1,6 @@
 import { useAuth } from '../../security/presentation/context';
 import { nextTaskStatus } from '../../tasks/domain/useCases';
-import { TASK_STATUS_LABELS, toTaskCounts, toTaskItemViewState } from '../../tasks/presentation/models/taskPresentation';
+import { TASK_STATUS_LABELS, toTaskCounts, toTaskItemViewState } from '../../tasks/presentation/models';
 import type { DashboardCapabilities } from '../../dashboard/presentation/context/DashboardCapabilitiesContext';
 import { useTaskUseCases } from './useTaskUseCases';
 import { useUserUseCases } from './useUserUseCases';

@@ -9,7 +9,7 @@ import {
   toTaskFormData,
   toTaskItemViewState,
   toTaskCounts,
-} from '../models/taskPresentation';
+} from '../models';
 
 const toErrorMessage = (error: unknown, fallback: string) => error instanceof Error ? error.message : fallback;
 

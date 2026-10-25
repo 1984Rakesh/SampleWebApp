@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { AuthUseCasesContext } from '../../security/presentation/context';
 import { ProfileUseCasesContext } from '../../profile/presentation/context';
-import { TaskUseCasesContext } from '../../tasks/presentation/context/TaskUseCasesContext';
+import { TaskUseCasesContext } from '../../tasks/presentation/context';
 import { DashboardCapabilitiesContext } from '../../dashboard/presentation/context/DashboardCapabilitiesContext';
 import { useAuthUseCases, useDashboardCapabilities, useTaskUseCases, useUserUseCases } from '../composition';
 

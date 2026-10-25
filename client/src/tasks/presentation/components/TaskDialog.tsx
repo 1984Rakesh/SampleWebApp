@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 import { useTaskFormViewModel } from '../hooks';
-import type { TaskFormData } from '../models/TaskFormViewState';
+import type { TaskFormData } from '../models';
 import { UiAlert, UiButton, UiDialog, UiFormFooter, UiGrid, UiGridItem, UiStack, UiText, UiTextField, UiToggleGroup } from '../../../components/ui';
 
 interface TaskDialogProps {

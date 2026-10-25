@@ -1,7 +1,7 @@
 // @ds TaskTable v2026-10-20
 import { UiCheckbox, UiChip, UiFlex, UiTable, UiTableBody, UiTableCell, UiTableContainer, UiTableFooter, UiTableHead, UiTableRow, UiText } from '../../../../components/ui';
 import TaskItemActions from './TaskItemActions';
-import type { TaskItemViewState } from '../../models/TaskListViewState';
+import type { TaskItemViewState } from '../../models';
 
 interface TaskTableProps { tasks: TaskItemViewState[]; footer?: React.ReactNode; onEdit: (id: string) => void; onDelete: (id: string) => void; onToggleStatus: (id: string) => void }
 
