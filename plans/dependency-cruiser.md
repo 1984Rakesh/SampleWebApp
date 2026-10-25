@@ -3,8 +3,8 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P1 — Add dependency-cruiser (report only)
-- Next task: P1.T1 (in progress, Devin)
-- Last updated: 2026-10-25 by Manager (P0 complete)
+- Next task: P1.T2
+- Last updated: 2026-10-25 by Manager (P1.T1 merged)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -76,7 +76,7 @@ Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server 
 ## Phase 1 — Add dependency-cruiser (report only)
 Exit criteria: `npm run check:architecture` runs on both sides with the full rule set at error severity and produces the baseline violation report. It is not yet in CI.
 
-- [r] **P1.T1 — Client dependency-cruiser config**
+- [x] **P1.T1 — Client dependency-cruiser config**
   - Type: setup
   - Branch: task/dependency-cruiser/p1-t1
   - Base: feat/dependency-cruiser
@@ -107,6 +107,7 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
   - Depends on: P0.T3
   - Notes:
     - 2026-10-25 — Devin: added `client/.dependency-cruiser.cjs`, `dependency-cruiser@18.6.0` (exact pin; 18.7.0 is under the 7-day minimum) and the `check:architecture` script. npm also pruned a stale optional-peer `yaml` lockfile entry. Config: `tsc` parser, `tsConfig: tsconfig.app.json`, `tsPreCompilationDeps: true`, all rules `error` with doc-section comments. A feature is any top-level `src/` folder except app/foundation/shared/components/assets, so `lib/` is checked as a feature. `no-orphans` uses native `orphan` plus `reachable: false` from `src/main.tsx` (native orphan misses files that import others). Barrel rule (e) is 3 rule objects that share one name, because back-references only flow from→to. Baseline: 213 errors (barrel 156, components/shared → `lib` 44, orphans 7, sibling → `lib` 4, ui-vendor in `lib/utils` 2), 0 layer-boundary hits. A temporary domain → axios import was reported. `comparisonData.ts` has 0 resolved deps. `npm test` 65/65, build and lint OK. Suggestion: a dedicated no-`src/lib` rule (doc rule (a)) was not added because it is not in Do.
+    - 2026-10-25 — Manager: reviewed config + baseline (213: barrel 156, lib-related 50, orphans 7; 0 layer-boundary); squash-merged PR #4. Baseline counts are the Done-when reference for Phase 2.
 
 - [ ] **P1.T2 — Server dependency-cruiser config**
   - Type: setup
@@ -273,7 +274,7 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
   - PR: —
   - Files: `.github/workflows/ci.yml`
   - Context: P0.T1 workflow; both sides now report 0 violations.
-  - Do: Add a `npm run check:architecture` step to the client and server jobs.
+  - Do: Add a `npm run check:architecture` step to the client and server jobs. In `client/.dependency-cruiser.cjs`, add an error-level rule `no-src-lib` forbidding any dependency on `^src/lib/` (doc rule (a); suggested in P1.T1).
   - Done when: CI is green on this PR. In a throwaway commit on the task branch (reverted before review), a domain → axios import makes the client job fail; link that failed run in the PR.
   - Depends on: P2.T10
   - Notes:
@@ -304,3 +305,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: dispatched P0.T3 to Devin.
 - 2026-10-25 — Manager: P0.T3 merged (PR #3); Phase 0 complete.
 - 2026-10-25 — Manager: dispatched P1.T1 to Devin.
+- 2026-10-25 — Manager: P1.T1 merged (PR #4). Revised P3.T1 Do: add explicit `no-src-lib` client rule.
