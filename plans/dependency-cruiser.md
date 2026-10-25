@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P0 — CI and rule docs
-- Next task: P0.T1
+- Next task: P0.T1 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager
 
 ## Goal
@@ -21,7 +21,7 @@ Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `c
 ## Phase 0 — CI and rule docs
 Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server verify commands in GitHub Actions. Rule docs state the agreed rules, no longer defer tooling, and the old ledger/skills are archived.
 
-- [ ] **P0.T1 — Add GitHub Actions CI**
+- [~] **P0.T1 — Add GitHub Actions CI**
   - Type: setup
   - Branch: task/dependency-cruiser/p0-t1
   - Base: feat/dependency-cruiser
@@ -283,10 +283,11 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Server tests may import client `data/{dtos,mappers}` only, for the contract test (existing deliberate coupling).
 
 ## Open Questions
-- [ ] Devin has no GitHub integration or repository yet; connect GitHub and add `1984Rakesh/SampleWebApp` before P0.T1 can be dispatched (owner: user)
+- [x] Devin GitHub integration and repository connected (2026-10-25)
 
 ## Blockers
 - —
 
 ## Change Log
 - 2026-10-25 — Manager: created plan after rules audit (import-graph audit: 0 layer violations; lib/, TaskRow, orphans and barrels need work).
+- 2026-10-25 — Manager: dispatched P0.T1 to Devin.
