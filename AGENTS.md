@@ -9,7 +9,7 @@ Before changing a side, read its instructions and rules:
 - Server: [server/AGENTS.md](./server/AGENTS.md) and [server architecture](./server/.devin/rules/server-architecture.md).
 - Client: [client/AGENTS.md](./client/AGENTS.md) and [client architecture](./client/.devin/rules/client-architecture.md).
 
-## 2. Target Architecture and Migration Status
+## 2. Target Architecture
 
 ```text
 Building blocks: Foundation → Features → App
@@ -21,7 +21,9 @@ App binds features and performs DI, provider/route/shell registration and cross-
 
 Target server modules: `app/`, `foundation/`, `security/`, `profile/`, `tasks/`, `shared/`, with thin `server.ts`. Target client modules add `dashboard/`, `comparison/`, shared `components/`, thin `App.tsx` and `main.tsx`. Within each feature use domain/infrastructure/presentation on server and domain/data/presentation on client as applicable; no empty layers for symmetry.
 
-**Migration complete (server and client accepted).** All client features — security, profile, tasks, dashboard, comparison — own their layers under `client/src/<feature>/`; no legacy layer-first roots remain. App maps account/profile/session/cache representations and injects display-only cross-feature capabilities (`DashboardCapabilities`, profile task-counts). Foundation exposes generic transport/storage/theme only, with no feature/App imports. Token refresh/signout/expiry are security-owned and wired through App; profile read/update ordering and authentication generations protect newer sessions/results. Public API/browser routes and stored user/token formats remain compatible.
+The feature-first layout is in place on both sides. App maps account/profile/session/cache representations and injects display-only cross-feature capabilities (`DashboardCapabilities`, profile task-counts). Foundation exposes generic transport/storage/theme only, with no feature/App imports. Token refresh/signout/expiry are security-owned and wired through App; profile read/update ordering and authentication generations protect newer sessions/results. Public API/browser routes and stored user/token formats remain compatible.
+
+Imports from outside a module folder go through its `index.ts` barrel, and there are no orphan source files (see [shared rules §7](./.devin/rules/clean-architecture.md)). Boundaries are enforced by dependency-cruiser (shared rules §8).
 
 ## 3. Implementation Workflow
 
@@ -29,7 +31,7 @@ Target server modules: `app/`, `foundation/`, `security/`, `profile/`, `tasks/`,
 2. Implement owned data/infrastructure adapters with explicit persistence/DTO/domain mappings and boundary error translation. Reuse generic foundation mechanisms, not sibling feature internals.
 3. Update presentation: server structural schemas/controllers/routes/response mapping; client presentation mappers/ViewState, ViewModels and prop-driven screens/components. Never leak DTOs, raw driver/HTTP errors or domain entities into UI.
 4. Bind concrete implementations and cross-feature contracts at the App edge: server `src/app/container.ts`; client `src/app/composition/` and `src/app/providers/`. ViewModels consume contracts owned in their presentation layer, never App modules. All feature consumer contexts are feature-owned (`<feature>/presentation/context/`).
-5. Update affected instructions/rules/links/diagrams alongside the actual migration. Shared docs distinguish target versus legacy paths; client instructions change only during client phases.
+5. Update affected instructions/rules/links/diagrams alongside structural changes.
 
 ## 4. Self-Audit
 
@@ -45,6 +47,7 @@ Target server modules: `app/`, `foundation/`, `security/`, `profile/`, `tasks/`,
 - Vendored shadcn/ui primitives, radix-ui, lucide-react and Tailwind composition stay inside `client/src/components/ui/` and `client/src/components/app/`. No component-library prop types or class passthroughs leak into consumers. Shared UI contracts such as SelectOption belong to components/ui; shared components must not import business domain/data/App or feature components.
 - Split multi-region render bodies into feature-owned controlled subcomponents. Shared components stay feature-independent; App wires dashboard/navbar capabilities and tasks-owned dialogs.
 - Preserve APIs, browser routes, database schema/data, stored-session compatibility and UI behavior during reorganization.
+- Cross-module-folder imports use the folder's `index.ts` barrel; same-folder imports are relative; barrels export only public API. No orphan source files except entries and `*.d.ts`.
 
 ## 5. Verification
 
@@ -52,13 +55,13 @@ Run checks for every modified side:
 
 ```bash
 # Server
-cd server && npm run build && npm test && npm run test:startup
+cd server && npm run build && npm test && npm run test:startup && npm run check:architecture
 
 # Client (when modified)
-cd client && npm test && npm run build && npm run lint
+cd client && npm test && npm run build && npm run lint && npm run check:architecture
 
 # Repository whitespace
 git diff --check
 ```
 
-Server tests typecheck before executing and use disposable databases/ephemeral listeners only. Never run fixtures against existing database files or import the persistent startup module. Architecture checker tooling is deferred by user choice; manual import audits remain required, and builds/tests do not replace them. Do not invent a check:architecture script or add a parser dependency without approval. Fix newly introduced failures before completing a phase.
+Server tests typecheck before executing and use disposable databases/ephemeral listeners only. Never run fixtures against existing database files or import the persistent startup module. Boundaries are enforced by dependency-cruiser via `npm run check:architecture` on each side. Rules are error-level; never weaken or ignore a rule to make it pass. The rules listed as manual-review items in [shared rules §8](./.devin/rules/clean-architecture.md) still need manual review; builds, tests and the checker do not replace it. Fix newly introduced failures before completing a phase.
