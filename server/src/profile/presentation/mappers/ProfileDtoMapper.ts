@@ -1,5 +1,5 @@
-import type { Profile } from '../../domain/models/Profile';
-import type { ProfileResponse } from '../schemas/ProfileDto';
+import type { Profile } from '../../domain/models';
+import type { ProfileResponse } from '../schemas';
 
 export function profileToResponse(profile: Profile): ProfileResponse {
   return {

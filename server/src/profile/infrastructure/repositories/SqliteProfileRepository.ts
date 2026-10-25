@@ -1,7 +1,7 @@
-import type { Profile, ProfileChanges } from '../../domain/models/Profile';
-import type { ProfileRepository } from '../../domain/ports/ProfileRepository';
+import type { Profile, ProfileChanges } from '../../domain/models';
+import type { ProfileRepository } from '../../domain/ports';
 import type { DatabaseConnection } from '../../../foundation/database/connection';
-import { PROFILE_COLUMNS, rowToProfile, type ProfileRow } from '../persistence/ProfileRow';
+import { PROFILE_COLUMNS, rowToProfile, type ProfileRow } from '../persistence';
 
 export class SqliteProfileRepository implements ProfileRepository {
   constructor(private readonly db: DatabaseConnection) {}
