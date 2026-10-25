@@ -1,10 +1,9 @@
 import { UiAvatar, UiCard, UiCardContent, UiChip, UiFlex, UiText } from '../../../components/ui';
-import { TASK_STATUS_LABELS } from '@/lib/task-labels';
 import type { UserProfileViewState } from '../models/UserProfileViewState';
 
-interface UserProfileCardProps { profile: UserProfileViewState; created: number; completed: number }
+interface UserProfileCardProps { profile: UserProfileViewState; created: number; completed: number; completedLabel: string }
 
-export default function UserProfileCard({ profile, created, completed }: UserProfileCardProps) {
+export default function UserProfileCard({ profile, created, completed, completedLabel }: UserProfileCardProps) {
   return (
     <UiCard>
       <UiCardContent>
@@ -16,7 +15,7 @@ export default function UserProfileCard({ profile, created, completed }: UserPro
         </UiFlex>
         <UiFlex dividerTop justify="space-between" textAlign="center">
           <UiFlex column flex={1}><UiText variant="h5" weight="bold">{created}</UiText><UiText variant="body2" tone="muted">Created</UiText></UiFlex>
-          <UiFlex column flex={1}><UiText variant="h5" weight="bold">{completed}</UiText><UiText variant="body2" tone="muted">{TASK_STATUS_LABELS.COMPLETED}</UiText></UiFlex>
+          <UiFlex column flex={1}><UiText variant="h5" weight="bold">{completed}</UiText><UiText variant="body2" tone="muted">{completedLabel}</UiText></UiFlex>
         </UiFlex>
       </UiCardContent>
     </UiCard>

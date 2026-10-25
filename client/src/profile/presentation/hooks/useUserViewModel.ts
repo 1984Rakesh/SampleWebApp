@@ -35,6 +35,7 @@ export function useUserViewModel() {
   return {
     profile,
     taskCounts: { created: taskCounts.created, completed: taskCounts.completed },
+    statusLabels: userUseCases.statusLabels,
     isLoading: userQuery.isLoading || taskCounts.isLoading,
     errorMessage: userQuery.error ? toErrorMessage(userQuery.error, 'Failed to load profile') : undefined,
     isEditing: true,

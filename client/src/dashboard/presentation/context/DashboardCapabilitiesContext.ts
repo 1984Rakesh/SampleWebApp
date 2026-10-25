@@ -1,11 +1,12 @@
 import { createContext, useContext } from 'react';
-import type { DashboardTaskCounts, DashboardTaskItem } from '../models/DashboardViewState';
+import type { DashboardStatusLabels, DashboardTaskCounts, DashboardTaskItem } from '../models/DashboardViewState';
 
 export interface DashboardCapabilities {
   profileName: string;
   isProfileLoading: boolean;
   taskItems: DashboardTaskItem[];
   counts: DashboardTaskCounts;
+  statusLabels: DashboardStatusLabels;
   isTasksLoading: boolean;
   errorMessage?: string;
   toggleTaskStatus(id: string): Promise<void>;

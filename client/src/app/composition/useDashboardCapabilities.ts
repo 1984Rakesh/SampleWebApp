@@ -1,9 +1,15 @@
 import { useAuth } from '../../security/presentation/context/AuthSessionContext';
 import { nextTaskStatus } from '../../tasks/domain/useCases';
-import { toTaskCounts, toTaskItemViewState } from '../../tasks/presentation/models/taskPresentation';
+import { TASK_STATUS_LABELS, toTaskCounts, toTaskItemViewState } from '../../tasks/presentation/models/taskPresentation';
 import type { DashboardCapabilities } from '../../dashboard/presentation/context/DashboardCapabilitiesContext';
 import { useTaskUseCases } from './useTaskUseCases';
 import { useUserUseCases } from './useUserUseCases';
+
+const statusLabels: DashboardCapabilities['statusLabels'] = {
+  completed: TASK_STATUS_LABELS.COMPLETED,
+  inProgress: TASK_STATUS_LABELS.IN_PROGRESS,
+  todo: TASK_STATUS_LABELS.TODO,
+};
 
 export function useDashboardCapabilities(): DashboardCapabilities {
   const { user } = useAuth();
@@ -28,6 +34,7 @@ export function useDashboardCapabilities(): DashboardCapabilities {
     isProfileLoading: profileQuery.isLoading,
     taskItems: tasks.map(toTaskItemViewState),
     counts: toTaskCounts(tasks),
+    statusLabels,
     isTasksLoading: tasksQuery.isLoading,
     errorMessage: tasksQuery.error instanceof Error ? tasksQuery.error.message : undefined,
     toggleTaskStatus,
