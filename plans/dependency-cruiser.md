@@ -63,7 +63,7 @@ Exit criteria: every PR to `feat/dependency-cruiser` runs the client and server 
   - Type: setup
   - Branch: task/dependency-cruiser/p0-t3
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/3
   - Files: `plan-mui-shadcn-migration.md` → `plans/history/mui-shadcn-migration.md`, delete `.devin/skills/manager/`, `.devin/skills/worker/`
   - Context: Execution now follows the Devin "Plan Worker" playbook and plans/RULES.md. The repo-local skills use the old `plan-<name>.md` convention and conflict with it. The user approved this deletion (Decision 2026-10-25).
   - Do: `git mv` the MUI plan into `plans/history/` unchanged and delete the two skill folders. Leave `.devin/skills/mui-to-shadcn/` and `.devin/skills/clean-architecture-tasks-design/` untouched. Fix any doc links that pointed at the moved or deleted files.
