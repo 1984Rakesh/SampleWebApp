@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T3
+- Next task: P2.T3 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P2.T2 merged)
 
 ## Goal
@@ -174,7 +174,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: `TASK_STATUS_LABELS` moved verbatim (same `Record<string, string>` type) into `tasks/presentation/models/taskPresentation.ts`, and `src/lib/` is deleted. Dashboard owns `DashboardStatusLabels { completed, inProgress, todo }` (`DashboardViewState.ts`); `DashboardCapabilities.statusLabels` goes to `DashboardStats`/`DashboardProgress` as a prop, and `legend` moved inside the component. Profile owns `ProfileStatusLabels { completed }` (`ProfileUseCasesContext.ts`); `ProfileUseCases.statusLabels` reaches `UserProfileCard` through a new `completedLabel` prop. App builds both as module-level constants from `TASK_STATUS_LABELS`, imported from `taskPresentation` (already imported by both App files, so no new edge). Outside the list, required to pass the fields down (1–2 lines each): `dashboard/presentation/{hooks/useDashboardViewModel.ts,screens/DashboardScreen.tsx}`, `profile/presentation/{hooks/useUserViewModel.ts,screens/ProfileScreen.tsx}`. No tests changed. Client `check:architecture` 167 → 163: sibling-feature 4 → 0; barrel 156 and orphans 7 unchanged, with identical hit lists. `npm test` 65/65, build, lint and `git diff --check` all pass. An SSR render of Stats/Progress/ProfileCard is byte-identical on base vs branch.
     - 2026-10-25 — Manager: reviewed full diff (feature-owned label types, App-injected, SSR output identical, 167 → 163); squash-merged PR #7.
 
-- [ ] **P2.T3 — Replace TaskRow with a feature-neutral components/app block**
+- [~] **P2.T3 — Replace TaskRow with a feature-neutral components/app block**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t3
   - Base: feat/dependency-cruiser
@@ -332,3 +332,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T1 merged (PR #6). P3.T1 extended: keep cn private.
 - 2026-10-25 — Manager: dispatched P2.T2 to Devin.
 - 2026-10-25 — Manager: P2.T2 merged (PR #7).
+- 2026-10-25 — Manager: dispatched P2.T3 to Devin.
