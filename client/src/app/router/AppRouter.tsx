@@ -10,7 +10,7 @@ const RegisterScreen = React.lazy(() => import('../../security/presentation/scre
 const DashboardScreen = React.lazy(() => import('../../dashboard/presentation/screens').then((m) => ({ default: m.DashboardScreen })));
 const ProfileScreen = React.lazy(() => import('../../profile/presentation/screens').then((m) => ({ default: m.ProfileScreen })));
 const TaskListScreen = React.lazy(() => import('../../tasks/presentation/screens').then((m) => ({ default: m.TaskListScreen })));
-const ComparisonScreen = React.lazy(() => import('../../comparison/presentation/screens/ComparisonScreen'));
+const ComparisonScreen = React.lazy(() => import('../../comparison/presentation/screens').then((m) => ({ default: m.ComparisonScreen })));
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
