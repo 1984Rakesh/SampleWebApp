@@ -1,5 +1,3 @@
-import axios from 'axios';
-void axios;
 import { TaskStatus, TaskPriority } from './enums';
 
 export interface Task {
