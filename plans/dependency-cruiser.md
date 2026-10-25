@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T2
+- Next task: P2.T2 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P2.T1 merged)
 
 ## Goal
@@ -160,7 +160,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: `git mv src/lib/utils.ts src/components/ui/utils.ts` (content unchanged). 43 importers updated: 40 in `components/ui/` now import `./utils` (each file's quote style kept); the 3 in `components/app/` (Logo, StatCard, TaskRow) import `cn` from `../ui`, the barrel, which now ends with `export { cn } from './utils';`. `components.json`: `aliases.utils` → `@/components/ui/utils`, `lib` alias removed. No files outside the list. The plan's "~48 importers" was 43 in practice. `src/lib/task-labels.ts` is left for P2.T2. Client `check:architecture` 213 → 167: `ui-vendor-only-in-components-ui-app` 2 → 0, `shared-modules-not-to-features-or-app` 44 → 0; barrel 156, orphans 7 and sibling-feature 4 (all `lib/task-labels`) unchanged. The barrel and orphan hit lists are identical before and after. `npm test` 65/65, build, lint, `git diff --check` all pass. Note: `cn` is now public through `components/ui/index.ts`, so features could import it; P3.T1's planned `no-src-lib` rule does not cover that. The vendor allowlist still keeps clsx/tailwind-merge in components/ui.
     - 2026-10-25 — Manager: reviewed (213 → 167 as expected, scope ok); squash-merged PR #6. cn-privacy question moved to P3.T1.
 
-- [ ] **P2.T2 — Make task status labels tasks-owned and App-injected**
+- [~] **P2.T2 — Make task status labels tasks-owned and App-injected**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t2
   - Base: feat/dependency-cruiser
@@ -328,3 +328,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P1.T2 merged (PR #5); Phase 1 complete. Added P2.T11 (contract test enum import); P3.T1 now depends on P2.T11, also adds server parity rules, Files updated.
 - 2026-10-25 — Manager: dispatched P2.T1 to Devin.
 - 2026-10-25 — Manager: P2.T1 merged (PR #6). P3.T1 extended: keep cn private.
+- 2026-10-25 — Manager: dispatched P2.T2 to Devin.
