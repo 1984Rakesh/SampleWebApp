@@ -15,3 +15,4 @@
 - 2026-10-25 — P2.T1 merged as PR #23 (6be9000) via a local worker. RULES.md architecture bullet updated; P4.T2 gains the presentation-models barrel rule.
 - 2026-10-25 — P2.T2 dispatched to a local Claude Code worker.
 - 2026-10-25 — Token-saving pass: every remaining task (P2.T3–P4.T4) gets a **Read only** reference list and pre-answered facts (Ui* inventory per file, Radix Select/ToggleGroup empty-value quirks, test selectors); conventions.md gains repo path, read-narrowly and no-experiment rules.
+- 2026-10-25 — PR #24 (P2.T2) failed review: ChecklistRow maps shared colour tones to Badge variants, so Low priority renders as status-done and High/Medium show two dots. Fix-up P2.T2a written on task/shadcn-direct-ui/p2-t2 (commits b93062a, 0ba2e09); not dispatched.
