@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T9
+- Next task: P2.T9 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P2.T8 merged)
 
 ## Goal
@@ -260,14 +260,14 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: Added 9 barrels: `components/{app,feedback,layout}`, `foundation/{network,session}`, `shared/{domain,data}` and `app/providers`; extended `components/ui` (types `SelectOption`, `UiChipTone`; shadcn `Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle` for `StatCard`) and `app/composition` (`AppNavbar`, `accountToProfile`, `sessions`). Default exports are re-exported by name (`axiosClient`, `LoadingSpinner`, `Navbar`, `AppNavbar`); importers switched to named imports. `App.tsx` now imports `./app/router` and `./app/providers`, so `app/router/index.ts` is no longer an orphan. `components/app` uses the `../ui` barrel for `UiCheckbox`, `UiChip`, `UiChipTone` and the Card primitives; its `cn` import is unchanged (separate statement, for P3.T1). Same-barrel duplicates merged (`LoginUseCase`, `RegisterUserUseCase`, `TaskFilters`, `ChecklistRow`, `AuthProvider`). No cycles reported by depcruise, oxlint or the build. Trimmed re-exports with no importer outside their folder: `app/router` `ProtectedRoute`, `PublicRoute`; `foundation/theme` `ColorModeContext`, `ColorModePreference`, `ThemeMode`; `tasks/domain/useCases` `validateTaskFilters`, `GetTasksInput`; `tasks/presentation/context` `TaskUseCases`; `dashboard/presentation/models` `DashboardBadgeTone`, `DashboardDueDateTone`, `DashboardViewState`; `comparison/presentation/models` `ComparisonLayer`, `ComparisonConcept`; `comparison/presentation/components` `CodeBlock`. `components/ui` keeps its whole API per the Manager note, including unused `UiSnackbar`, `UiContainer`, `UiTablePagination`, `UiIconName`, `UiNavItem` and `cn`. Every other client barrel export (55 barrels) has an outside importer, checked with a TS-AST script. No tests changed. Client `check:architecture` 45 → 0 (barrel 44 → 0, no-orphans 1 → 0); server stays at 130. Client `npm ci`, test 65/65, build, lint pass; server build, 29/29 tests, startup 3/3 pass; `git diff --check` clean. Chunks: main `index` 677.78 → 679.58 kB (gzip 210.44 → 210.66); dashboard `screens` 7.15 → 5.24 kB, because `StatCard`/`ChecklistRow` now load via the `components/app` barrel that main already pulls in for `Logo`; other lazy chunks unchanged (0.96→0.95, 3.31, 4.50, 40.44→40.45). Open question: the ui barrel now exports the shadcn Card primitives (className passthrough), like `cn` today; P3.T1 may want to treat `components/app` → `components/ui/card.tsx` the same way as the `cn` edge. No files changed outside the list.
     - 2026-10-25 — Manager: reviewed (9 new barrels, client 45 → 0, all removals with no additions, no cycles, trimming done except components/ui by design, server green); squash-merged PR #13. P3.T1 extended: shadcn Card primitives private like cn. Main-bundle shift of StatCard/ChecklistRow is folded into the existing chunking Open Question.
 
-- [ ] **P2.T9 — Server barrels: security, profile, tasks**
+- [~] **P2.T9 — Server barrels: security, profile, tasks**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t9
   - Base: feat/dependency-cruiser
   - PR: —
   - Files: `server/src/{security,profile,tasks}/**/index.ts` (new), importers in `server/src/`, `server/tests/*` (paths only)
   - Context: P0.T2 rule (e). There are no server barrels today (~95 cross-folder imports in features).
-  - Do: Add barrels for each feature module folder imported from outside itself and rewrite the imports. If the diff exceeds ~40 files, stop after security, set the task to `[!]` and suggest the split in Blockers.
+  - Do: Add barrels for each feature module folder imported from outside itself and rewrite the imports, in one PR with one commit per feature (security, profile, tasks).
   - Done when: no barrel violations target server feature folders, and the server verify commands pass, including `test:startup`.
   - Depends on: P2.T8
   - Notes:
@@ -367,3 +367,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T7 merged (PR #12). P2.T8 extended: trim unused barrel exports client-wide. Logged main-bundle chunking as an Open Question.
 - 2026-10-25 — Manager: dispatched P2.T8 to Devin.
 - 2026-10-25 — Manager: P2.T8 merged (PR #13); client at 0 violations. P3.T1 extended: shadcn raw primitives private.
+- 2026-10-25 — Manager: P2.T9 Do revised (no 40-file stop; one PR with per-feature commits, user choice). Dispatched P2.T9 to Devin.
