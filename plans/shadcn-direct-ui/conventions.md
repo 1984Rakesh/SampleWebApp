@@ -1,12 +1,6 @@
 # Conventions: shadcn direct UI
 Follows plans/RULES.md. Rules below apply to every task in this plan.
 
-## Working efficiently
-- Repo location: Devin cloud `~/repos/SampleWebApp`; a local worker works in its current checkout/worktree. Never search the filesystem for the repo.
-- Read only the files your task names (its **Read only** line, Files, and the primitives you use). Use `wc -l`/`head` or `sed -n` ranges before reading anything large; never `cat` all of `bundle.js` or `comparisonData.ts`.
-- Don't experiment to confirm behaviour the task file or these conventions already state (CLI flags, library quirks, test harness). If a stated fact turns out wrong, note it in the Report instead of probing further.
-- Verify with `cd client && npm run verify` (quiet); run individual checks only to debug a failure.
-
 ## Design source
 - The Tasks App DS lives in `plans/shadcn-direct-ui/design-system/`: `README.md` (brand book), `globals.css` (tokens), `tokens.json` (type scale, spacing), `components/<Name>.md` (guidelines), `components/bundle.js` (reference implementation: the exact Tailwind class strings to copy), `components/index.d.ts` (prop shapes). Read only the parts your task's **Read only** line names; the primitives in `client/src/components/ui/` already carry the DS classes (PR #22).
 - Ignore the DS README's setup steps 1–4 and `pnpm` commands: Tailwind v4, aliases and `components.json` already exist. This repo uses **npm**.

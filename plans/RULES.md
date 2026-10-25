@@ -6,7 +6,6 @@ Applies to every plan in `plans/`. The Manager (Claude) owns this file; Devin re
 - **client/** — React 19, Vite 8, TypeScript 6, Tailwind CSS v4, vendored shadcn/ui (radix-ui, lucide-react), TanStack Query, Axios, Zod, React Router 7. Lint: oxlint. Tests: Node test runner + Vite SSR (`client/tests/*.test.mjs`).
 - **server/** — Express 5, better-sqlite3, bcrypt, jsonwebtoken, Zod, TypeScript 7 (no JS compiler API). Tests: tsx + Node test runner (`server/tests/*.test.ts`), compiled startup smoke test.
 - No root package.json. Each side installs and verifies on its own.
-- New dependencies: pick versions published at least 7 days ago; never bypass security configuration.
 
 ## Architecture
 The authoritative rules are in the repo:
@@ -48,7 +47,8 @@ cd server && npm ci && npm run build && npm test && npm run test:startup && npm 
 # Repository
 git diff --check
 ```
-Before P1.T2a merges, `npm run verify` does not exist; use `npm test && npm run build && npm run lint && npm run check:architecture`. `check:architecture` exists only once plan `dependency-cruiser` P1 has merged; skip it before then. If a client DTO/mapper moves, also run the server suite, because `server/tests/client-contract.test.ts` imports client code.
+New dependencies: pick exact versions published at least 7 days ago; never bypass security configuration.
+If a client DTO/mapper moves, also run the server suite, because `server/tests/client-contract.test.ts` imports client code.
 
 ## Task types
 - **setup**: tooling, CI, config, docs. No behaviour or visual change to the app.
