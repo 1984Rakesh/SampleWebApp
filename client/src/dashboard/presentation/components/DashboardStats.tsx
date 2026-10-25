@@ -1,5 +1,5 @@
 import type { DashboardStatusLabels, DashboardTaskCounts } from '../models';
-import { StatCard } from '../../../components/app/StatCard';
+import { StatCard } from '../../../components/app';
 import { UiGrid, UiGridItem } from '../../../components/ui';
 
 interface DashboardStatsProps { counts: DashboardTaskCounts; statusLabels: DashboardStatusLabels; total: number; dueToday: number; dueThisWeek: number }

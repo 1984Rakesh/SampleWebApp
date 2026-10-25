@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { CircleCheck, Clock, List, type LucideIcon } from 'lucide-react';
 import { cn } from '../ui';
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui';
 
 const TONES: Record<'done' | 'inprogress' | 'todo', [string, LucideIcon]> = {
   done: ['bg-status-done text-status-done-foreground', CircleCheck],

@@ -1,6 +1,6 @@
 import { useDashboardViewModel } from '../hooks';
 import { DashboardProgress, DashboardRecentTasks, DashboardStats } from '../components';
-import LoadingSpinner from '../../../components/feedback/LoadingSpinner';
+import { LoadingSpinner } from '../../../components/feedback';
 import { UiAlert, UiAsideGrid, UiFlex, UiPage, UiScreen, UiText } from '../../../components/ui';
 
 export default function DashboardScreen() {

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { AuthProvider } from './AuthProvider';
 import { FeatureUseCasesProvider } from './FeatureUseCasesProvider';
 import { ThemeProvider } from '../../foundation/theme';
-import { ErrorBoundary } from '../../components/feedback/ErrorBoundary';
+import { ErrorBoundary } from '../../components/feedback';
 import { UiToastHost } from '../../components/ui';
 
 const queryClient = new QueryClient({

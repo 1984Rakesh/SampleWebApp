@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 import { useAuthViewModel } from '../hooks';
-import { Logo } from '../../../components/app/Logo';
+import { Logo } from '../../../components/app';
 import {
   UiAlert,
   UiButton,
