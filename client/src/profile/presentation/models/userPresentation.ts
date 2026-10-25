@@ -1,4 +1,4 @@
-import type { Profile } from '../../domain/models/Profile';
+import type { Profile } from '../../domain/models';
 import type { UserProfileViewState } from './UserProfileViewState';
 
 export function toUserProfileViewState(user: Profile): UserProfileViewState {

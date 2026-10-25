@@ -1,5 +1,5 @@
-import type { Profile, UpdateProfileInput } from '../models/Profile';
-import type { ProfileRepository } from '../repositories/ProfileRepository';
+import type { Profile, UpdateProfileInput } from '../models';
+import type { ProfileRepository } from '../repositories';
 import { normalizeName, normalizeOptionalText } from '../../../shared/domain/validation';
 
 export async function updateProfileUseCase(repository: ProfileRepository, input: UpdateProfileInput): Promise<Profile> {

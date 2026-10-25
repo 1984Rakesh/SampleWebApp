@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { Profile, UpdateProfileInput } from '../../domain/models/Profile';
+import type { Profile, UpdateProfileInput } from '../../domain/models';
 
 export interface ProfileStatusLabels {
   completed: string;

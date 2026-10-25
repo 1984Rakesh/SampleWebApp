@@ -1,6 +1,5 @@
-import { profileSchema } from '../dtos/schemas';
-import type { ProfileDTO, UpdateProfileDTO } from '../dtos/ProfileDTO';
-import { ProfileModel, type UpdateProfileInput } from '../../domain/models/Profile';
+import { profileSchema, type ProfileDTO, type UpdateProfileDTO } from '../dtos';
+import { ProfileModel, type UpdateProfileInput } from '../../domain/models';
 import { translateError } from '../../../shared/data/translateError';
 
 export function toDomain(dto: ProfileDTO): ProfileModel {

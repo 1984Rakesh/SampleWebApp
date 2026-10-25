@@ -1,5 +1,5 @@
 import { UiAvatar, UiCard, UiCardContent, UiChip, UiFlex, UiText } from '../../../components/ui';
-import type { UserProfileViewState } from '../models/UserProfileViewState';
+import type { UserProfileViewState } from '../models';
 
 interface UserProfileCardProps { profile: UserProfileViewState; created: number; completed: number; completedLabel: string }
 

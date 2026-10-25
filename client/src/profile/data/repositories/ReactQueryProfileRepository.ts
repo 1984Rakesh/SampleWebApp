@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import type { ProfileRepository } from '../../domain/repositories/ProfileRepository';
-import type { Profile } from '../../domain/models/Profile';
-import { getCurrentUserUseCase } from '../../domain/useCases/GetCurrentUserUseCase';
+import type { ProfileRepository } from '../../domain/repositories';
+import type { Profile } from '../../domain/models';
+import { getCurrentUserUseCase } from '../../domain/useCases';
 
 const profileKey = (id?: string) => ['user', id];
 export function cacheProfile(client: QueryClient, profile: Profile): void {
