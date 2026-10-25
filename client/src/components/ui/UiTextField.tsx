@@ -1,7 +1,7 @@
 import { Input } from './input';
 import { Label } from './label';
 import { Textarea } from './textarea';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 interface UiTextFieldProps {
   id?: string;

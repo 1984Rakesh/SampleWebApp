@@ -146,7 +146,7 @@ Exit criteria: `npm run check:architecture` runs on both sides with the full rul
 ## Phase 2 — Fix existing violations
 Exit criteria: `npm run check:architecture` reports 0 violations on both sides, with behaviour and visuals unchanged.
 
-- [~] **P2.T1 — Move the `cn` helper into components/ui**
+- [r] **P2.T1 — Move the `cn` helper into components/ui**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t1
   - Base: feat/dependency-cruiser
@@ -157,6 +157,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Done when: `src/lib/utils.ts` no longer exists. No import of `@/lib/utils` remains. The client verify commands pass, apart from `check:architecture` violations outside this task's scope.
   - Depends on: P1.T2
   - Notes:
+    - 2026-10-25 — Devin: `git mv src/lib/utils.ts src/components/ui/utils.ts` (content unchanged). 43 importers updated: 40 in `components/ui/` now import `./utils` (each file's quote style kept); the 3 in `components/app/` (Logo, StatCard, TaskRow) import `cn` from `../ui`, the barrel, which now ends with `export { cn } from './utils';`. `components.json`: `aliases.utils` → `@/components/ui/utils`, `lib` alias removed. No files outside the list. The plan's "~48 importers" was 43 in practice. `src/lib/task-labels.ts` is left for P2.T2. Client `check:architecture` 213 → 167: `ui-vendor-only-in-components-ui-app` 2 → 0, `shared-modules-not-to-features-or-app` 44 → 0; barrel 156, orphans 7 and sibling-feature 4 (all `lib/task-labels`) unchanged. The barrel and orphan hit lists are identical before and after. `npm test` 65/65, build, lint, `git diff --check` all pass. Note: `cn` is now public through `components/ui/index.ts`, so features could import it; P3.T1's planned `no-src-lib` rule does not cover that. The vendor allowlist still keeps clsx/tailwind-merge in components/ui.
 
 - [ ] **P2.T2 — Make task status labels tasks-owned and App-injected**
   - Type: refactor

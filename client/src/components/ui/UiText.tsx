@@ -1,6 +1,6 @@
 import { Link as RouterLink } from 'react-router-dom';
 import type { CSSProperties } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 import { mtClass, mbClass } from './spacing';
 
 type UiTextVariant = 'pageTitle' | 'h1' | 'h3' | 'h4' | 'h5' | 'h6' | 'subtitle1' | 'subtitle2' | 'body1' | 'body2' | 'caption';

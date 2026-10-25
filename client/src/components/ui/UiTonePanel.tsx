@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 const toneMap = {
   'status-progress': 'bg-status-progress text-status-progress-foreground',

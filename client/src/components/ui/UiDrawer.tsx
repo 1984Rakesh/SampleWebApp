@@ -2,7 +2,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTitle } from './sheet';
 import UiIcon from './UiIcon';
 import type { UiIconName } from './UiIcon';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 interface UiDrawerProps {
   open: boolean;

@@ -1,5 +1,5 @@
 // @ds Tabs v2026-10-20
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 import type { SelectOption } from './SelectOption';
 
 // Rendered as a toggle group rather than tablist/tab: these options filter

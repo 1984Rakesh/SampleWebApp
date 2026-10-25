@@ -1,6 +1,6 @@
 // @ds TaskBadge v2026-10-20
 import { Badge } from './badge';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 export type UiChipTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 

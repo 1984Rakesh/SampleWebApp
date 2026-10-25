@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { Button } from './button';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 type UiButtonVariant = 'solid' | 'outline' | 'text' | 'link';
 type UiButtonTone = 'primary' | 'danger' | 'muted';

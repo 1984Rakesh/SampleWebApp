@@ -1,6 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { Label } from './label';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 import type { SelectOption } from './SelectOption';
 
 // Radix Select rejects empty-string item values; an empty option value (the

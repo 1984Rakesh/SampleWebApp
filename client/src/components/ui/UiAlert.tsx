@@ -1,6 +1,6 @@
 import { CircleCheck, Info, OctagonX, TriangleAlert } from 'lucide-react';
 import { Alert, AlertDescription } from './alert';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 type UiAlertType = 'error' | 'success' | 'info' | 'warning';
 

@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 import UiIcon from './UiIcon';
 import type { UiIconName } from './UiIcon';
-import { cn } from '@/lib/utils';
+import { cn } from './utils';
 
 interface UiAvatarProps {
   src?: string;
