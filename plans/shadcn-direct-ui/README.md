@@ -1,7 +1,7 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
 - Current phase: P2 — Rules and shared components
-- Next task: P2.T1
+- Next task: P2.T2
 - Last updated: 2026-10-25
 
 ## Goal
@@ -18,8 +18,8 @@ Exit criteria: theme CSS carries the DS tokens; regenerated shadcn primitives wi
 
 ## Phase 2 — Rules and shared components
 Exit criteria: dependency-cruiser and docs allow direct shadcn in feature presentation/App; `components/app` and navbar/feedback use primitives only.
-- [~] P2.T1 — Allow direct shadcn imports (rules + docs) · setup · PR — · deps P1.T3
-- [ ] P2.T2 — Rebuild components/app on primitives · ui · PR — · deps P2.T1
+- [x] P2.T1 — Allow direct shadcn imports (rules + docs) · setup · PR #23 · deps P1.T3
+- [~] P2.T2 — Rebuild components/app on primitives · ui · PR — · deps P2.T1
 - [ ] P2.T3 — AppHeader, navbar and feedback · ui · PR — · deps P2.T2
 - [-] P2.T4 — Trim AGENTS.md files to pointers · setup · dropped (done by Manager 2026-10-25)
 

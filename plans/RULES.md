@@ -22,7 +22,7 @@ Inside feature:  Presentation → Domain ← Data (client) / Infrastructure (ser
 ```
 - Domains are pure TypeScript: only own domain + `shared/domain`.
 - Features never import App or sibling features; cross-feature needs are consumer-owned contracts injected by App.
-- Vendored shadcn primitives, radix-ui, lucide-react and Tailwind class composition live only in `client/src/components/ui/` and `client/src/components/app/`.
+- shadcn/ui primitives are generated into `client/src/components/ui/` and exported, with `cn`, from its `index.ts` barrel. Feature `presentation/screens|components`, `components/layout|feedback`, `src/app/` and `App.tsx` import them from that barrel (never `components/ui/<file>.tsx`), plus `lucide-react` and `sonner`. radix-ui, cva, clsx and tailwind-merge stay inside `components/ui` and `components/app`. Domain, data, foundation, shared, ViewModels, presentation models, hooks and contexts stay UI-library free (client rules §4.7).
 - **Enforcement:** dependency-cruiser, per side (`client/.dependency-cruiser.cjs`, `server/.dependency-cruiser.cjs`), run with `npm run check:architecture`. All rules are `error`. Rules the tool can't check (prop leakage, ViewState vs entity rendering, tri-state patches, error translation) stay manual review items.
 - Fix existing violations inside your task's scope only; never weaken or `ignore` a dependency-cruiser rule to make a check pass. Raise it as a blocker instead.
 

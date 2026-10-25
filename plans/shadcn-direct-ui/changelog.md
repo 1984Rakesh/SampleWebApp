@@ -12,3 +12,5 @@
 - 2026-10-25 — P1.T3 dispatched to Devin (Normal).
 - 2026-10-25 — P1.T3 merged as PR #22 (882a1b4); Phase 1 complete. P3.T4 notes: tint priority toggle items in TaskDialog.
 - 2026-10-25 — P2.T1 dispatched to a local Claude Code worker session (trial instead of Devin).
+- 2026-10-25 — P2.T1 merged as PR #23 (6be9000) via a local worker. RULES.md architecture bullet updated; P4.T2 gains the presentation-models barrel rule.
+- 2026-10-25 — P2.T2 dispatched to a local Claude Code worker.
