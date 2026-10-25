@@ -1,7 +1,7 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
 - Current phase: P1 — DS tokens and primitives
-- Next task: P1.T1
+- Next task: P1.T2
 - Last updated: 2026-10-25
 
 ## Goal
@@ -11,8 +11,8 @@ Legend: `[ ]` todo · `[~]` in progress · `[r]` in review · `[x]` merged · `[
 
 ## Phase 1 — DS tokens and primitives
 Exit criteria: theme CSS carries the DS tokens; regenerated shadcn primitives with DS variants exported from `components/ui`; existing screens (still on wrappers) render; client checks green.
-- [~] P1.T1 — Adopt DS theme tokens · ui · PR — · deps —
-- [ ] P1.T2 — Regenerate shadcn primitives · ui · PR — · deps P1.T1
+- [x] P1.T1 — Adopt DS theme tokens · ui · PR #19 · deps —
+- [~] P1.T2 — Regenerate shadcn primitives · ui · PR — · deps P1.T1
 - [ ] P1.T3 — DS variants on primitives · ui · PR — · deps P1.T2
 
 ## Phase 2 — Rules and shared components

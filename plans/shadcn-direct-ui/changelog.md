@@ -1,2 +1,4 @@
 - 2026-10-25 — Plan created from plan-shadcn-direct-ui.md (worker-ledger draft) for Devin dispatch; 17 tasks in 4 phases.
 - 2026-10-25 — P1.T1 dispatched to Devin.
+- 2026-10-25 — P1.T1 merged as PR #19 (84e5e84); radius scale now DS (md 12px, lg 16px, xl 20px).
+- 2026-10-25 — P1.T2 dispatched to Devin.
