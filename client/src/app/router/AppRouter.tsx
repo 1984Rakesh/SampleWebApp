@@ -5,8 +5,8 @@ import { UiPage, UiText } from '../../components/ui';
 import AppNavbar from '../composition/AppNavbar';
 
 // Placeholder screens - will be implemented in Phase 9
-const LoginScreen = React.lazy(() => import('../../security/presentation/screens/LoginScreen'));
-const RegisterScreen = React.lazy(() => import('../../security/presentation/screens/RegisterScreen'));
+const LoginScreen = React.lazy(() => import('../../security/presentation/screens').then((m) => ({ default: m.LoginScreen })));
+const RegisterScreen = React.lazy(() => import('../../security/presentation/screens').then((m) => ({ default: m.RegisterScreen })));
 const DashboardScreen = React.lazy(() => import('../../dashboard/presentation/screens/DashboardScreen'));
 const ProfileScreen = React.lazy(() => import('../../profile/presentation/screens/ProfileScreen'));
 const TaskListScreen = React.lazy(() => import('../../tasks/presentation/screens/TaskListScreen'));

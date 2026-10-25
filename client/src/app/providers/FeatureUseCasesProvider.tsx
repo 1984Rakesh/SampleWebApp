@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { AuthUseCasesContext } from '../../security/presentation/context/AuthUseCasesContext';
+import { AuthUseCasesContext } from '../../security/presentation/context';
 import { ProfileUseCasesContext } from '../../profile/presentation/context/ProfileUseCasesContext';
 import { TaskUseCasesContext } from '../../tasks/presentation/context/TaskUseCasesContext';
 import { DashboardCapabilitiesContext } from '../../dashboard/presentation/context/DashboardCapabilitiesContext';

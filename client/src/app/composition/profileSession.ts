@@ -1,5 +1,5 @@
-import { AccountModel, type Account } from '../../security/domain/models/Account';
-import type { SessionRepository } from '../../security/domain/repositories/SessionRepository';
+import { AccountModel, type Account } from '../../security/domain/models';
+import type { SessionRepository } from '../../security/domain/repositories';
 import { ProfileModel, type Profile } from '../../profile/domain/models/Profile';
 import type { ProfileRepository } from '../../profile/domain/repositories/ProfileRepository';
 import { UnauthorizedError } from '../../shared/domain/errors';

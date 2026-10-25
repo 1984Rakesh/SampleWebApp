@@ -1,8 +1,8 @@
 import { useCallback, useSyncExternalStore, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import type { AuthSession } from '../../security/domain/models/AuthSession';
-import { signOutUseCase } from '../../security/domain/useCases/SignOutUseCase';
-import { AuthSessionContext } from '../../security/presentation/context/AuthSessionContext';
+import type { AuthSession } from '../../security/domain/models';
+import { signOutUseCase } from '../../security/domain/useCases';
+import { AuthSessionContext } from '../../security/presentation/context';
 import { cacheProfile } from '../../profile/data/repositories/ReactQueryProfileRepository';
 import { sessions } from '../composition/securityRuntime';
 import { accountToProfile } from '../composition/profileSession';
