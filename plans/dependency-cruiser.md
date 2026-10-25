@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T7
+- Next task: P2.T7 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P2.T6 merged)
 
 ## Goal
@@ -230,7 +230,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: Added 10 barrels: `profile/domain/{models,repositories,useCases}`, `profile/data/{dtos,mappers,api,repositories}` and `profile/presentation/{components,models,screens}`. Extended the existing `presentation/context` barrel with `ProfileUseCasesContext`. Each barrel uses named re-exports and exports only what outside importers use. `ProfileStatusLabels` and `ProfileUseCases` stay internal. The mappers barrel exports `toDomain as profileToDomain`, and its only importer, `HttpProfileRepository`, now calls `profileToDomain`. The components barrel re-exports the 3 default-exported components by name. Rewrote every cross-folder profile import in `profile/*` and `app/*`, and merged same-barrel duplicates (`useUserUseCases.ts` repositories, `ProfileMapper.ts` dtos). Imports inside a folder stay relative, and no file imports its own index. `AppRouter` lazy-loads `ProfileScreen` through the screens barrel. The chunk is renamed `ProfileScreen-*.js` → `screens-*.js` and stays the same size, 4.55 kB (gzip 1.78 kB). No tests changed; the client tests and the server contract test load files by path, and no file moved. Client `check:architecture` went 115 → 82: barrel 109 → 76, no-orphans 6 → 6. All 33 removed hits target `src/profile/`, no hits were added, 0 profile targets remain, and no new barrel is an orphan. Server `check:architecture` stays at 130. Client `npm ci`/test 65/65/build/lint pass; server build, 29/29 tests and startup 3/3 pass; `git diff --check` is clean. No files changed outside the list. Left for P2.T8: profile's deep imports of `shared/domain/validation`, `shared/data/translateError` and `components/feedback/LoadingSpinner`.
     - 2026-10-25 — Manager: reviewed (10 new barrels + 1 extended, no test changes, 115 → 82 with all 33 removed hits in profile and none added, chunk size unchanged, server green); squash-merged PR #11.
 
-- [ ] **P2.T7 — Client barrels: tasks, dashboard, comparison**
+- [~] **P2.T7 — Client barrels: tasks, dashboard, comparison**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t7
   - Base: feat/dependency-cruiser
@@ -354,3 +354,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T5 merged (PR #10). Logged the lazy-screens-via-barrel convention as a Decision and in P2.T6/T7 Context.
 - 2026-10-25 — Manager: dispatched P2.T6 to Devin.
 - 2026-10-25 — Manager: P2.T6 merged (PR #11).
+- 2026-10-25 — Manager: dispatched P2.T7 to Devin.
