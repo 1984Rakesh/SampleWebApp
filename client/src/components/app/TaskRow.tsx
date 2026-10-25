@@ -1,5 +1,5 @@
 // @ds TaskRow v2026-10-20
-import { cn } from '@/lib/utils';
+import { cn } from '../ui';
 import UiCheckbox from '../ui/UiCheckbox';
 import UiChip from '../ui/UiChip';
 import type { UiChipTone } from '../ui/UiChip';

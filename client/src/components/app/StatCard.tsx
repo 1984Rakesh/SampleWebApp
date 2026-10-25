@@ -1,7 +1,7 @@
 // @ds StatCard v2026-10-20
 import type { ReactNode } from 'react';
 import { CircleCheck, Clock, List, type LucideIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '../ui';
 import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 
 const TONES: Record<'done' | 'inprogress' | 'todo', [string, LucideIcon]> = {

@@ -49,3 +49,4 @@ export { default as UiList } from './UiList';
 export { default as UiTonePanel } from './UiTonePanel';
 export type { UiIconName } from './UiIcon';
 export type { UiNavItem } from './UiDrawer';
+export { cn } from './utils';
