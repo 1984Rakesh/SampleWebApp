@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto';
-import type { NewTask, Task, TaskChanges, TaskFilters } from '../../domain/models/Task';
-import type { TaskRepository } from '../../domain/ports/TaskRepository';
+import type { NewTask, Task, TaskChanges, TaskFilters } from '../../domain/models';
+import type { TaskRepository } from '../../domain/ports';
 import type { DatabaseConnection } from '../../../foundation/database/connection';
-import { rowToTask, type TaskRow } from '../persistence/TaskRow';
+import { rowToTask, type TaskRow } from '../persistence';
 
 export class SqliteTaskRepository implements TaskRepository {
   constructor(private readonly db: DatabaseConnection) {}

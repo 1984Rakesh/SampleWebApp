@@ -1,0 +1,1 @@
+export { profileToResponse } from './ProfileDtoMapper';

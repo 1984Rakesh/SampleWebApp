@@ -1,8 +1,8 @@
 import { NotFoundError } from '../../../shared/domain/errors';
 import { normalizeOptionalText } from '../../../shared/domain/normalizeOptionalText';
 import { normalizeUserName } from '../../../shared/domain/normalizeUserName';
-import type { Profile, ProfileChanges, UpdateProfileInput } from '../models/Profile';
-import type { ProfileRepository } from '../ports/ProfileRepository';
+import type { Profile, ProfileChanges, UpdateProfileInput } from '../models';
+import type { ProfileRepository } from '../ports';
 
 export class UpdateProfileUseCase {
   constructor(private readonly profiles: ProfileRepository) {}

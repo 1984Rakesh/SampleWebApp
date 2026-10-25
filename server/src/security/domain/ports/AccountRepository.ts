@@ -1,4 +1,4 @@
-import type { AccountCredentials, AccountIdentity, NewAccount, SessionAccount } from '../models/Account';
+import type { AccountCredentials, AccountIdentity, NewAccount, SessionAccount } from '../models';
 
 export interface AccountRepository {
   findIdentityById(id: string): Promise<AccountIdentity | null>;

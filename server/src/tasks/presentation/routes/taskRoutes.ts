@@ -1,5 +1,5 @@
 import { Router, type RequestHandler } from 'express';
-import type { TaskController } from '../controllers/TaskController';
+import type { TaskController } from '../controllers';
 
 export function createTaskRoutes(controller: TaskController, authMiddleware: RequestHandler): Router {
   const router = Router();

@@ -1,7 +1,7 @@
 import { NotFoundError } from '../../../shared/domain/errors';
 import { normalizeOptionalText } from '../../../shared/domain/normalizeOptionalText';
-import { normalizeTaskTitle, type Task, type TaskChanges } from '../models/Task';
-import type { TaskRepository } from '../ports/TaskRepository';
+import { normalizeTaskTitle, type Task, type TaskChanges } from '../models';
+import type { TaskRepository } from '../ports';
 
 export interface UpdateTaskInput {
   id: string;

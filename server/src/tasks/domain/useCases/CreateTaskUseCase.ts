@@ -4,8 +4,8 @@ import {
   normalizeTaskTitle,
   type Task,
   type TaskPriority,
-} from '../models/Task';
-import type { TaskRepository } from '../ports/TaskRepository';
+} from '../models';
+import type { TaskRepository } from '../ports';
 import { normalizeOptionalText } from '../../../shared/domain/normalizeOptionalText';
 
 export interface CreateTaskInput {

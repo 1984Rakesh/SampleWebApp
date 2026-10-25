@@ -1,6 +1,5 @@
 import { UnauthorizedError } from '../../../shared/domain/errors';
-import type { TokenService } from '../ports/TokenService';
-import type { AccountRepository } from '../ports/AccountRepository';
+import type { TokenService, AccountRepository } from '../ports';
 
 export class RefreshAccessTokenUseCase {
   constructor(

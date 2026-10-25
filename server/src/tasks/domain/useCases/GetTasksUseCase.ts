@@ -1,5 +1,5 @@
-import type { Task, TaskFilters } from '../models/Task';
-import type { TaskRepository } from '../ports/TaskRepository';
+import type { Task, TaskFilters } from '../models';
+import type { TaskRepository } from '../ports';
 
 export interface GetTasksInput {
   userId: string;

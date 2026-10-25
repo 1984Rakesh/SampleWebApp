@@ -1,0 +1,1 @@
+export { SqliteProfileRepository } from './SqliteProfileRepository';

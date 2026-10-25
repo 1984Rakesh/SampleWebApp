@@ -1,5 +1,5 @@
-import type { Task } from '../../domain/models/Task';
-import type { TaskResponse } from '../schemas/TaskDto';
+import type { Task } from '../../domain/models';
+import type { TaskResponse } from '../schemas';
 
 export function taskToResponse(task: Task): TaskResponse {
   return {

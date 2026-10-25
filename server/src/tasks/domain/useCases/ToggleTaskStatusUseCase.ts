@@ -1,6 +1,6 @@
 import { NotFoundError } from '../../../shared/domain/errors';
-import type { Task, TaskStatus } from '../models/Task';
-import type { TaskRepository } from '../ports/TaskRepository';
+import type { Task, TaskStatus } from '../models';
+import type { TaskRepository } from '../ports';
 
 export interface ToggleTaskStatusInput {
   id: string;
