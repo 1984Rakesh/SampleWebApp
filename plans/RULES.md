@@ -59,7 +59,7 @@ Before P1.T2a merges, `npm run verify` does not exist; use `npm test && npm run 
 - Never mix refactor and ui in one task.
 
 ## Ledger rules
-- **Worker (Devin):** in the plan file, edit only your own task: status `[~]`→`[r]` (or `[!]` + a Blockers line), the PR field, and dated Notes. Never set `[x]`, never edit other tasks, structure, Decisions or this file.
+- **Worker (Devin):** in the plan file, edit only your own task: status `[~]`→`[r]` (or `[!]` + a Blockers line), `PR: pending` (the Manager records the number), and dated Notes. Never set `[x]`, never edit other tasks, structure, Decisions or this file.
 - **One push:** commit the code and the task-file (ledger) update, then push them together in a single `git push`, so CI runs once.
-- **Worker session ends at `[r]`/`[!]`:** once the PR is open, CI checked and the ledger pushed, the worker replies once with its report and ends its session as completed. It never waits for review, approval or merge; review findings come back as a new fix-up task (`<ID>a`) in a new session.
+- **Worker session ends at `[r]`/`[!]`:** once the PR is open and the ledger pushed, the worker replies once (it does not wait for or check CI; the Manager checks CI at review) with its report and ends its session as completed. It never waits for review, approval or merge; review findings come back as a new fix-up task (`<ID>a`) in a new session.
 - **Manager (Claude):** sets `[x]` after merge, adds or changes tasks, Decisions, Open Questions and the Change Log; owns this file.
