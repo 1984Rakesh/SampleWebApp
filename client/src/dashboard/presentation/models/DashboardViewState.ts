@@ -1,4 +1,6 @@
-export type DashboardBadgeTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+export type DashboardStatusVariant = 'status-todo' | 'status-progress' | 'status-done';
+
+export type DashboardPriorityVariant = 'priority-high' | 'priority-medium' | 'priority-low';
 
 export type DashboardDueDateTone = 'amber' | 'muted' | 'default';
 
@@ -7,9 +9,9 @@ export interface DashboardTaskItem {
   title: string;
   description?: string;
   statusLabel: string;
-  statusTone: DashboardBadgeTone;
+  statusVariant: DashboardStatusVariant;
   priorityLabel: string;
-  priorityTone: DashboardBadgeTone;
+  priorityVariant: DashboardPriorityVariant;
   dueDate?: string;
   dueDateLabel?: string;
   dueDateTone: DashboardDueDateTone;
