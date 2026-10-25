@@ -3,8 +3,8 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T3 (in progress, Devin)
-- Last updated: 2026-10-25 by Manager (P2.T2 merged)
+- Next task: P2.T4
+- Last updated: 2026-10-25 by Manager (P2.T3 merged)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -174,7 +174,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: `TASK_STATUS_LABELS` moved verbatim (same `Record<string, string>` type) into `tasks/presentation/models/taskPresentation.ts`, and `src/lib/` is deleted. Dashboard owns `DashboardStatusLabels { completed, inProgress, todo }` (`DashboardViewState.ts`); `DashboardCapabilities.statusLabels` goes to `DashboardStats`/`DashboardProgress` as a prop, and `legend` moved inside the component. Profile owns `ProfileStatusLabels { completed }` (`ProfileUseCasesContext.ts`); `ProfileUseCases.statusLabels` reaches `UserProfileCard` through a new `completedLabel` prop. App builds both as module-level constants from `TASK_STATUS_LABELS`, imported from `taskPresentation` (already imported by both App files, so no new edge). Outside the list, required to pass the fields down (1–2 lines each): `dashboard/presentation/{hooks/useDashboardViewModel.ts,screens/DashboardScreen.tsx}`, `profile/presentation/{hooks/useUserViewModel.ts,screens/ProfileScreen.tsx}`. No tests changed. Client `check:architecture` 167 → 163: sibling-feature 4 → 0; barrel 156 and orphans 7 unchanged, with identical hit lists. `npm test` 65/65, build, lint and `git diff --check` all pass. An SSR render of Stats/Progress/ProfileCard is byte-identical on base vs branch.
     - 2026-10-25 — Manager: reviewed full diff (feature-owned label types, App-injected, SSR output identical, 167 → 163); squash-merged PR #7.
 
-- [r] **P2.T3 — Replace TaskRow with a feature-neutral components/app block**
+- [x] **P2.T3 — Replace TaskRow with a feature-neutral components/app block**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t3
   - Base: feat/dependency-cruiser
@@ -186,6 +186,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Depends on: P2.T2
   - Notes:
     - 2026-10-25 — Devin: `git mv` TaskRow.tsx → `components/app/ChecklistRow.tsx`. Its props are closed and semantic: `title`, `description?`, `checked`, `toggleAriaLabel`, `chips: { label, tone: UiChipTone }[]`, `meta?`, `metaTone?: 'warning' | 'muted'`, `divider?`, `onToggle`. Markup, classes and `data-slot="task-row"` are unchanged. The `• ` priority prefix is now dashboard data. `DashboardRecentTasks` maps `dueDateTone` `amber → warning`, everything else `→ muted`; the block still gates emphasis on `!checked`. Line 1 keeps `// @ds TaskRow v2026-10-20`, and the comment calls ChecklistRow the neutral version of the DS block. The `../ui/UiCheckbox` and `../ui/UiChip` deep imports are left for P2.T8. Outside the list: one cell in `.devin/skills/mui-to-shadcn/component-map.md` (TaskRow repo path → ChecklistRow.tsx), so the design-sync map does not point at a deleted file. SSR render of `DashboardRecentTasks` (36 rows covering all branches, plus an empty list and a single row) is byte-identical on base vs branch: 96,955 bytes, same sha256. Client `check:architecture` 163 → 163 (barrel 156, orphans 7); the hit lists are identical apart from the 3 renamed paths. `npm test` 65/65, build, lint and `git diff --check` pass. Note: the dashboard still deep-imports `components/app/ChecklistRow` because there is no `components/app` barrel; that is left to the barrel tasks.
+    - 2026-10-25 — Manager: reviewed (closed semantic props, SSR byte-identical across 38 cases, 163 unchanged, component-map.md path fix accepted); squash-merged PR #8.
 
 - [ ] **P2.T4 — Remove the orphaned Toast component**
   - Type: refactor
@@ -314,6 +315,8 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 ## Open Questions
 - [x] Devin GitHub integration and repository connected (2026-10-25)
 
+- [ ] Feature components still use raw Tailwind classes (e.g. `DashboardRecentTasks.tsx` `px-6 pb-6`), against client §4.7. Audit and fix in a later ui-cleanup plan, not this one. (owner: manager; raised in P2.T3 review)
+
 ## Blockers
 - —
 
@@ -334,3 +337,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: dispatched P2.T2 to Devin.
 - 2026-10-25 — Manager: P2.T2 merged (PR #7).
 - 2026-10-25 — Manager: dispatched P2.T3 to Devin.
+- 2026-10-25 — Manager: P2.T3 merged (PR #8). Logged raw-Tailwind-in-features follow-up as an Open Question.
