@@ -1,0 +1,6 @@
+- 2026-10-25 — Drop all `Ui*` wrappers; screens import shadcn primitives from the `components/ui` barrel (user choice; MUI already removed in bf795ea) → conventions.md Architecture
+- 2026-10-25 — Relax `ui-vendor-only-in-components-ui-app` / `cn-only-in-components-ui-app` for feature presentation screens/components, components/layout|feedback and src/app (approved policy change, not a workaround) → P2.T1
+- 2026-10-25 — Tasks App DS artifact is the styling source; copied into plans/shadcn-direct-ui/design-system because Devin cannot open claude.ai artifacts; vendored permanently into client/docs/design-system in P4.T3
+- 2026-10-25 — Keep prior boundary: task-specific UI stays tasks-owned; only generic Logo, StatCard, ChecklistRow, AppHeader live in components/app → conventions.md
+- 2026-10-25 — Tests for wrappers are replaced before wrappers are deleted (P4.T1 before P4.T2) so every PR stays green
+- 2026-10-25 — plans/RULES.md architecture bullet about vendored UI is updated by the Manager after P2.T1 merges

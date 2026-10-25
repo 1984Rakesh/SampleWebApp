@@ -1,0 +1,1 @@
+- 2026-10-25 — Plan created from plan-shadcn-direct-ui.md (worker-ledger draft) for Devin dispatch; 17 tasks in 4 phases.
