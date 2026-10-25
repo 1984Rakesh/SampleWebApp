@@ -3,8 +3,8 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T11 (in progress, Devin)
-- Last updated: 2026-10-25 by Manager (P2.T10 merged)
+- Next task: P3.T1 (in progress, Devin)
+- Last updated: 2026-10-25 by Manager (P2.T11 merged)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -288,7 +288,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: added 4 barrels: `shared/domain` (`ConflictError, DomainError, NotFoundError, UnauthorizedError, ValidationError, normalizeOptionalText, normalizeUserName`), `foundation/http` (`errorMiddleware, parseRequest, requestLogger, requireUserId`), `foundation/database` (`createDatabase, runMigrations, seedDatabase`, type `DatabaseConnection`) and `foundation/persistence` (`normalizeSqliteTimestamp`). Rewrote 28 importers in `src/` and merged duplicate imports from the same barrel. `AuthenticatedIdentity` is not exported (no importer outside the folder); its `declare global` augmentation still applies. No `app/index.ts`: `MODULE_FOLDER` makes only `app/<sub>/` a module folder, and app's files sit directly in `app/`, so depcruise doesn't flag `server.ts → app/*`. Side effects: none of these modules runs anything at import time. Feature repositories import `DatabaseConnection` with `import type`, so their compiled JS doesn't load `foundation/database`. Requiring `dist/shared/domain` or `dist/foundation/http` loads no DB or config. `dist/server.js` require order is unchanged (dotenv → config → container → createApp → database). There are no standalone seed or migration scripts. Tests unchanged (white-box); contract test untouched (P2.T11). No files outside scope changed. Server check:architecture 37 → 1 (barrel 36 → 0, tests→client 1 → 1); 36 removed, 0 added; no-circular 0. Node 24: build ok, test 29/29, test:startup 3/3. Compiled smoke boot (fresh DB, then a reboot on the same DB) logs the same as before. Client check:architecture 0. `git diff --check` clean.
     - 2026-10-25 — Manager: reviewed (4 minimal barrels; server 37 → 1 with 36 removals and none added; load order unchanged; compiled smoke boot identical; client still 0); squash-merged PR #15.
 
-- [r] **P2.T11 — Contract test stops importing client domain enums**
+- [x] **P2.T11 — Contract test stops importing client domain enums**
   - Type: test
   - Branch: task/dependency-cruiser/p2-t11
   - Base: feat/dependency-cruiser
@@ -300,11 +300,12 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Depends on: P2.T10
   - Notes:
     - 2026-10-25 — Devin: removed the `TaskPriority`/`TaskStatus` import from `server/tests/client-contract.test.ts`. The assertions and the query/body values use `'TODO'`, `'COMPLETED'` and `'HIGH'`. The `toCreateTaskDTO` input uses a type-only cast built from the mapper: `const HIGH_PRIORITY = 'HIGH' as Parameters<typeof toCreateTaskDTO>[0]['priority']`. Nothing is imported from client domain, client code is unchanged, and no files outside scope changed. Server check:architecture 1 → 0 (121 modules); client 0. Node 24: build ok, test 29/29 (incl. typecheck), test:startup 3/3, `git diff --check` clean.
+    - 2026-10-25 — Manager: reviewed and squash-merged PR #16. Diff matches the scope (one test file plus the ledger); the cast is type-only and no client domain import remains. CI is green on both jobs. Server 1 → 0, client 0. Phase 2 exit criteria met.
 
 ## Phase 3 — Enforce in CI
 Exit criteria: CI fails any PR with an architecture violation, and the docs list the check as a required verify step.
 
-- [ ] **P3.T1 — Gate CI on check:architecture**
+- [~] **P3.T1 — Gate CI on check:architecture**
   - Type: setup
   - Branch: task/dependency-cruiser/p3-t1
   - Base: feat/dependency-cruiser
@@ -378,3 +379,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T10 Done-when corrected; the tests→client hit belongs to P2.T11.
 - 2026-10-25 — Manager: dispatched P2.T10 to Devin.
 - 2026-10-25 — Manager: P2.T10 merged (PR #15). Dispatched P2.T11 to Devin.
+- 2026-10-25 — Manager: P2.T11 merged (PR #16); both sides at 0 violations. Dispatched P3.T1 to Devin.
