@@ -13,7 +13,7 @@ Legend: `[ ]` todo · `[~]` in progress · `[r]` in review · `[x]` merged · `[
 Exit criteria: theme CSS carries the DS tokens; regenerated shadcn primitives with DS variants exported from `components/ui`; existing screens (still on wrappers) render; client checks green.
 - [x] P1.T1 — Adopt DS theme tokens · ui · PR #19 · deps —
 - [x] P1.T2 — Regenerate shadcn primitives · ui · PR #20 · deps P1.T1
-- [ ] P1.T2a — shadcn CLI alias and quiet verify script · setup · PR — · deps P1.T2
+- [~] P1.T2a — shadcn CLI alias and quiet verify script · setup · PR — · deps P1.T2
 - [ ] P1.T3 — DS variants on primitives · ui · PR — · deps P1.T2a
 
 ## Phase 2 — Rules and shared components

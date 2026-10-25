@@ -7,3 +7,4 @@
 - 2026-10-25 — Deleted `.devin/skills/mui-to-shadcn/` (user request); P4.T3 no longer deletes it.
 - 2026-10-25 — Deleted `.devin/skills/clean-architecture-tasks-design/` (user request); the DS source is `plans/shadcn-direct-ui/design-system/`.
 - 2026-10-25 — Compacted always-on rules (user request): shared/client/server rule files rewritten as generic rules with stable section numbers, AGENTS.md files reduced to pointers, workflow, verify and server test safety (~59k → ~21k chars). P2.T4 dropped; P2.T1 docs scope narrowed to client rules §1/§4.7/§4.8.
+- 2026-10-25 — P1.T2a dispatched to Devin (Lite).
