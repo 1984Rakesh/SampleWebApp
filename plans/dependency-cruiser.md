@@ -282,7 +282,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Files: `server/src/{foundation/*,shared/domain}/index.ts`, `server/src/app/index.ts` if needed, importers, tests (paths only)
   - Context: same as P2.T9. `server.ts` (entry) imports `app/*`.
   - Do: Same as P2.T9, for these folders.
-  - Done when: server `npm run check:architecture` reports **0 violations**, and the server verify commands pass.
+  - Done when: server `npm run check:architecture` reports no barrel violations (only the `tests-to-client-only-dtos-mappers` hit owned by P2.T11 may remain), and the server verify commands pass.
   - Depends on: P2.T9
   - Notes:
 
@@ -372,3 +372,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T8 merged (PR #13); client at 0 violations. P3.T1 extended: shadcn raw primitives private.
 - 2026-10-25 — Manager: P2.T9 Do revised (no 40-file stop; one PR with per-feature commits, user choice). Dispatched P2.T9 to Devin.
 - 2026-10-25 — Manager: P2.T9 merged (PR #14). Decision: tests stay white-box.
+- 2026-10-25 — Manager: P2.T10 Done-when corrected; the tests→client hit belongs to P2.T11.
