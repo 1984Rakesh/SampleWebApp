@@ -14,7 +14,7 @@ Extend the [shared rules](../../../.devin/rules/clean-architecture.md). Inside a
 | Domain | Own models/repositories/use cases, `shared/domain` | App, foundation, outer layers, frameworks, browser APIs |
 | Data | Own domain/data, generic foundation transport, `shared/data` | App, presentation, sibling features |
 | Presentation ViewModels/mappers | Own domain/presentation, injected consumer contracts, generic foundation hooks | App, data implementations, Axios/Zod/React Query |
-| Screens/feature components | ViewState, options, callbacks, own presentation, shared UI | Domain entities/enums, App/data, vendored UI primitives |
+| Screens/feature components | ViewState, options, callbacks, own presentation, shared UI, shadcn primitives/`cn` from the `components/ui` barrel, lucide-react, sonner (§4.7) | Domain entities/enums, App/data, primitive files, radix-ui/cva/clsx/tailwind-merge |
 | Shared components | Own UI contracts/components, generic theme | App, features, business models, data |
 | Foundation | Generic capabilities and permitted libraries | App, features, business policy |
 | App | All layers, for binding/providers/routes/shell | Business invariants, duplicate domain validation |
@@ -46,8 +46,8 @@ Extend the [shared rules](../../../.devin/rules/clean-architecture.md). Inside a
 4. Shared layout (navbar, shell) is prop-driven; App owns its state and callbacks and renders feature-owned dialogs. Never drive global navigation from a feature form ViewModel.
 5. Split distinct render regions into controlled subcomponents; keep internals out of public barrels.
 6. `SelectOption` belongs to `components/ui`; shared primitives never depend on feature types.
-7. Only `components/ui` and `components/app` import vendored shadcn/ui primitives, radix-ui, lucide-react, sonner, cva/clsx/tailwind-merge and compose Tailwind classes. Their exported APIs are narrow and semantic (closed variant/tone/size unions, value callbacks): no library Props, `asChild`, className passthroughs or arbitrary spreads. Features and App compose those components only.
-8. No `src/lib/`. `cn` lives in `components/ui/utils.ts`. Display copy (labels, status names) lives in the owning feature; App injects it into other features.
+7. Feature `presentation/screens|components`, `components/layout|feedback`, `src/app/` and `App.tsx` use shadcn/ui directly: they import primitives and `cn` from the `components/ui` barrel (never `components/ui/<file>.tsx`), icons from lucide-react and toasts from sonner, and compose Tailwind token utilities. Primitives are generated into `components/ui` and styled there per the Tasks App DS. radix-ui, cva, clsx and tailwind-merge stay private to `components/ui` and `components/app`. ViewModels, presentation models, hooks, contexts, domain, data, foundation and shared stay UI-library free.
+8. No `src/lib/`. `cn` lives in `components/ui/utils.ts`; the consumers in §4.7 import it from the `components/ui` barrel. Display copy (labels, status names) lives in the owning feature; App injects it into other features.
 9. `components/app` holds only feature-neutral blocks with semantic props; a feature-specific block belongs to its feature.
 
 ## 5. Session, Network and Cross-Feature Synchronization
