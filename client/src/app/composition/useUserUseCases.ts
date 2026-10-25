@@ -5,12 +5,14 @@ import { useProfileRepository } from '../../profile/data/repositories/ReactQuery
 import { updateProfileUseCase } from '../../profile/domain/useCases/UpdateProfileUseCase';
 import type { UpdateProfileInput } from '../../profile/domain/models/Profile';
 import { useAuth } from '../../security/presentation/context/AuthSessionContext';
-import { toTaskCounts } from '../../tasks/presentation/models/taskPresentation';
+import { TASK_STATUS_LABELS, toTaskCounts } from '../../tasks/presentation/models/taskPresentation';
 import { sessions } from './securityRuntime';
 import { bindProfileSession } from './profileSession';
 import { useTaskUseCases } from './useTaskUseCases';
 
 const source = bindProfileSession(createProfileRepository(createProfileApi(axiosClient)), sessions);
+
+const statusLabels = { completed: TASK_STATUS_LABELS.COMPLETED };
 
 function useTaskCounts() {
   const query = useTaskUseCases().useTasksQuery({});
@@ -22,7 +24,7 @@ export function useUserUseCases() {
   const { user } = useAuth();
   const { repository, useCurrentUserQuery, isUpdating } = useProfileRepository(source, user?.id);
   return {
-    useCurrentUserQuery, useTaskCounts,
+    useCurrentUserQuery, useTaskCounts, statusLabels,
     updateProfile: (input: UpdateProfileInput) => updateProfileUseCase(repository, input),
     isUpdating,
   };

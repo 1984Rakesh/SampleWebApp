@@ -1,16 +1,14 @@
-import type { DashboardTaskCounts } from '../models/DashboardViewState';
+import type { DashboardStatusLabels, DashboardTaskCounts } from '../models/DashboardViewState';
 import { UiAvatar, UiCard, UiCardContent, UiCardHeader, UiFlex, UiIcon, UiProgress, UiSwatch, UiText } from '../../../components/ui';
-import { TASK_STATUS_LABELS } from '@/lib/task-labels';
 
-interface DashboardProgressProps { counts: DashboardTaskCounts; total: number; percent: number }
+interface DashboardProgressProps { counts: DashboardTaskCounts; statusLabels: DashboardStatusLabels; total: number; percent: number }
 
-const legend = [
-  { label: TASK_STATUS_LABELS.COMPLETED, swatch: 'chart-1' },
-  { label: TASK_STATUS_LABELS.IN_PROGRESS, swatch: 'chart-2' },
-  { label: TASK_STATUS_LABELS.TODO, swatch: 'chart-3' },
-] as const;
-
-export default function DashboardProgress({ counts, total, percent }: DashboardProgressProps) {
+export default function DashboardProgress({ counts, statusLabels, total, percent }: DashboardProgressProps) {
+  const legend = [
+    { label: statusLabels.completed, swatch: 'chart-1' },
+    { label: statusLabels.inProgress, swatch: 'chart-2' },
+    { label: statusLabels.todo, swatch: 'chart-3' },
+  ] as const;
   const values = [counts.completed, counts.inProgress, counts.todo];
   return (
     <UiFlex column gap={2}>
