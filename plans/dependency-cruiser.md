@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T4
+- Next task: P2.T4 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P2.T3 merged)
 
 ## Goal
@@ -188,7 +188,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: `git mv` TaskRow.tsx → `components/app/ChecklistRow.tsx`. Its props are closed and semantic: `title`, `description?`, `checked`, `toggleAriaLabel`, `chips: { label, tone: UiChipTone }[]`, `meta?`, `metaTone?: 'warning' | 'muted'`, `divider?`, `onToggle`. Markup, classes and `data-slot="task-row"` are unchanged. The `• ` priority prefix is now dashboard data. `DashboardRecentTasks` maps `dueDateTone` `amber → warning`, everything else `→ muted`; the block still gates emphasis on `!checked`. Line 1 keeps `// @ds TaskRow v2026-10-20`, and the comment calls ChecklistRow the neutral version of the DS block. The `../ui/UiCheckbox` and `../ui/UiChip` deep imports are left for P2.T8. Outside the list: one cell in `.devin/skills/mui-to-shadcn/component-map.md` (TaskRow repo path → ChecklistRow.tsx), so the design-sync map does not point at a deleted file. SSR render of `DashboardRecentTasks` (36 rows covering all branches, plus an empty list and a single row) is byte-identical on base vs branch: 96,955 bytes, same sha256. Client `check:architecture` 163 → 163 (barrel 156, orphans 7); the hit lists are identical apart from the 3 renamed paths. `npm test` 65/65, build, lint and `git diff --check` pass. Note: the dashboard still deep-imports `components/app/ChecklistRow` because there is no `components/app` barrel; that is left to the barrel tasks.
     - 2026-10-25 — Manager: reviewed (closed semantic props, SSR byte-identical across 38 cases, 163 unchanged, component-map.md path fix accepted); squash-merged PR #8.
 
-- [ ] **P2.T4 — Remove the orphaned Toast component**
+- [~] **P2.T4 — Remove the orphaned Toast component**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t4
   - Base: feat/dependency-cruiser
@@ -338,3 +338,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T2 merged (PR #7).
 - 2026-10-25 — Manager: dispatched P2.T3 to Devin.
 - 2026-10-25 — Manager: P2.T3 merged (PR #8). Logged raw-Tailwind-in-features follow-up as an Open Question.
+- 2026-10-25 — Manager: dispatched P2.T4 to Devin.
