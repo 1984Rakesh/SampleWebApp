@@ -13,8 +13,19 @@ const APP = '^src/(?:app/|App\\.tsx$)';
 const MODULE_FOLDER = `src/(?:(?:app|foundation|shared|components)/[^/]+|${FEATURE_NAME}/[^/]+/[^/]+)/`;
 const MODULE_FILE = `^${MODULE_FOLDER}`;
 const MODULE_BARREL = `^${MODULE_FOLDER}index\\.tsx?$`;
-const UI_VENDOR =
-  '(?:^|/)node_modules/(?:radix-ui|@radix-ui/[^/]+|lucide-react|class-variance-authority|clsx|tailwind-merge|sonner)/';
+// client §4.7: low-level UI libraries stay private to components/ui and components/app.
+const UI_PRIVATE_VENDOR =
+  '(?:^|/)node_modules/(?:radix-ui|@radix-ui/[^/]+|class-variance-authority|clsx|tailwind-merge)/';
+// client §4.7: public UI packages that UI_CONSUMERS may import directly.
+const UI_PUBLIC_VENDOR = '(?:^|/)node_modules/(?:lucide-react|sonner)/';
+// client §4.7: modules that render UI and may use shadcn primitives through the components/ui barrel.
+const UI_CONSUMERS = [
+  '^src/[^/]+/presentation/(screens|components)/',
+  '^src/components/(layout|feedback)/',
+  '^src/app/',
+  '^src/App\\.tsx$',
+];
+const UI_BARREL = '^src/components/ui/index\\.ts$';
 const SHADCN_PRIMITIVE = '^src/components/ui/[a-z][^/]*\\.tsx$';
 const CN_HELPER = '^src/components/ui/utils\\.ts$';
 const BARREL_COMMENT =
@@ -137,17 +148,33 @@ module.exports = {
       name: 'ui-vendor-only-in-components-ui-app',
       severity: 'error',
       comment:
-        'shared §2 No Leaky Abstractions / client §4.7: radix-ui, lucide-react, cva, clsx, tailwind-merge, sonner and shadcn primitives only in components/ui and components/app.',
+        'shared §2 No Leaky Abstractions / client §4.7: radix-ui, cva, clsx, tailwind-merge and primitive files (components/ui/<lowercase>.tsx) only in components/ui and components/app; everyone else uses the components/ui barrel.',
       from: { pathNot: '^src/components/(?:ui|app)/' },
-      to: { path: [UI_VENDOR, SHADCN_PRIMITIVE] },
+      to: { path: [UI_PRIVATE_VENDOR, SHADCN_PRIMITIVE] },
+    },
+    {
+      name: 'ui-vendor-only-in-components-ui-app',
+      severity: 'error',
+      comment:
+        'shared §2 No Leaky Abstractions / client §4.7: lucide-react and sonner only in components/ui, components/app, presentation screens/components, components/layout|feedback and App.',
+      from: { pathNot: ['^src/components/(?:ui|app)/', ...UI_CONSUMERS] },
+      to: { path: UI_PUBLIC_VENDOR },
     },
     {
       name: 'cn-only-in-components-ui-app',
       severity: 'error',
       comment:
-        'shared §2 No Leaky Abstractions / client §4.7, §4.8: the cn class helper (components/ui/utils.ts) is private to components/ui and components/app.',
+        'shared §2 No Leaky Abstractions / client §4.7, §4.8: the cn helper file (components/ui/utils.ts) is private to components/ui and components/app; UI consumers get cn from the barrel.',
       from: { pathNot: '^src/components/(?:ui|app)/' },
       to: { path: CN_HELPER },
+    },
+    {
+      name: 'cn-only-in-components-ui-app',
+      severity: 'error',
+      comment:
+        'shared §2 No Leaky Abstractions / client §4.7, §4.8: domain, data, foundation and shared stay UI-library free, so they never import the components/ui barrel (and its cn or primitives).',
+      from: { path: ['^src/(?:foundation|shared)/', `^src/${FEATURE_NAME}/(?:domain|data)/`] },
+      to: { path: UI_BARREL },
     },
     {
       name: 'shared-modules-not-to-features-or-app',
