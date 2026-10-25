@@ -3,8 +3,8 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T10 (in progress, Devin)
-- Last updated: 2026-10-25 by Manager (P2.T9 merged)
+- Next task: P2.T11 (in progress, Devin)
+- Last updated: 2026-10-25 by Manager (P2.T10 merged)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -274,7 +274,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: added 31 `index.ts` barrels under `server/src/{security,profile,tasks}/<layer>/<sub>/` and rewrote every cross-folder `src/` import to use them, with one commit per feature (security, profile, tasks). Barrels use named re-exports only and `export type` for types. Each exports only the symbols that `src/` imports from outside its folder. Same-folder imports stay relative. Merged duplicate imports from the same barrel into one statement. No aliases were needed. No files outside scope changed. `server/tests/*` is unchanged because the barrel rule's `from` is `^src/`, so test deep imports aren't flagged. Server check:architecture 130 → 37 (barrel 129 → 36, tests→client 1 → 1). 93 hits removed, all targeting feature folders, and 0 added. The remaining hits target foundation/shared (P2.T10) and client (P2.T11). no-circular is 0. Compiled dist container and feature barrels load with no `undefined` exports. Build ok, test 29/29, test:startup 3/3, client check:architecture 0, `git diff --check` clean. Suggestion: tests still deep-import feature files; consider a later rule/task if tests should use barrels too.
     - 2026-10-25 — Manager: reviewed (29 barrels in per-feature commits; server 130 → 37 with 93 in-scope removals and none added; no require cycles; startup/tests green; client still 0); squash-merged PR #14. Tests stay white-box (Decision).
 
-- [r] **P2.T10 — Server barrels: foundation, shared, app**
+- [x] **P2.T10 — Server barrels: foundation, shared, app**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t10
   - Base: feat/dependency-cruiser
@@ -286,8 +286,9 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Depends on: P2.T9
   - Notes:
     - 2026-10-25 — Devin: added 4 barrels: `shared/domain` (`ConflictError, DomainError, NotFoundError, UnauthorizedError, ValidationError, normalizeOptionalText, normalizeUserName`), `foundation/http` (`errorMiddleware, parseRequest, requestLogger, requireUserId`), `foundation/database` (`createDatabase, runMigrations, seedDatabase`, type `DatabaseConnection`) and `foundation/persistence` (`normalizeSqliteTimestamp`). Rewrote 28 importers in `src/` and merged duplicate imports from the same barrel. `AuthenticatedIdentity` is not exported (no importer outside the folder); its `declare global` augmentation still applies. No `app/index.ts`: `MODULE_FOLDER` makes only `app/<sub>/` a module folder, and app's files sit directly in `app/`, so depcruise doesn't flag `server.ts → app/*`. Side effects: none of these modules runs anything at import time. Feature repositories import `DatabaseConnection` with `import type`, so their compiled JS doesn't load `foundation/database`. Requiring `dist/shared/domain` or `dist/foundation/http` loads no DB or config. `dist/server.js` require order is unchanged (dotenv → config → container → createApp → database). There are no standalone seed or migration scripts. Tests unchanged (white-box); contract test untouched (P2.T11). No files outside scope changed. Server check:architecture 37 → 1 (barrel 36 → 0, tests→client 1 → 1); 36 removed, 0 added; no-circular 0. Node 24: build ok, test 29/29, test:startup 3/3. Compiled smoke boot (fresh DB, then a reboot on the same DB) logs the same as before. Client check:architecture 0. `git diff --check` clean.
+    - 2026-10-25 — Manager: reviewed (4 minimal barrels; server 37 → 1 with 36 removals and none added; load order unchanged; compiled smoke boot identical; client still 0); squash-merged PR #15.
 
-- [ ] **P2.T11 — Contract test stops importing client domain enums**
+- [~] **P2.T11 — Contract test stops importing client domain enums**
   - Type: test
   - Branch: task/dependency-cruiser/p2-t11
   - Base: feat/dependency-cruiser
@@ -375,3 +376,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T9 merged (PR #14). Decision: tests stay white-box.
 - 2026-10-25 — Manager: P2.T10 Done-when corrected; the tests→client hit belongs to P2.T11.
 - 2026-10-25 — Manager: dispatched P2.T10 to Devin.
+- 2026-10-25 — Manager: P2.T10 merged (PR #15). Dispatched P2.T11 to Devin.
