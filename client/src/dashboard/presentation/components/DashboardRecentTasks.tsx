@@ -1,4 +1,4 @@
-import type { DashboardTaskItem } from '../models/DashboardViewState';
+import type { DashboardTaskItem } from '../models';
 import { ChecklistRow } from '../../../components/app/ChecklistRow';
 import { UiButton, UiCard, UiCardHeader, UiIcon, UiText } from '../../../components/ui';
 

@@ -1,7 +1,5 @@
 import { useDashboardViewModel } from '../hooks';
-import DashboardProgress from '../components/DashboardProgress';
-import DashboardRecentTasks from '../components/DashboardRecentTasks';
-import DashboardStats from '../components/DashboardStats';
+import { DashboardProgress, DashboardRecentTasks, DashboardStats } from '../components';
 import LoadingSpinner from '../../../components/feedback/LoadingSpinner';
 import { UiAlert, UiAsideGrid, UiFlex, UiPage, UiScreen, UiText } from '../../../components/ui';
 
