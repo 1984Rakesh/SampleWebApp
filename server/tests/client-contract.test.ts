@@ -8,8 +8,9 @@ import { refreshTokenResponseSchema } from '../../client/src/security/data/dtos/
 import { toDomain as authToDomain, toLoginRequestDTO, toRegisterRequestDTO } from '../../client/src/security/data/mappers/AuthMapper';
 import { toDomain as taskToDomain, toCreateTaskDTO, toUpdateTaskDTO } from '../../client/src/tasks/data/mappers/TaskMapper';
 import { toDomain as userToDomain, toUpdateProfileDTO } from '../../client/src/profile/data/mappers/ProfileMapper';
-import { TaskPriority, TaskStatus } from '../../client/src/tasks/domain/models/enums';
 import { assertError, createTestServer } from './helpers';
+
+const HIGH_PRIORITY = 'HIGH' as Parameters<typeof toCreateTaskDTO>[0]['priority'];
 
 test('client feature request and response mappers preserve compatibility with server endpoints', async (t) => {
   const { request } = await createTestServer(t);
@@ -47,13 +48,13 @@ test('client feature request and response mappers preserve compatibility with se
 
   const created = await request<TaskDTO>('/api/tasks', {
     method: 'POST', token,
-    body: toCreateTaskDTO({ title: 'Contract task', priority: TaskPriority.HIGH, description: 'Details' }),
+    body: toCreateTaskDTO({ title: 'Contract task', priority: HIGH_PRIORITY, description: 'Details' }),
   });
   assert.equal(created.status, 201);
   const task = taskToDomain(created.body);
   assert.equal(task.userId, session.user.id);
-  assert.equal(task.status, TaskStatus.TODO);
-  assert.equal(task.priority, TaskPriority.HIGH);
+  assert.equal(task.status, 'TODO');
+  assert.equal(task.priority, 'HIGH');
   const updated = await request<TaskDTO>(`/api/tasks/${task.id}`, {
     method: 'PUT', token, body: toUpdateTaskDTO({ title: 'Updated task', description: '', dueDate: '' }),
   });
@@ -61,11 +62,11 @@ test('client feature request and response mappers preserve compatibility with se
   assert.equal(taskToDomain(updated.body).description, undefined);
   assert.equal(taskToDomain(updated.body).dueDate, undefined);
   const toggled = await request<TaskDTO>(`/api/tasks/${task.id}/status`, {
-    method: 'PATCH', token, body: { status: TaskStatus.COMPLETED },
+    method: 'PATCH', token, body: { status: 'COMPLETED' },
   });
   assert.equal(toggled.status, 200);
-  assert.equal(taskToDomain(toggled.body).status, TaskStatus.COMPLETED);
-  const filters = new URLSearchParams({ status: TaskStatus.COMPLETED, priority: TaskPriority.HIGH });
+  assert.equal(taskToDomain(toggled.body).status, 'COMPLETED');
+  const filters = new URLSearchParams({ status: 'COMPLETED', priority: 'HIGH' });
   const listed = await request<TaskDTO[]>(`/api/tasks?${filters}`, { token });
   assert.equal(listed.status, 200);
   assert.deepEqual(listed.body.map(taskToDomain).map((item) => item.id), [task.id]);

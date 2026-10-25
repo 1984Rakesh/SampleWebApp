@@ -288,17 +288,18 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: added 4 barrels: `shared/domain` (`ConflictError, DomainError, NotFoundError, UnauthorizedError, ValidationError, normalizeOptionalText, normalizeUserName`), `foundation/http` (`errorMiddleware, parseRequest, requestLogger, requireUserId`), `foundation/database` (`createDatabase, runMigrations, seedDatabase`, type `DatabaseConnection`) and `foundation/persistence` (`normalizeSqliteTimestamp`). Rewrote 28 importers in `src/` and merged duplicate imports from the same barrel. `AuthenticatedIdentity` is not exported (no importer outside the folder); its `declare global` augmentation still applies. No `app/index.ts`: `MODULE_FOLDER` makes only `app/<sub>/` a module folder, and app's files sit directly in `app/`, so depcruise doesn't flag `server.ts → app/*`. Side effects: none of these modules runs anything at import time. Feature repositories import `DatabaseConnection` with `import type`, so their compiled JS doesn't load `foundation/database`. Requiring `dist/shared/domain` or `dist/foundation/http` loads no DB or config. `dist/server.js` require order is unchanged (dotenv → config → container → createApp → database). There are no standalone seed or migration scripts. Tests unchanged (white-box); contract test untouched (P2.T11). No files outside scope changed. Server check:architecture 37 → 1 (barrel 36 → 0, tests→client 1 → 1); 36 removed, 0 added; no-circular 0. Node 24: build ok, test 29/29, test:startup 3/3. Compiled smoke boot (fresh DB, then a reboot on the same DB) logs the same as before. Client check:architecture 0. `git diff --check` clean.
     - 2026-10-25 — Manager: reviewed (4 minimal barrels; server 37 → 1 with 36 removals and none added; load order unchanged; compiled smoke boot identical; client still 0); squash-merged PR #15.
 
-- [~] **P2.T11 — Contract test stops importing client domain enums**
+- [r] **P2.T11 — Contract test stops importing client domain enums**
   - Type: test
   - Branch: task/dependency-cruiser/p2-t11
   - Base: feat/dependency-cruiser
-  - PR: —
+  - PR: https://github.com/1984Rakesh/SampleWebApp/pull/16
   - Files: `server/tests/client-contract.test.ts`
   - Context: P1.T2 baseline: `tests/client-contract.test.ts → ../client/src/tasks/domain/models/enums.ts` (`TaskPriority`, `TaskStatus`) violates server rule §5.4 (tests may import only `client/src/<feature>/data/{dtos,mappers}`).
   - Do: Replace the enum imports with the API's string literals (`'TODO' | 'IN_PROGRESS' | 'COMPLETED'`, and the priority values). Keep every assertion's meaning. Import nothing else from client domain.
   - Done when: server `npm run check:architecture` reports 0 `tests-to-client-only-dtos-mappers` hits, and the server verify commands pass with the same test count (29).
   - Depends on: P2.T10
   - Notes:
+    - 2026-10-25 — Devin: removed the `TaskPriority`/`TaskStatus` import from `server/tests/client-contract.test.ts`. The assertions and the query/body values use `'TODO'`, `'COMPLETED'` and `'HIGH'`. The `toCreateTaskDTO` input uses a type-only cast built from the mapper: `const HIGH_PRIORITY = 'HIGH' as Parameters<typeof toCreateTaskDTO>[0]['priority']`. Nothing is imported from client domain, client code is unchanged, and no files outside scope changed. Server check:architecture 1 → 0 (121 modules); client 0. Node 24: build ok, test 29/29 (incl. typecheck), test:startup 3/3, `git diff --check` clean.
 
 ## Phase 3 — Enforce in CI
 Exit criteria: CI fails any PR with an architecture violation, and the docs list the check as a required verify step.
