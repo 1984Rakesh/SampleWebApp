@@ -1,9 +1,6 @@
 import { UnauthorizedError } from '../../../shared/domain/errors';
-import type { AuthResult, LoginInput } from '../models/Auth';
-import { normalizeEmail } from '../models/Account';
-import type { PasswordHasher } from '../ports/PasswordHasher';
-import type { TokenService } from '../ports/TokenService';
-import type { AccountRepository } from '../ports/AccountRepository';
+import { normalizeEmail, type AuthResult, type LoginInput } from '../models';
+import type { PasswordHasher, TokenService, AccountRepository } from '../ports';
 
 export class LoginUseCase {
   constructor(

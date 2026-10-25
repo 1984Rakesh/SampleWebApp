@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '../../../shared/domain/errors';
-import type { AuthTokens, TokenPayload } from '../../domain/models/Auth';
-import type { TokenService } from '../../domain/ports/TokenService';
+import type { AuthTokens, TokenPayload } from '../../domain/models';
+import type { TokenService } from '../../domain/ports';
 
 export interface JwtTokenServiceConfig {
   secret: string;

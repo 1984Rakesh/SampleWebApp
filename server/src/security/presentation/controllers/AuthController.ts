@@ -1,15 +1,13 @@
 import type { Request, Response } from 'express';
-import type { LoginUseCase } from '../../domain/useCases/LoginUseCase';
-import type { RefreshAccessTokenUseCase } from '../../domain/useCases/RefreshAccessTokenUseCase';
-import type { RegisterUserUseCase } from '../../domain/useCases/RegisterUserUseCase';
+import type { LoginUseCase, RefreshAccessTokenUseCase, RegisterUserUseCase } from '../../domain/useCases';
 import { parseRequest } from '../../../foundation/http/parseRequest';
-import { authResultToResponse } from '../mappers/AuthDtoMapper';
+import { authResultToResponse } from '../mappers';
 import {
   loginBodySchema,
   refreshBodySchema,
   registerBodySchema,
   type RefreshResponse,
-} from '../schemas/AuthDto';
+} from '../schemas';
 
 export interface AuthControllerDependencies {
   registerUser: RegisterUserUseCase;
