@@ -3,8 +3,8 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T2 (in progress, Devin)
-- Last updated: 2026-10-25 by Manager (P2.T1 merged)
+- Next task: P2.T3
+- Last updated: 2026-10-25 by Manager (P2.T2 merged)
 
 ## Goal
 Make the clean-architecture rules machine-enforced. Add dependency-cruiser to `client/` and `server/` with error-level rules for layer boundaries, vendor-library allowlists, barrel-only cross-folder imports and no-orphans. Fix every existing violation and gate all PRs on it in CI. Done means `npm run check:architecture` passes on both sides in CI, and the rule docs describe the tool instead of saying architecture tooling is deferred.
@@ -160,7 +160,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: `git mv src/lib/utils.ts src/components/ui/utils.ts` (content unchanged). 43 importers updated: 40 in `components/ui/` now import `./utils` (each file's quote style kept); the 3 in `components/app/` (Logo, StatCard, TaskRow) import `cn` from `../ui`, the barrel, which now ends with `export { cn } from './utils';`. `components.json`: `aliases.utils` → `@/components/ui/utils`, `lib` alias removed. No files outside the list. The plan's "~48 importers" was 43 in practice. `src/lib/task-labels.ts` is left for P2.T2. Client `check:architecture` 213 → 167: `ui-vendor-only-in-components-ui-app` 2 → 0, `shared-modules-not-to-features-or-app` 44 → 0; barrel 156, orphans 7 and sibling-feature 4 (all `lib/task-labels`) unchanged. The barrel and orphan hit lists are identical before and after. `npm test` 65/65, build, lint, `git diff --check` all pass. Note: `cn` is now public through `components/ui/index.ts`, so features could import it; P3.T1's planned `no-src-lib` rule does not cover that. The vendor allowlist still keeps clsx/tailwind-merge in components/ui.
     - 2026-10-25 — Manager: reviewed (213 → 167 as expected, scope ok); squash-merged PR #6. cn-privacy question moved to P3.T1.
 
-- [r] **P2.T2 — Make task status labels tasks-owned and App-injected**
+- [x] **P2.T2 — Make task status labels tasks-owned and App-injected**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t2
   - Base: feat/dependency-cruiser
@@ -172,6 +172,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
   - Depends on: P2.T1
   - Notes:
     - 2026-10-25 — Devin: `TASK_STATUS_LABELS` moved verbatim (same `Record<string, string>` type) into `tasks/presentation/models/taskPresentation.ts`, and `src/lib/` is deleted. Dashboard owns `DashboardStatusLabels { completed, inProgress, todo }` (`DashboardViewState.ts`); `DashboardCapabilities.statusLabels` goes to `DashboardStats`/`DashboardProgress` as a prop, and `legend` moved inside the component. Profile owns `ProfileStatusLabels { completed }` (`ProfileUseCasesContext.ts`); `ProfileUseCases.statusLabels` reaches `UserProfileCard` through a new `completedLabel` prop. App builds both as module-level constants from `TASK_STATUS_LABELS`, imported from `taskPresentation` (already imported by both App files, so no new edge). Outside the list, required to pass the fields down (1–2 lines each): `dashboard/presentation/{hooks/useDashboardViewModel.ts,screens/DashboardScreen.tsx}`, `profile/presentation/{hooks/useUserViewModel.ts,screens/ProfileScreen.tsx}`. No tests changed. Client `check:architecture` 167 → 163: sibling-feature 4 → 0; barrel 156 and orphans 7 unchanged, with identical hit lists. `npm test` 65/65, build, lint and `git diff --check` all pass. An SSR render of Stats/Progress/ProfileCard is byte-identical on base vs branch.
+    - 2026-10-25 — Manager: reviewed full diff (feature-owned label types, App-injected, SSR output identical, 167 → 163); squash-merged PR #7.
 
 - [ ] **P2.T3 — Replace TaskRow with a feature-neutral components/app block**
   - Type: refactor
@@ -330,3 +331,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: dispatched P2.T1 to Devin.
 - 2026-10-25 — Manager: P2.T1 merged (PR #6). P3.T1 extended: keep cn private.
 - 2026-10-25 — Manager: dispatched P2.T2 to Devin.
+- 2026-10-25 — Manager: P2.T2 merged (PR #7).
