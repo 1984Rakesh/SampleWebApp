@@ -22,8 +22,8 @@ export default function DashboardRecentTasks({ tasks, onToggle }: DashboardRecen
           checked={task.isCompleted}
           toggleAriaLabel={task.toggleAriaLabel}
           chips={[
-            { label: task.statusLabel, tone: task.statusTone },
-            { label: `• ${task.priorityLabel}`, tone: task.priorityTone },
+            { label: task.statusLabel, variant: task.statusVariant },
+            { label: task.priorityLabel, variant: task.priorityVariant },
           ]}
           meta={task.dueDateLabel}
           metaTone={task.dueDateTone === 'amber' ? 'warning' : 'muted'}

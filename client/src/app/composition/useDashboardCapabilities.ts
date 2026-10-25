@@ -1,7 +1,10 @@
 import { useAuth } from '../../security/presentation/context';
+import { TaskPriority, TaskStatus } from '../../tasks/domain/models';
+import type { Task } from '../../tasks/domain/models';
 import { nextTaskStatus } from '../../tasks/domain/useCases';
 import { TASK_STATUS_LABELS, toTaskCounts, toTaskItemViewState } from '../../tasks/presentation/models';
 import type { DashboardCapabilities } from '../../dashboard/presentation/context';
+import type { DashboardPriorityVariant, DashboardStatusVariant } from '../../dashboard/presentation/models';
 import { useTaskUseCases } from './useTaskUseCases';
 import { useUserUseCases } from './useUserUseCases';
 
@@ -10,6 +13,24 @@ const statusLabels: DashboardCapabilities['statusLabels'] = {
   inProgress: TASK_STATUS_LABELS.IN_PROGRESS,
   todo: TASK_STATUS_LABELS.TODO,
 };
+
+const statusVariants: Record<TaskStatus, DashboardStatusVariant> = {
+  [TaskStatus.TODO]: 'status-todo',
+  [TaskStatus.IN_PROGRESS]: 'status-progress',
+  [TaskStatus.COMPLETED]: 'status-done',
+};
+
+const priorityVariants: Record<TaskPriority, DashboardPriorityVariant> = {
+  [TaskPriority.HIGH]: 'priority-high',
+  [TaskPriority.MEDIUM]: 'priority-medium',
+  [TaskPriority.LOW]: 'priority-low',
+};
+
+const toDashboardTaskItem = (task: Task) => ({
+  ...toTaskItemViewState(task),
+  statusVariant: statusVariants[task.status],
+  priorityVariant: priorityVariants[task.priority],
+});
 
 export function useDashboardCapabilities(): DashboardCapabilities {
   const { user } = useAuth();
@@ -32,7 +53,7 @@ export function useDashboardCapabilities(): DashboardCapabilities {
   return {
     profileName: profileQuery.data?.name || user?.name || 'User',
     isProfileLoading: profileQuery.isLoading,
-    taskItems: tasks.map(toTaskItemViewState),
+    taskItems: tasks.map(toDashboardTaskItem),
     counts: toTaskCounts(tasks),
     statusLabels,
     isTasksLoading: tasksQuery.isLoading,
