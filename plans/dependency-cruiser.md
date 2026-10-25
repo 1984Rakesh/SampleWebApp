@@ -3,7 +3,7 @@
 ## Status
 - Feature branch: feat/dependency-cruiser
 - Current phase: P2 — Fix existing violations
-- Next task: P2.T6
+- Next task: P2.T6 (in progress, Devin)
 - Last updated: 2026-10-25 by Manager (P2.T5 merged)
 
 ## Goal
@@ -216,7 +216,7 @@ Exit criteria: `npm run check:architecture` reports 0 violations on both sides, 
     - 2026-10-25 — Devin: Added 8 barrels: `security/domain/{models,repositories,useCases}`, `security/data/{dtos,mappers,api,repositories}` and `security/presentation/screens`. Extended the existing `presentation/context` barrel with `AuthSessionContext` and `AuthUseCasesContext`. Each barrel uses named re-exports and exports only what outside importers use. `AccountDTO` and `accountSchema` stay internal. The mappers barrel exports `toDomain as authToDomain`, matching the tasks barrel, and its 2 importers now call `authToDomain`. Rewrote every cross-folder security import in `security/*` and `app/*`, and merged same-barrel duplicates. Imports inside a folder stay relative, and no file imports its own index. `AppRouter` now lazy-loads the screens through the barrel with `import('…/screens').then((m) => ({ default: m.LoginScreen }))`. As a result, Login and Register now ship as one 3.32 kB `screens` chunk instead of `LoginScreen` 1.31 kB + `RegisterScreen` 1.40 kB + `hooks` 0.87 kB. This is a bundle-only change; behaviour is unchanged. No tests changed; `client/tests` and the server contract test load files by path. Client `check:architecture` went 162 → 115: barrel 156 → 109, no-orphans 6 → 6. All 47 removed hits target `src/security/`, no hits were added, 0 security targets remain, and no new barrel is an orphan. Server `check:architecture` stays at 130. Client `npm ci`/test 65/65/build/lint pass; server build, 29/29 tests and startup 3/3 pass; `git diff --check` is clean. Left for P2.T8: the security files' deep imports of `components/app/Logo`, `shared/*` and `foundation/session/storage`.
     - 2026-10-25 — Manager: reviewed (8 minimal barrels, no test changes, 162 → 115 with all 47 removed hits in security and none added, server green); squash-merged PR #10. The merged Login/Register lazy chunk was accepted as the convention.
 
-- [ ] **P2.T6 — Client barrels: profile**
+- [~] **P2.T6 — Client barrels: profile**
   - Type: refactor
   - Branch: task/dependency-cruiser/p2-t6
   - Base: feat/dependency-cruiser
@@ -350,3 +350,4 @@ Exit criteria: CI fails any PR with an architecture violation, and the docs list
 - 2026-10-25 — Manager: P2.T4 merged (PR #9). Logged unused UiSnackbar as an Open Question.
 - 2026-10-25 — Manager: new rule — worker sessions end at `[r]` without waiting for merge (RULES.md, playbook). Dispatched P2.T5 to Devin.
 - 2026-10-25 — Manager: P2.T5 merged (PR #10). Logged the lazy-screens-via-barrel convention as a Decision and in P2.T6/T7 Context.
+- 2026-10-25 — Manager: dispatched P2.T6 to Devin.
