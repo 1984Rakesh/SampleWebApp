@@ -9,7 +9,7 @@ export default function ProfileEditForm({ name, email, bio, isSubmitting, errorM
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Account details</CardTitle>
+        <CardTitle className="text-[22px] leading-7 tracking-tight">Account details</CardTitle>
         <CardDescription>Update the name shown across the app.</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -39,7 +39,7 @@ export default function ProfileEditForm({ name, email, bio, isSubmitting, errorM
           </div>
         </CardContent>
         <CardFooter className="justify-end gap-2 border-t">
-          <Button variant="outline" onClick={onCancel} disabled={isSubmitting}>Cancel</Button>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>Cancel</Button>
           <Button type="submit" disabled={isSubmitting || !name.trim()}>
             {isSubmitting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
             Save changes
