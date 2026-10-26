@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { UiButton, UiCode, UiPaper } from '../../../components/ui';
+import { Button } from '../../../components/ui';
 
 interface CodeBlockProps {
   code: string;
@@ -21,22 +21,25 @@ export default function CodeBlock({ code, language = 'typescript', title }: Code
   };
 
   return (
-    <UiPaper
-      tone="dark"
-      title={title}
-      action={
-        <UiButton
-          variant="solid"
-          tone="muted"
+    <div className="overflow-hidden rounded-md border border-border bg-muted text-foreground">
+      {title && (
+        <div className="border-b border-border bg-accent px-4 py-2 text-sm font-medium text-muted-foreground">{title}</div>
+      )}
+      <div className="relative">
+        <Button
+          type="button"
+          variant="secondary"
           size="sm"
+          className="absolute top-2 right-2"
+          aria-label={copied ? 'Code copied' : 'Copy code'}
           onClick={copyToClipboard}
-          ariaLabel="Copy code"
         >
-          {copied ? 'Copied!' : 'Copy'}
-        </UiButton>
-      }
-    >
-      <UiCode code={code} language={language} />
-    </UiPaper>
+          {copied ? 'Copied' : 'Copy'}
+        </Button>
+        <pre className="overflow-x-auto p-4">
+          <code className={`language-${language} text-sm`}>{code}</code>
+        </pre>
+      </div>
+    </div>
   );
 }
