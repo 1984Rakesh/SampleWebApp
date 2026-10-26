@@ -109,7 +109,6 @@
 @theme inline {
   --font-sans: "DM Sans", system-ui, sans-serif;
   --font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", "DM Sans", sans-serif;
-  --font-heading: "Bricolage Grotesque Variable", "Bricolage Grotesque", "DM Sans", sans-serif;
 
   --radius-sm: 9px;
   --radius-md: var(--radius);
