@@ -1,7 +1,7 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
 - Current phase: P2 — Rules and shared components
-- Next task: P2.T3a (fix-up of PR #26, not dispatched)
+- Next task: P2.T3a (Devin Local Agent, run manually)
 - Last updated: 2026-10-25
 
 ## Goal
@@ -22,7 +22,7 @@ Exit criteria: dependency-cruiser and docs allow direct shadcn in feature presen
 - [x] P2.T2 — Rebuild components/app on primitives · ui · PR #24 · deps P2.T1
 - [x] P2.T2a — ChecklistRow chip variants (fix-up of PR #24) · fix · PR #25 · deps P2.T2
 - [r] P2.T3 — AppHeader, navbar and feedback · ui · PR #26 · deps P2.T2
-- [ ] P2.T3a — Restore navbar wiring assertions (fix-up of PR #26) · test · PR — · deps P2.T3
+- [~] P2.T3a — Restore navbar wiring assertions (fix-up of PR #26) · test · PR — · deps P2.T3
 - [-] P2.T4 — Trim AGENTS.md files to pointers · setup · dropped (done by Manager 2026-10-25)
 
 ## Phase 3 — Screens use shadcn directly
