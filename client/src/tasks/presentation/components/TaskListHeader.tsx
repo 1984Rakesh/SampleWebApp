@@ -1,12 +1,10 @@
-import { UiFlex, UiText } from '../../../components/ui';
-
 interface TaskListHeaderProps { total: number; todo: number }
 
 export default function TaskListHeader({ total, todo }: TaskListHeaderProps) {
   return (
-    <UiFlex column gap={1} mb={3}>
-      <UiText variant="pageTitle">Tasks</UiText>
-      <UiText tone="muted">{total} tasks in total, {todo} still to do.</UiText>
-    </UiFlex>
+    <div className="flex flex-col gap-1">
+      <h1 className="font-display text-[42px] leading-[46px] font-bold tracking-tight">Tasks</h1>
+      <p className="text-muted-foreground">{total} tasks in total, {todo} still to do.</p>
+    </div>
   );
 }
