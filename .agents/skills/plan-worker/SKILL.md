@@ -33,7 +33,7 @@ Exception: if your task file names another task file, PR or source file as a ref
 ## 1. Sync and read (one command)
 - Work in the current checkout (the repo root). If `npm`/`node` is not on PATH, `source ~/.nvm/nvm.sh` in the same command.
 - Your first command does all of this: `git fetch -q`, check out **Base** and `git pull -q`, create **Branch** from it, `cat -n` the task file(s), `conventions.md` and every path on the `Files:` line, print RULES.md's verify section (`sed -n '/^## Verify commands/,/^## Task types/p' plans/RULES.md`), and install dependencies quietly (`(cd client && npm ci > /tmp/install.log 2>&1 && echo INSTALL OK || tail -n 30 /tmp/install.log)`).
-- If the working tree has uncommitted changes, stop and report instead of stashing or discarding them.
+- If the working tree has uncommitted changes, stop and report instead of stashing or discarding them. After the push, check out **Base** again so the checkout is left as you found it.
 - Note Type, Branch, Base, Files, Context, Do, Done when and Manager notes. Manager notes override general habits; they never override RULES.md or conventions.md (if they conflict, follow the notes and flag it in the PR).
 - Beyond your Files, read only the references the task's **Read only** line names, and only the line ranges given; add them to the first command when you can. Never `cat` a reference over ~150 lines: `grep -n` the names you need and `sed -n` just those ranges.
 - Everything else is off-limits, including `Ui*` wrapper sources and design-system files not on the **Read only** line. If a fact is missing, one `grep -n` per question is allowed; record the gap under Open questions.
@@ -50,7 +50,8 @@ Exception: if your task file names another task file, PR or source file as a ref
 
 ## 4. Edit, verify, record and commit (one command)
 - In a single foreground command, chained with `&&` from the repo root: write all edits; run verify (`(cd client && npm run verify > /tmp/verify.log 2>&1) && echo VERIFY OK`); run every **Done when** check; update the task file (`Status: [r]`, `PR: pending`, the Report lines below); `git add -A && git commit -q -m "<ID>: <task title>"`. End the chain with `|| { echo FAIL; tail -n 60 /tmp/verify.log; }`.
-- Never run verify in the background. Never print full logs.
+- Run every command in the foreground with a long timeout (`timeout` 300000 ms or more): verify takes 2–4 minutes, and a backgrounded command costs extra `get_output` turns. Never print full logs.
+- Test counts: the verify log uses the dot reporter and prints no totals. When a Done-when needs a count, add `(cd client && node --test --test-concurrency=1 --test-reporter=spec tests/*.test.mjs 2>&1 | grep -E '^ℹ (tests|pass|fail)')` to the same chain; don't grep the verify log for counts.
 - On a failure, read only the relevant lines (`grep -n -C 5 -E 'error|Error|FAIL|✖' /tmp/verify.log | head -80`), fix, and rerun the same chain once. If it can't pass within scope, go to Blocked.
 - List any Done-when check you couldn't run under Open questions.
 - Report lines (append to `## Report (Worker)`; no other lines):
@@ -62,8 +63,8 @@ Exception: if your task file names another task file, PR or source file as a ref
   Never set `[x]`. The Manager records the PR number.
 
 ## 5. Push and open the PR (one turn)
-- `git push -q -u origin <Branch>`, then open the PR in the same turn. Target **Base** (never `main`); title `<ID>: <task title>` (batch: `<ID1>+<ID2>: <title>`).
-- Use your built-in PR tool if you have one, else `gh pr create --base <Base> --title … --body …`. If neither works, reply with the compare URL `https://github.com/<owner>/<repo>/compare/<Base>...<Branch>` instead.
+- `git push -q -u origin <Branch>`. PR target is **Base** (never `main`); title `<ID>: <task title>` (batch: `<ID1>+<ID2>: <title>`).
+- Local runs have no working PR tool here (the GitHub MCP doesn't connect and `gh` isn't installed): don't try. After the push, reply with the compare URL `https://github.com/<owner>/<repo>/compare/<Base>...<Branch>` and put the PR body you would have written in the reply's last lines (at most 10). The Manager opens the PR.
 - PR body (the only place for full detail): summary, files outside the list with reasons, verification summary, before/after numbers the Manager notes ask for, open questions.
 - Do NOT merge, approve, rebase or force-push other branches.
 
@@ -77,4 +78,4 @@ Exception: if your task file names another task file, PR or source file as a ref
 
 ## Finish: reply once, then stop
 - Once the PR is open, your work is complete. Don't wait for, poll or check CI.
-- Reply once, at most 3 lines: `<ID> [r] PR #N · <key metric> · questions: <n> (see PR)`. Then stop: don't ask "anything else?".
+- Reply once: `<ID> [r] <compare URL> · <key metric> · questions: <n>`, then the short PR body. Then stop: don't ask "anything else?".
