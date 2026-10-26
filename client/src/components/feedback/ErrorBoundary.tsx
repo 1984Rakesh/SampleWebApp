@@ -1,5 +1,5 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { UiPage, UiCard, UiCardContent, UiCardHeader, UiButton, UiText } from '../ui';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '../ui';
 
 interface Props {
   children: ReactNode;
@@ -32,19 +32,21 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <UiPage>
-          <UiCard maxWidth={448}>
-            <UiCardHeader title="Something went wrong" />
-            <UiCardContent>
-              <UiText tone="muted" mb={3}>
+        <main className="mx-auto flex min-h-screen w-full max-w-[1200px] items-center justify-center px-4 sm:px-8">
+          <Card className="w-full max-w-md rounded-xl">
+            <CardHeader>
+              <CardTitle className="font-display text-xl font-semibold">Something went wrong</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <p className="text-muted-foreground">
                 {this.state.error?.message || 'An unexpected error occurred'}
-              </UiText>
-              <UiButton variant="solid" fullWidth onClick={() => window.location.reload()}>
-                Reload Page
-              </UiButton>
-            </UiCardContent>
-          </UiCard>
-        </UiPage>
+              </p>
+              <Button className="w-full" onClick={() => window.location.reload()}>
+                Reload page
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
       );
     }
 
