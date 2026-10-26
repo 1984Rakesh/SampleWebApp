@@ -177,6 +177,14 @@ module.exports = {
       to: { path: UI_BARREL },
     },
     {
+      name: 'presentation-logic-not-to-ui-barrel',
+      severity: 'error',
+      comment:
+        'shared §2 No Leaky Abstractions / client §4.7: ViewModels (presentation/hooks), presentation models and contexts stay UI-library free; only type imports such as SelectOption may come from the components/ui barrel.',
+      from: { path: `^src/${FEATURE_NAME}/presentation/(?:models|hooks|context)/` },
+      to: { path: UI_BARREL, dependencyTypesNot: ['type-only'] },
+    },
+    {
       name: 'shared-modules-not-to-features-or-app',
       severity: 'error',
       comment:

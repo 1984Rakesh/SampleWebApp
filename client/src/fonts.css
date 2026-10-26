@@ -1,4 +1,4 @@
-/* Self-hosted webfonts (fontsource). Mapped to Tailwind font-sans / font-display / font-heading in index.css. */
+/* Self-hosted webfonts (fontsource). Mapped to Tailwind font-sans / font-display in index.css. */
 @import "@fontsource-variable/bricolage-grotesque/index.css";
 @import "@fontsource/dm-sans/400.css";
 @import "@fontsource/dm-sans/500.css";
