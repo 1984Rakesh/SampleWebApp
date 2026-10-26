@@ -1,7 +1,7 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
 - Current phase: P3 — Screens use shadcn directly
-- Next task: P4.T2 (not dispatched)
+- Next: batch B3 = P4.T2 + P4.T3 (not dispatched)
 - Last updated: 2026-10-25
 
 ## Goal
