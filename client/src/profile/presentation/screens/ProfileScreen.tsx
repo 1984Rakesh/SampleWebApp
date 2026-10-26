@@ -1,22 +1,31 @@
+import { OctagonX } from 'lucide-react';
 import { useUserViewModel } from '../hooks';
 import { LoadingSpinner } from '../../../components/feedback';
 import { ProfileAppearance, ProfileEditForm, UserProfileCard } from '../components';
-import { UiAlert, UiAsideGrid, UiFlex, UiPage, UiScreen, UiText } from '../../../components/ui';
+import { Alert, AlertDescription } from '../../../components/ui';
 
 export default function ProfileScreen() {
   const user = useUserViewModel();
-  if (user.isLoading) return <UiPage><LoadingSpinner text="Loading profile..." /></UiPage>;
-  if (!user.profile) return <UiPage><UiText tone="muted">No user found</UiText></UiPage>;
+  if (user.isLoading) return <main className="flex min-h-screen items-center justify-center bg-background p-4"><LoadingSpinner text="Loading profile..." /></main>;
+  if (!user.profile) return <main className="flex min-h-screen items-center justify-center bg-background p-4"><p className="text-muted-foreground">No user found</p></main>;
   return (
-    <UiScreen maxWidth="5xl">
-      <UiFlex column gap={3}>
-        <UiFlex column gap={1}><UiText variant="pageTitle">Profile</UiText><UiText tone="muted">Manage your personal details and preferences.</UiText></UiFlex>
-        {user.errorMessage && <UiAlert type="error" gutterBottom>{user.errorMessage}</UiAlert>}
-        <UiAsideGrid template="sidebar" gap={2.5}>
+    <main className="min-h-screen bg-background px-4 py-4 md:px-8 md:pt-10 md:pb-16">
+      <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <h1 className="font-display text-[42px] leading-[46px] font-bold tracking-tight">Profile</h1>
+          <p className="text-muted-foreground">Manage your personal details and preferences.</p>
+        </div>
+        {user.errorMessage && (
+          <Alert variant="destructive" className="mb-4">
+            <OctagonX />
+            <AlertDescription>{user.errorMessage}</AlertDescription>
+          </Alert>
+        )}
+        <div className="grid items-start gap-5 md:grid-cols-[280px_minmax(0,1fr)]">
           <UserProfileCard profile={user.profile} created={user.taskCounts.created} completed={user.taskCounts.completed} completedLabel={user.statusLabels.completed} />
-          <UiFlex column gap={2.5}><ProfileEditForm name={user.editName} email={user.profile.email} bio={user.editBio} isSubmitting={user.isUpdating} errorMessage={user.updateErrorMessage} onNameChange={user.setEditName} onBioChange={user.setEditBio} onSubmit={user.saveProfile} onCancel={user.cancelEditing} /><ProfileAppearance /></UiFlex>
-        </UiAsideGrid>
-      </UiFlex>
-    </UiScreen>
+          <div className="flex flex-col gap-5"><ProfileEditForm name={user.editName} email={user.profile.email} bio={user.editBio} isSubmitting={user.isUpdating} errorMessage={user.updateErrorMessage} onNameChange={user.setEditName} onBioChange={user.setEditBio} onSubmit={user.saveProfile} onCancel={user.cancelEditing} /><ProfileAppearance /></div>
+        </div>
+      </div>
+    </main>
   );
 }
