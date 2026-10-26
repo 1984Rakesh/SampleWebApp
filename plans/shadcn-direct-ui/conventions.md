@@ -8,7 +8,7 @@ Follows plans/RULES.md. Rules below apply to every task in this plan.
 
 ## Styling
 - Never write hex/rgb colours in `src` outside the theme CSS; use token utilities (`bg-card`, `text-muted-foreground`, `bg-priority-high`, `border-divider`, …).
-- Fonts: `font-display` (Bricolage Grotesque) for page/card/dialog titles and stat numbers; `font-sans` (DM Sans) for the rest. Type sizes from `tokens.json` (`display-xl` 42/46 bold, `display-lg` 28/32, `display-md`, `stat`, …).
+- Fonts: `font-display` (Bricolage Grotesque) for page/card/dialog titles and stat numbers; `font-sans` (DM Sans) for the rest. Type sizes from `tokens.json` (`display-xl` 42/46 bold, `display-lg` 28/32, `display-md` 22/28, `stat`, …). There are no `display-*` utilities: write the bracket classes each token's `usage` lists (e.g. `font-display text-[22px] leading-7 font-semibold tracking-tight`). Card titles use `display-md`; auth-screen card titles `display-lg` (since P3.T1).
 - Radii: inputs/buttons `rounded-md`; stat cards `rounded-card`; content cards `rounded-xl`; dialog `rounded-2xl`; badges/nav pills `rounded-full`.
 - Page content `mx-auto w-full max-w-[1200px] px-8` (Profile `max-w-[1000px]`); sections `gap-6`/`gap-8`; card padding `p-5`–`p-7`. Must work at 375px (use `px-4 sm:px-8`, stacking grids, horizontally scrolling tables).
 - No emoji, no exclamation marks, sentence case labels. Priority/status always show the word.
@@ -22,6 +22,7 @@ Follows plans/RULES.md. Rules below apply to every task in this plan.
 - Screens/components render ViewState and primitives only; ViewModels, hooks, handlers, routes, test ids and API/session contracts do not change.
 - Task-specific UI (task table, task badges mapping, task dialog) stays in `tasks/presentation/components`; dashboard uses its own display contracts plus generic `components/app` pieces (StatCard, ChecklistRow). No new cross-feature imports.
 - A new file must be imported in the same task (no-orphans rule).
+- Don't open the old `Ui*` wrapper sources: each task's Manager notes list what the wrappers it replaces did (since P3.T2).
 
 ## shadcn CLI
 - Avoid rerunning the CLI; edit the vendored files directly. If a task must run it, use `npx shadcn@4.22.0` (pinned) from `client/`.
