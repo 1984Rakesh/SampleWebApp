@@ -1,8 +1,8 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
-- Current phase: P3 — Screens use shadcn directly
-- Next task: P4.T4 (Manager's browser walkthrough; not started)
-- Last updated: 2026-10-25
+- Current phase: complete (all phases merged)
+- Next task: none. Walkthrough findings F1–F4 (see tasks/P4.T4.md) are follow-ups outside this plan
+- Last updated: 2026-10-26
 
 ## Goal
 Delete the ~45 custom `Ui*` wrappers in `client/src/components/ui/`, regenerate the shadcn/ui primitives styled to the Tasks App DS (`design-system/` in this folder, copied from https://claude.ai/artifact/ETKyCDM6Luq1GCm5n6um56), and have every screen use the shadcn components directly. Done means: no `Ui*` file or import left, rules/docs/dependency-cruiser describe direct shadcn usage, all client checks green, every screen works in light/dark at desktop and 375px.
@@ -41,4 +41,4 @@ Exit criteria: no `client/src/components/ui/Ui*`; tests cover DS primitives; doc
 - [x] P4.T1 — Replace wrapper tests · test · PR #35 · deps P3.T1–P3.T7
 - [x] P4.T2 — Delete the Ui* wrapper layer · refactor · PR #36 · deps P4.T1
 - [x] P4.T3 — Vendor DS docs · setup · PR #36 · deps P4.T2
-- [ ] P4.T4 — Browser acceptance walkthrough · test · PR — · deps P4.T3
+- [x] P4.T4 — Browser acceptance walkthrough · test · PR #37 · deps P4.T3
