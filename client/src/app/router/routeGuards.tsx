@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { UiPage, UiText } from '../../components/ui';
+import { LoadingSpinner } from '../../components/feedback';
 import { useAuth } from '../../security/presentation/context';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -9,9 +9,9 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <UiPage>
-        <UiText tone="muted">Loading...</UiText>
-      </UiPage>
+      <main className="flex min-h-screen items-center justify-center bg-background p-4">
+        <LoadingSpinner text="Loading..." />
+      </main>
     );
   }
 
@@ -27,9 +27,9 @@ export function PublicRoute({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <UiPage>
-        <UiText tone="muted">Loading...</UiText>
-      </UiPage>
+      <main className="flex min-h-screen items-center justify-center bg-background p-4">
+        <LoadingSpinner text="Loading..." />
+      </main>
     );
   }
 
