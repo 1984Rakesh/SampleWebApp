@@ -1,12 +1,11 @@
 ---
-description: "Express server clean architecture rules"
-trigger: glob
-globs: "server/**"
+name: server-architecture
+description: Express + SQLite server clean-architecture rules (layer table, domain, persistence and SQL, auth/JWT, controllers and API, App wiring, verification). Use before changing code under server/; read the shared clean-architecture skill too when a change crosses a boundary.
 ---
 
 # Server Clean Architecture Rules (Express + SQLite)
 
-Extend the [shared rules](../../../.devin/rules/clean-architecture.md). Inside a feature: Presentation → Domain ← Infrastructure. The dependency-cruiser config cites these section numbers; keep them stable.
+Extend the [shared rules](../clean-architecture/SKILL.md). Inside a feature: Presentation → Domain ← Infrastructure. The dependency-cruiser config cites these section numbers (server §n); keep them stable.
 
 ## 1. Module and Layer Dependencies
 
@@ -50,7 +49,7 @@ Features that share a table own separate ports and adapters; App gives both adap
 ## 5. Module Folders, Barrels and Orphans
 
 1. Module folders as in shared §7; non-feature roots are `app`, `foundation`, `shared`.
-2. Cross-folder imports use the folder's `index.ts`; same-folder imports are relative; barrels export only public API.
+2. Barrels as in shared §7.
 3. No orphans except the entry `src/server.ts` and `*.d.ts`.
 4. `src` never imports `tests`. `server/tests/` may import only `client/src/<feature>/data/{dtos,mappers}` (contract test).
 
@@ -58,4 +57,4 @@ Features that share a table own separate ports and adapters; App gives both adap
 
 - Only `app/config.ts` reads `process.env` and rejects missing/default production JWT secrets; `dotenv` only in `server.ts` and `app/`. Only `app/container.ts` constructs adapters, use cases, controllers and routers; `app/createApp.ts` mounts middleware and routes; `server.ts` configures, migrates, awaits the seed, then listens.
 - `src` uses only packages in `dependencies`, never devDependencies; every import resolves.
-- Run `npm run build`, `npm test`, `npm run test:startup`, `npm run check:architecture` and `git diff --check`. Test safety rules are in [server/AGENTS.md](../../AGENTS.md).
+- Run `npm run build`, `npm test`, `npm run test:startup`, `npm run check:architecture` and `git diff --check`. Test safety rules are in [server/AGENTS.md](../../../server/AGENTS.md).

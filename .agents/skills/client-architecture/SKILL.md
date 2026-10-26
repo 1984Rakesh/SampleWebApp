@@ -1,11 +1,11 @@
 ---
-description: "React client clean architecture rules"
-trigger: always_on
+name: client-architecture
+description: React client clean-architecture rules (layer table, domain, data/React Query, presentation and shadcn UI boundary, session sync, verification). Use before changing code under client/; read the shared clean-architecture skill too when a change crosses a boundary.
 ---
 
 # Client Clean Architecture Rules (React)
 
-Extend the [shared rules](../../../.devin/rules/clean-architecture.md). Inside a feature: Presentation → Domain ← Data. The dependency-cruiser config cites these section numbers; keep them stable.
+Extend the [shared rules](../clean-architecture/SKILL.md). Inside a feature: Presentation → Domain ← Data. The dependency-cruiser config cites these section numbers (client §n); keep them stable.
 
 ## 1. Module and Layer Dependencies
 
@@ -28,7 +28,7 @@ Extend the [shared rules](../../../.devin/rules/clean-architecture.md). Inside a
 1. Models own entities, constants, normalizers and command/query value types; repositories import models only, never use cases. Every read and mutation has a focused use case and repository contract.
 2. Each feature owns its models and DTOs even when data overlaps another feature's; never alias or re-export another feature's entity. App maps between them.
 3. Validate mutations in domain (including whitespace-only names); UI hints and schemas do not replace it.
-4. Payloads never carry `userId`; nullable updates keep tri-state semantics through domain inputs and DTOs.
+4. `userId` and tri-state patches: shared §2, §5.
 
 ## 3. Data and Composition
 
@@ -60,7 +60,7 @@ Extend the [shared rules](../../../.devin/rules/clean-architecture.md). Inside a
 ## 6. Module Folders, Barrels and Orphans
 
 1. Module folders as in shared §7; non-feature roots are `app`, `foundation`, `shared`, `components`.
-2. Cross-folder imports use the folder's `index.ts`; same-folder imports are relative; barrels export only public API.
+2. Barrels as in shared §7.
 3. No orphans except the entry `src/main.tsx` and `*.d.ts`.
 
 ## 7. Verification

@@ -1,11 +1,11 @@
 # Agent Instructions
 
 Read before changing code:
-- Shared: [clean-architecture rules](./.devin/rules/clean-architecture.md).
-- Client: [client/AGENTS.md](./client/AGENTS.md) and [client rules](./client/.devin/rules/client-architecture.md).
-- Server: [server/AGENTS.md](./server/AGENTS.md) and [server rules](./server/.devin/rules/server-architecture.md).
+- Shared: [clean-architecture rules](./.agents/skills/clean-architecture/SKILL.md).
+- Client: [client/AGENTS.md](./client/AGENTS.md) and [client rules](./.agents/skills/client-architecture/SKILL.md).
+- Server: [server/AGENTS.md](./server/AGENTS.md) and [server rules](./.agents/skills/server-architecture/SKILL.md).
 
-The rule files are the source of truth; these AGENTS files only add workflow and verification.
+The rule files are agent skills (loaded on demand, not injected every turn) and the source of truth; these AGENTS files only add workflow and verification.
 
 ## Workflow
 

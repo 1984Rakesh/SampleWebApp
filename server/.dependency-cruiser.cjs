@@ -1,7 +1,7 @@
 /**
  * Server architecture boundaries. Every rule is error-level and enforces a rule from
- * server/.devin/rules/server-architecture.md (server §n) or
- * .devin/rules/clean-architecture.md (shared §n). Never weaken a rule to pass.
+ * .agents/skills/server-architecture/SKILL.md (server §n) or
+ * .agents/skills/clean-architecture/SKILL.md (shared §n). Never weaken a rule to pass.
  *
  * TypeScript 7 has no JS compiler API, so sources are parsed with swc (@swc/core).
  */

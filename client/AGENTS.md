@@ -1,6 +1,6 @@
 # Client Agent Instructions (React)
 
-Follow the [client rules](./.devin/rules/client-architecture.md), [shared rules](../.devin/rules/clean-architecture.md) and [root instructions](../AGENTS.md).
+Follow the [client rules](../.agents/skills/client-architecture/SKILL.md), [shared rules](../.agents/skills/clean-architecture/SKILL.md) and [root instructions](../AGENTS.md).
 
 ## Layout
 

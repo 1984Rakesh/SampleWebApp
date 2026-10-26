@@ -9,11 +9,11 @@ Applies to every plan in `plans/`. The Manager (Claude) owns this file; Devin re
 
 ## Architecture
 The authoritative rules are in the repo:
-- Root: `AGENTS.md`, `.devin/rules/clean-architecture.md`
-- Client: `client/AGENTS.md`, `client/.devin/rules/client-architecture.md`
-- Server: `server/AGENTS.md`, `server/.devin/rules/server-architecture.md`
+- Root: `AGENTS.md`, `.agents/skills/clean-architecture/SKILL.md`
+- Client: `client/AGENTS.md`, `.agents/skills/client-architecture/SKILL.md`
+- Server: `server/AGENTS.md`, `.agents/skills/server-architecture/SKILL.md`
 
-Read the shared files and the side you touch before every task. Summary:
+The rule files are skills, loaded only when invoked. Workers invoke one only when the task's Read only line names it (domain, data, API or module-structure changes); for other tasks the summary below, the task file and `check:architecture` cover it. Summary:
 ```
 Building blocks: Foundation → Features → App
 Imports:         App → Features / Foundation

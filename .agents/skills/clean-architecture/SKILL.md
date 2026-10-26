@@ -1,11 +1,11 @@
 ---
-description: "Shared clean architecture rules"
-trigger: always_on
+name: clean-architecture
+description: Shared clean-architecture rules for client and server (dependency rule, boundaries, use cases, errors, API contract, naming, barrels). Use before changing domain, data/infrastructure, API contracts or module structure on either side.
 ---
 
 # Clean Architecture Rules (Shared)
 
-Apply to client and server. Side rules: [client](../../client/.devin/rules/client-architecture.md), [server](../../server/.devin/rules/server-architecture.md). The dependency-cruiser configs cite these section numbers; keep them stable.
+Apply to client and server. Side rules: [client](../client-architecture/SKILL.md), [server](../server-architecture/SKILL.md). The dependency-cruiser configs cite these section numbers (shared §n); keep them stable.
 
 ## 1. Dependency Rule
 

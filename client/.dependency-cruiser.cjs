@@ -1,7 +1,7 @@
 /**
  * Client architecture boundaries. Every rule is error-level and enforces a rule from
- * client/.devin/rules/client-architecture.md (client §n) or
- * .devin/rules/clean-architecture.md (shared §n). Never weaken a rule to pass.
+ * .agents/skills/client-architecture/SKILL.md (client §n) or
+ * .agents/skills/clean-architecture/SKILL.md (shared §n). Never weaken a rule to pass.
  */
 
 const ROOTS = '(?:app|foundation|shared|components|assets)';

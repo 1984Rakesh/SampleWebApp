@@ -1,6 +1,6 @@
 # Server Agent Instructions (Express + SQLite)
 
-Follow the [server rules](./.devin/rules/server-architecture.md), [shared rules](../.devin/rules/clean-architecture.md) and [root instructions](../AGENTS.md).
+Follow the [server rules](../.agents/skills/server-architecture/SKILL.md), [shared rules](../.agents/skills/clean-architecture/SKILL.md) and [root instructions](../AGENTS.md).
 
 ## Layout
 
