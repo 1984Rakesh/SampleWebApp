@@ -96,17 +96,15 @@ function storage(t, initial = {}) {
 
 test('shared navbar renders supplied links, user and theme without feature or App providers', () => {
   const html = renderToStaticMarkup(memory(createElement(Navbar, navbarProps())));
-  for (const text of ['Test User', 'Clean Architecture', 'href="/tasks"', 'href="/profile"', 'aria-current="page"', 'aria-label="New task"', 'aria-label="Log out"']) {
+  for (const text of ['Test User', 'Clean Architecture', 'href="/tasks"', 'href="/profile"', 'aria-current="page"', 'aria-label="New task"', 'aria-label="Log out"', 'aria-label="Toggle theme"']) {
     assert.ok(html.includes(text), `Missing navbar content: ${text}`);
   }
-  for (const [mode, tooltip, icon] of [
-    ['light', 'Switch to dark theme', 'theme-dark'],
-    ['dark', 'Switch to light theme', 'theme-light'],
+  for (const [mode, title] of [
+    ['light', 'Switch to dark theme'],
+    ['dark', 'Switch to light theme'],
   ]) {
-    const toolbar = NavbarToolbar(navbarProps({ view: { ...view, mode } }));
-    const toggle = descendants(toolbar).find((item) => item.props.ariaLabel === 'Toggle theme');
-    assert.equal(toggle.props.tooltip, tooltip);
-    assert.equal(toggle.props.icon, icon);
+    const themed = renderToStaticMarkup(memory(createElement(Navbar, navbarProps({ view: { ...view, mode } }))));
+    assert.ok(themed.includes(`title="${title}"`), `Missing theme toggle title: ${title}`);
   }
 });
 
@@ -123,16 +121,19 @@ test('controlled navbar forwards actions and mobile drawer state through narrow 
   const entry = Navbar(props);
   assert.equal(entry.props.children[1].props.open, true);
   const toolbar = NavbarToolbar(entry.props.children[0].props);
+  const rendered = toolbar.type(toolbar.props);
+  const nodes = descendants(rendered);
   for (const label of ['Open navigation', 'Toggle theme', 'Log out', 'New task']) {
-    const action = descendants(toolbar).find((item) => item.props.ariaLabel === label);
-    assert.ok(action);
+    const action = nodes.find((item) => item.props['aria-label'] === label);
+    assert.ok(action, `Missing ${label}`);
     action.props.onClick();
   }
   const drawer = NavbarDrawer(entry.props.children[1].props);
-  drawer.props.onClose();
-  const links = descendants(drawer).find((item) => Array.isArray(item.props.items)).props.items;
-  assert.deepEqual(links.map(({ to, label }) => ({ to, label })), view.links);
-  links[0].onClick();
+  assert.equal(drawer.props.open, true);
+  drawer.props.onOpenChange(false);
+  const links = descendants(drawer).filter((item) => typeof item.props.to === 'string');
+  assert.deepEqual(links.map(({ props }) => ({ to: props.to, label: props.children })), view.links);
+  links[0].props.onClick();
   assert.deepEqual(calls, ['open', 'theme', 'logout', 'create', 'close', 'close']);
 });
 

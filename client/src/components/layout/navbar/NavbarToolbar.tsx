@@ -1,46 +1,47 @@
-import {
-  UiAppBar, UiAvatar, UiButton, UiFlex, UiIconButton, UiNavButton, UiResponsive, UiText, UiToolbar,
-} from '../../ui';
-import { Logo } from '../../app';
+import { NavLink } from 'react-router-dom';
+import { Menu, Plus } from 'lucide-react';
+import { Button, cn } from '../../ui';
+import { AppHeader, type AppHeaderLinkSlot } from '../../app';
 import type { NavbarProps } from './NavbarViewState';
 
 type Props = Pick<NavbarProps, 'view' | 'onOpenNavigation' | 'onToggleTheme' | 'onLogout' | 'onCreateTask'>;
 
+function renderRouterLink({ href, className, activeClassName, ariaLabel, children }: AppHeaderLinkSlot) {
+  return (
+    <NavLink
+      to={href}
+      end={href === '/dashboard'}
+      aria-label={ariaLabel}
+      className={({ isActive }) => cn(className, isActive && activeClassName)}
+    >
+      {children}
+    </NavLink>
+  );
+}
+
 export default function NavbarToolbar({ view, onOpenNavigation, onToggleTheme, onLogout, onCreateTask }: Props) {
   return (
-    <UiAppBar>
-      <UiToolbar>
-        <UiIconButton icon="menu" ariaLabel="Open navigation" onClick={onOpenNavigation} hideFrom="md" />
-        <UiFlex grow align="center" minWidth0 gap={1}>
-          <UiButton to={view.brand.to} ariaLabel="Go to Dashboard" noShrink>
-            <Logo name={view.brand.label} hideWordmarkBelow="sm" />
-          </UiButton>
-          <UiResponsive display="flex" hideBelow="md">
-            <UiFlex gap={0.5} ml={1}>
-              {view.links.map((link) => <UiNavButton key={link.to} to={link.to}>{link.label}</UiNavButton>)}
-            </UiFlex>
-          </UiResponsive>
-        </UiFlex>
-        <UiFlex align="center" gap={1}>
-          <UiIconButton
-            icon={view.mode === 'light' ? 'theme-dark' : 'theme-light'}
-            ariaLabel="Toggle theme"
-            tooltip={view.mode === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
-            onClick={onToggleTheme}
-            bordered
-          />
-          <UiResponsive display="flex" hideBelow="md">
-            <UiButton to={view.profilePath} variant="outline" ariaLabel="Open profile">
-              <UiFlex align="center" gap={1}>
-                <UiAvatar label={view.initial} size="sm" tone="primary" variant="solid" />
-                <UiText variant="body2" weight="medium" noWrap maxWidth={180}>{view.userName}</UiText>
-              </UiFlex>
-            </UiButton>
-          </UiResponsive>
-          <UiIconButton icon="logout" ariaLabel="Log out" tooltip="Log out" onClick={onLogout} bordered />
-          <UiIconButton icon="add" ariaLabel="New task" tooltip="New task" onClick={onCreateTask} variant="solid" tone="primary" />
-        </UiFlex>
-      </UiToolbar>
-    </UiAppBar>
+    <AppHeader
+      appName={view.brand.label}
+      brandHref={view.brand.to}
+      navItems={view.links.map((link) => ({ href: link.to, label: link.label }))}
+      userName={view.userName}
+      userInitial={view.initial}
+      userHref={view.profilePath}
+      mode={view.mode}
+      onToggleTheme={onToggleTheme}
+      onLogout={onLogout}
+      renderLink={renderRouterLink}
+      leading={
+        <Button type="button" variant="ghost" size="icon" className="md:hidden" aria-label="Open navigation" onClick={onOpenNavigation}>
+          <Menu aria-hidden="true" />
+        </Button>
+      }
+      actions={
+        <Button type="button" size="icon" aria-label="New task" title="New task" onClick={onCreateTask}>
+          <Plus aria-hidden="true" />
+        </Button>
+      }
+    />
   );
 }

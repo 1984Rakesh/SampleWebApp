@@ -1,19 +1,125 @@
-/* Production entry for the Tailwind v4 + shadcn/ui app. Token files live beside it. */
+/* Production entry for the Tailwind v4 + shadcn/ui app. Theme tokens mirror
+   plans/shadcn-direct-ui/design-system/globals.css. */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./fonts.css";
-@import "./colors.css";
-@import "./radius.css";
 
 @custom-variant dark (&:is(.dark *));
 
+/* Light is :root, dark is .dark, as in a stock shadcn/ui install. */
+:root {
+  color-scheme: light;
+  --radius: 0.75rem;
+  --background: #f5f6fa;
+  --foreground: #141824;
+  --card: #ffffff;
+  --card-foreground: #141824;
+  --popover: #ffffff;
+  --popover-foreground: #141824;
+  --primary: #4655d4;
+  --primary-foreground: #ffffff;
+  --secondary: #ebedf2;
+  --secondary-foreground: #4a5468;
+  --muted: #f0f2f7;
+  --muted-foreground: #5b6577;
+  --accent: #e9ecfa;
+  --accent-foreground: #141824;
+  --destructive: #c23b2a;
+  --destructive-border: #f0c9c3;
+  --border: #e4e7ee;
+  --input: #cbd1dc;
+  --ring: #4655d4;
+  --header: #ffffff;
+  --inset: #ffffff;
+  --divider: #ecedf3;
+  --link: #3745b8;
+  --success: #3fa663;
+  --success-foreground: #ffffff;
+  --warning: #8a5a00;
+  --check-ring: #8a94a8;
+  --chart-1: #3fa663;
+  --chart-2: #4655d4;
+  --chart-3: #8790a5;
+  --priority-high: #fde8e4;
+  --priority-high-foreground: #b4321f;
+  --priority-medium: #fdf0d5;
+  --priority-medium-foreground: #8a5a00;
+  --priority-low: #ddf3ef;
+  --priority-low-foreground: #0b6b5e;
+  --status-todo: #ebedf2;
+  --status-todo-foreground: #4a5468;
+  --status-progress: #e6e9fc;
+  --status-progress-foreground: #3745b8;
+  --status-done: #ddf3e4;
+  --status-done-foreground: #1b6b3a;
+  --overlay: rgba(20, 24, 36, 0.5);
+  --card-shadow: 0 1px 2px rgba(20, 24, 36, 0.04);
+  --dialog-shadow: 0 24px 80px rgba(20, 24, 36, 0.3);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #0a0d13;
+  --foreground: #eceff5;
+  --card: #11151d;
+  --card-foreground: #eceff5;
+  --popover: #11151d;
+  --popover-foreground: #eceff5;
+  --primary: #8c9eff;
+  --primary-foreground: #0a0d13;
+  --secondary: #1e2430;
+  --secondary-foreground: #b5bdcc;
+  --muted: #0d1118;
+  --muted-foreground: #98a2b5;
+  --accent: #232b3b;
+  --accent-foreground: #eceff5;
+  --destructive: #ff9e8c;
+  --destructive-border: #3a2a2e;
+  --border: #1e2430;
+  --input: #2a3242;
+  --ring: #8c9eff;
+  --header: #0d1118;
+  --inset: #0d1118;
+  --divider: #1b212c;
+  --link: #a9b7ff;
+  --success: #8fe3a8;
+  --success-foreground: #0a0d13;
+  --warning: #f6c177;
+  --check-ring: #6b778e;
+  --chart-1: #8fe3a8;
+  --chart-2: #8c9eff;
+  --chart-3: #3a4458;
+  --priority-high: rgba(255, 143, 122, 0.14);
+  --priority-high-foreground: #ff9e8c;
+  --priority-medium: rgba(244, 184, 96, 0.14);
+  --priority-medium-foreground: #f6c177;
+  --priority-low: rgba(111, 211, 195, 0.14);
+  --priority-low-foreground: #7fdccb;
+  --status-todo: #1e2430;
+  --status-todo-foreground: #b5bdcc;
+  --status-progress: rgba(140, 158, 255, 0.16);
+  --status-progress-foreground: #a9b7ff;
+  --status-done: rgba(111, 214, 140, 0.14);
+  --status-done-foreground: #8fe3a8;
+  --overlay: rgba(0, 0, 0, 0.6);
+  --card-shadow: none;
+  --dialog-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+}
+
 @theme inline {
-  --font-sans: var(--font-body);
-  --font-heading: var(--font-display);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", "DM Sans", sans-serif;
+
+  --radius-sm: 9px;
+  --radius-md: var(--radius);
+  --radius-lg: 16px;
+  --radius-card: 18px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+
+  --shadow-card: var(--card-shadow);
+  --shadow-dialog: var(--dialog-shadow);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -29,26 +135,34 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-border: var(--destructive-border);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-header: var(--header);
+  --color-inset: var(--inset);
+  --color-divider: var(--divider);
+  --color-link: var(--link);
   --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
+  --color-check-ring: var(--check-ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-status-todo: var(--status-todo);
   --color-status-todo-foreground: var(--status-todo-foreground);
-  --color-status-progress: var(--status-progress);
-  --color-status-progress-foreground: var(--status-progress-foreground);
-  --color-status-done: var(--status-done);
-  --color-status-done-foreground: var(--status-done-foreground);
   --color-priority-high: var(--priority-high);
   --color-priority-high-foreground: var(--priority-high-foreground);
   --color-priority-medium: var(--priority-medium);
   --color-priority-medium-foreground: var(--priority-medium-foreground);
   --color-priority-low: var(--priority-low);
   --color-priority-low-foreground: var(--priority-low-foreground);
+  --color-status-progress: var(--status-progress);
+  --color-status-progress-foreground: var(--status-progress-foreground);
+  --color-status-done: var(--status-done);
+  --color-status-done-foreground: var(--status-done-foreground);
+  --color-overlay: var(--overlay);
 }
 
 @layer base {

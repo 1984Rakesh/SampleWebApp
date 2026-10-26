@@ -1,67 +1,20 @@
-# Clean Architecture Agent Instructions (Shared)
+# Agent Instructions
 
-Apply these instructions and the [shared architecture rules](./.devin/rules/clean-architecture.md) to every feature, bug fix and refactor. Existing violations are not precedents; remediate those within task scope with regression tests.
+Read before changing code:
+- Shared: [clean-architecture rules](./.agents/skills/clean-architecture/SKILL.md).
+- Client: [client/AGENTS.md](./client/AGENTS.md) and [client rules](./.agents/skills/client-architecture/SKILL.md).
+- Server: [server/AGENTS.md](./server/AGENTS.md) and [server rules](./.agents/skills/server-architecture/SKILL.md).
 
-## 1. Required Instructions
+The rule files are agent skills (loaded on demand, not injected every turn) and the source of truth; these AGENTS files only add workflow and verification.
 
-Before changing a side, read its instructions and rules:
-- Shared: this file and [shared rules](./.devin/rules/clean-architecture.md).
-- Server: [server/AGENTS.md](./server/AGENTS.md) and [server architecture](./server/.devin/rules/server-architecture.md).
-- Client: [client/AGENTS.md](./client/AGENTS.md) and [client architecture](./client/.devin/rules/client-architecture.md).
+## Workflow
 
-## 2. Target Architecture
+1. Domain first: models, value types, errors, repository/port contracts, one use case per operation.
+2. Data/infrastructure adapters with explicit mappings and boundary error translation.
+3. Presentation: server schemas/controllers/routes; client mappers, ViewState, ViewModels and prop-driven screens.
+4. Wire concrete implementations and cross-feature contracts only in App.
+5. Update affected rules, AGENTS files and links in the same change.
 
-```text
-Building blocks: Foundation → Features → App
-Imports:         App → Features / Foundation
-Within features: Presentation → Domain ← Data / Infrastructure
-```
+## Verification
 
-App binds features and performs DI, provider/route/shell registration and cross-feature adaptation. Foundation provides generic technical capabilities; it never imports features or App. Feature domains are pure TypeScript and never import foundation, frameworks, browser/server APIs or outer layers. Feature outer layers may use appropriate foundation capabilities. Cross-feature dependencies use narrow consumer-owned contracts injected by App, never sibling ViewModel/repository implementation imports.
-
-Target server modules: `app/`, `foundation/`, `security/`, `profile/`, `tasks/`, `shared/`, with thin `server.ts`. Target client modules add `dashboard/`, `comparison/`, shared `components/`, thin `App.tsx` and `main.tsx`. Within each feature use domain/infrastructure/presentation on server and domain/data/presentation on client as applicable; no empty layers for symmetry.
-
-The feature-first layout is in place on both sides. App maps account/profile/session/cache representations and injects display-only cross-feature capabilities (`DashboardCapabilities`, profile task-counts). Foundation exposes generic transport/storage/theme only, with no feature/App imports. Token refresh/signout/expiry are security-owned and wired through App; profile read/update ordering and authentication generations protect newer sessions/results. Public API/browser routes and stored user/token formats remain compatible.
-
-Imports from outside a module folder go through its `index.ts` barrel, and there are no orphan source files (see [shared rules §7](./.devin/rules/clean-architecture.md)). Boundaries are enforced by dependency-cruiser (shared rules §8).
-
-## 3. Implementation Workflow
-
-1. Define owned domain models/value types/normalization/errors, repository or port contracts and single-operation use cases. Ports depend only on models/minimal shared domain, never use cases. Every read and write goes through a use case and contract.
-2. Implement owned data/infrastructure adapters with explicit persistence/DTO/domain mappings and boundary error translation. Reuse generic foundation mechanisms, not sibling feature internals.
-3. Update presentation: server structural schemas/controllers/routes/response mapping; client presentation mappers/ViewState, ViewModels and prop-driven screens/components. Never leak DTOs, raw driver/HTTP errors or domain entities into UI.
-4. Bind concrete implementations and cross-feature contracts at the App edge: server `src/app/container.ts`; client `src/app/composition/` and `src/app/providers/`. ViewModels consume contracts owned in their presentation layer, never App modules. All feature consumer contexts are feature-owned (`<feature>/presentation/context/`).
-5. Update affected instructions/rules/links/diagrams alongside structural changes.
-
-## 4. Self-Audit
-
-- No domain imports of foundation, data/infrastructure, presentation, App, React, Express, Axios, Zod, SQLite, crypto implementations or environment/browser APIs.
-- No upward repository/port imports from useCases; command/filter types belong to owned domain models.
-- No foundation imports of features/App; no shared-kernel feature entities or frameworks; no feature-to-App service locator dependencies.
-- DI/concrete feature construction and cross-feature synchronization live in App, not foundation or UI.
-- Reads and writes go through focused use cases and domain repository contracts.
-- Explicit Persistence Row ↔ Domain ↔ DTO ↔ ViewState mappings normalize then validate; never fabricate persisted IDs/ownership/enums.
-- Database/JWT/transport errors are translated at boundaries; public error envelopes and status codes remain consistent.
-- Nullable updates distinguish omitted/undefined, explicit null/empty, and non-empty values through schemas/mappers/SQL.
-- Client components render ViewState/primitives/options, not raw domain entities/enums. ViewModels own form state/validation/actions.
-- Vendored shadcn/ui primitives, radix-ui, lucide-react and Tailwind composition stay inside `client/src/components/ui/` and `client/src/components/app/`. No component-library prop types or class passthroughs leak into consumers. Shared UI contracts such as SelectOption belong to components/ui; shared components must not import business domain/data/App or feature components.
-- Split multi-region render bodies into feature-owned controlled subcomponents. Shared components stay feature-independent; App wires dashboard/navbar capabilities and tasks-owned dialogs.
-- Preserve APIs, browser routes, database schema/data, stored-session compatibility and UI behavior during reorganization.
-- Cross-module-folder imports use the folder's `index.ts` barrel; same-folder imports are relative; barrels export only public API. No orphan source files except entries and `*.d.ts`.
-
-## 5. Verification
-
-Run checks for every modified side:
-
-```bash
-# Server
-cd server && npm run build && npm test && npm run test:startup && npm run check:architecture
-
-# Client (when modified)
-cd client && npm test && npm run build && npm run lint && npm run check:architecture
-
-# Repository whitespace
-git diff --check
-```
-
-Server tests typecheck before executing and use disposable databases/ephemeral listeners only. Never run fixtures against existing database files or import the persistent startup module. Boundaries are enforced by dependency-cruiser via `npm run check:architecture` on each side. Rules are error-level; never weaken or ignore a rule to make it pass. The rules listed as manual-review items in [shared rules §8](./.devin/rules/clean-architecture.md) still need manual review; builds, tests and the checker do not replace it. Fix newly introduced failures before completing a phase.
+Run for each side you change, then `git diff --check` at the repository root. Fix any failure you introduce; never weaken a dependency-cruiser rule. Builds, tests and checks do not replace the manual-review items in shared §8.

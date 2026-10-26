@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute, PublicRoute } from './routeGuards';
-import { UiPage, UiText } from '../../components/ui';
+import { LoadingSpinner } from '../../components/feedback';
 import { AppNavbar } from '../composition';
 
 // Placeholder screens - will be implemented in Phase 9
@@ -26,9 +26,9 @@ export function AppRouter() {
     <BrowserRouter>
       <React.Suspense
         fallback={
-          <UiPage>
-            <UiText tone="muted">Loading...</UiText>
-          </UiPage>
+          <main className="flex min-h-screen items-center justify-center bg-background p-4">
+            <LoadingSpinner text="Loading..." />
+          </main>
         }
       >
         <Routes>

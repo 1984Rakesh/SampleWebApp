@@ -6,15 +6,14 @@ Applies to every plan in `plans/`. The Manager (Claude) owns this file; Devin re
 - **client/** — React 19, Vite 8, TypeScript 6, Tailwind CSS v4, vendored shadcn/ui (radix-ui, lucide-react), TanStack Query, Axios, Zod, React Router 7. Lint: oxlint. Tests: Node test runner + Vite SSR (`client/tests/*.test.mjs`).
 - **server/** — Express 5, better-sqlite3, bcrypt, jsonwebtoken, Zod, TypeScript 7 (no JS compiler API). Tests: tsx + Node test runner (`server/tests/*.test.ts`), compiled startup smoke test.
 - No root package.json. Each side installs and verifies on its own.
-- New dependencies: pick versions published at least 7 days ago; never bypass security configuration.
 
 ## Architecture
 The authoritative rules are in the repo:
-- Root: `AGENTS.md`, `.devin/rules/clean-architecture.md`
-- Client: `client/AGENTS.md`, `client/.devin/rules/client-architecture.md`
-- Server: `server/AGENTS.md`, `server/.devin/rules/server-architecture.md`
+- Root: `AGENTS.md`, `.agents/skills/clean-architecture/SKILL.md`
+- Client: `client/AGENTS.md`, `.agents/skills/client-architecture/SKILL.md`
+- Server: `server/AGENTS.md`, `.agents/skills/server-architecture/SKILL.md`
 
-Read the shared files and the side you touch before every task. Summary:
+The rule files are skills, loaded only when invoked. Workers invoke one only when the task's Read only line names it (domain, data, API or module-structure changes); for other tasks the summary below, the task file and `check:architecture` cover it. Summary:
 ```
 Building blocks: Foundation → Features → App
 Imports:         App → Features / Foundation
@@ -22,7 +21,7 @@ Inside feature:  Presentation → Domain ← Data (client) / Infrastructure (ser
 ```
 - Domains are pure TypeScript: only own domain + `shared/domain`.
 - Features never import App or sibling features; cross-feature needs are consumer-owned contracts injected by App.
-- Vendored shadcn primitives, radix-ui, lucide-react and Tailwind class composition live only in `client/src/components/ui/` and `client/src/components/app/`.
+- shadcn/ui primitives are generated into `client/src/components/ui/` and exported, with `cn`, from its `index.ts` barrel. Feature `presentation/screens|components`, `components/layout|feedback`, `src/app/` and `App.tsx` import them from that barrel (never `components/ui/<file>.tsx`), plus `lucide-react` and `sonner`. radix-ui, cva, clsx and tailwind-merge stay inside `components/ui` and `components/app`. Domain, data, foundation, shared, ViewModels, presentation models, hooks and contexts stay UI-library free (client rules §4.7).
 - **Enforcement:** dependency-cruiser, per side (`client/.dependency-cruiser.cjs`, `server/.dependency-cruiser.cjs`), run with `npm run check:architecture`. All rules are `error`. Rules the tool can't check (prop leakage, ViewState vs entity rendering, tri-state patches, error translation) stay manual review items.
 - Fix existing violations inside your task's scope only; never weaken or `ignore` a dependency-cruiser rule to make a check pass. Raise it as a blocker instead.
 
@@ -39,8 +38,8 @@ Inside feature:  Presentation → Domain ← Data (client) / Infrastructure (ser
 ## Verify commands
 Run for every side you modify, and paste the results into the PR:
 ```bash
-# Client
-cd client && npm ci && npm test && npm run build && npm run lint && npm run check:architecture
+# Client (npm ci once per session; after later edits rerun only npm run verify)
+cd client && npm ci && npm run verify
 
 # Server
 cd server && npm ci && npm run build && npm test && npm run test:startup && npm run check:architecture
@@ -48,7 +47,8 @@ cd server && npm ci && npm run build && npm test && npm run test:startup && npm 
 # Repository
 git diff --check
 ```
-`check:architecture` exists only once plan `dependency-cruiser` P1 has merged; skip it before then. If a client DTO/mapper moves, also run the server suite, because `server/tests/client-contract.test.ts` imports client code.
+New dependencies: pick exact versions published at least 7 days ago; never bypass security configuration.
+If a client DTO/mapper moves, also run the server suite, because `server/tests/client-contract.test.ts` imports client code.
 
 ## Task types
 - **setup**: tooling, CI, config, docs. No behaviour or visual change to the app.
@@ -59,6 +59,7 @@ git diff --check
 - Never mix refactor and ui in one task.
 
 ## Ledger rules
-- **Worker (Devin):** in the plan file, edit only your own task: status `[~]`→`[r]` (or `[!]` + a Blockers line), the PR field, and dated Notes. Never set `[x]`, never edit other tasks, structure, Decisions or this file.
-- **Worker session ends at `[r]`/`[!]`:** once the PR is open, CI checked and the ledger pushed, the worker replies once with its report and ends its session as completed. It never waits for review, approval or merge; review findings come back as a new fix-up task (`<ID>a`) in a new session.
+- **Worker (Devin):** in the plan file, edit only your own task: status `[~]`→`[r]` (or `[!]` + a Blockers line), `PR: pending` (the Manager records the number), and dated Notes. Never set `[x]`, never edit other tasks, structure, Decisions or this file.
+- **One push:** commit the code and the task-file (ledger) update, then push them together in a single `git push`, so CI runs once.
+- **Worker session ends at `[r]`/`[!]`:** once the PR is open and the ledger pushed, the worker replies once (it does not wait for or check CI; the Manager checks CI at review) with its report and ends its session as completed. It never waits for review, approval or merge; review findings come back as a new fix-up task (`<ID>a`) in a new session.
 - **Manager (Claude):** sets `[x]` after merge, adds or changes tasks, Decisions, Open Questions and the Change Log; owns this file.

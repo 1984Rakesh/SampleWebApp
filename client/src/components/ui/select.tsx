@@ -1,23 +1,26 @@
-// @ds Select v2026-10-20
 import * as React from "react"
+import { cn } from "./utils"
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 import { Select as SelectPrimitive } from "radix-ui"
-import { cn } from "./utils"
+
 function Select({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot="select" {...props} />
 }
+
 function SelectGroup({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Group>) {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />
 }
+
 function SelectValue({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />
 }
+
 function SelectTrigger({
   className,
   size = "default",
@@ -31,18 +34,19 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-fit items-center justify-between gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[placeholder]:text-muted-foreground data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+        "flex w-fit items-center justify-between gap-2 rounded-md border border-input bg-card px-3.5 text-sm font-medium whitespace-nowrap text-foreground transition-[color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive data-[placeholder]:text-muted-foreground data-[size=default]:h-11 data-[size=sm]:h-9 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
         className
       )}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
+        <ChevronDownIcon className="size-4 text-muted-foreground" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   )
 }
+
 function SelectContent({
   className,
   children,
@@ -79,6 +83,7 @@ function SelectContent({
     </SelectPrimitive.Portal>
   )
 }
+
 function SelectLabel({
   className,
   ...props
@@ -91,6 +96,7 @@ function SelectLabel({
     />
   )
 }
+
 function SelectItem({
   className,
   children,
@@ -117,6 +123,7 @@ function SelectItem({
     </SelectPrimitive.Item>
   )
 }
+
 function SelectSeparator({
   className,
   ...props
@@ -129,6 +136,7 @@ function SelectSeparator({
     />
   )
 }
+
 function SelectScrollUpButton({
   className,
   ...props
@@ -146,6 +154,7 @@ function SelectScrollUpButton({
     </SelectPrimitive.ScrollUpButton>
   )
 }
+
 function SelectScrollDownButton({
   className,
   ...props
@@ -163,6 +172,7 @@ function SelectScrollDownButton({
     </SelectPrimitive.ScrollDownButton>
   )
 }
+
 export {
   Select,
   SelectContent,

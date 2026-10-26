@@ -1,2 +1,2 @@
 export { toDashboardViewState } from './dashboardPresentation';
-export type { DashboardStatusLabels, DashboardTaskCounts, DashboardTaskItem } from './DashboardViewState';
+export type { DashboardStatusLabels, DashboardPriorityVariant, DashboardStatusVariant, DashboardTaskCounts, DashboardTaskItem } from './DashboardViewState';

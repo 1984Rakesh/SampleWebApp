@@ -1,7 +1,7 @@
-// @ds Label v2026-10-20
 import * as React from "react"
-import { Label as LabelPrimitive } from "radix-ui"
 import { cn } from "./utils"
+import { Label as LabelPrimitive } from "radix-ui"
+
 function Label({
   className,
   ...props
@@ -17,4 +17,5 @@ function Label({
     />
   )
 }
+
 export { Label }
