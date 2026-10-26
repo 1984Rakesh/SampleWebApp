@@ -13,7 +13,7 @@ export default function ProfileAppearance() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Appearance</CardTitle>
+        <CardTitle className="text-[22px] leading-7 tracking-tight">Appearance</CardTitle>
         <CardDescription>Choose how the app looks.</CardDescription>
         <CardAction>
           <ToggleGroup type="single" size="sm" value={mode} onValueChange={(value) => value && updateMode(value)} aria-label="Theme">
