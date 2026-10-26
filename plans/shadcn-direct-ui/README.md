@@ -1,7 +1,7 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
 - Current phase: P3 — Screens use shadcn directly
-- Next task: P3.T6 (not dispatched)
+- Next: batch B2 = P3.T7 + P4.T1 (not dispatched)
 - Last updated: 2026-10-25
 
 ## Goal
@@ -33,7 +33,7 @@ Exit criteria: `grep -rE "\bUi[A-Z]" client/src --include='*.ts*' | grep -v '^cl
 - [x] P3.T3 — Tasks list and table · ui · PR #31 · deps P2.T3
 - [x] P3.T4 — Task and delete dialogs · ui · PR #32 · deps P3.T3
 - [x] P3.T5 — Dashboard · ui · PR #33 · deps P2.T3
-- [ ] P3.T6 — Comparison · ui · PR — · deps P2.T3 · batch B1
+- [x] P3.T6 — Comparison · ui · PR #34 · deps P2.T3 · batch B1
 - [ ] P3.T7 — App shell and toasts · ui · PR — · deps P2.T3 · batch B1
 
 ## Phase 4 — Remove wrappers, docs, acceptance
