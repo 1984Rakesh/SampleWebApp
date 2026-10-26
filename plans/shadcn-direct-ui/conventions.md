@@ -12,6 +12,7 @@ Follows plans/RULES.md. Rules below apply to every task in this plan.
 - Radii: inputs/buttons `rounded-md`; stat cards `rounded-card`; content cards `rounded-xl`; dialog `rounded-2xl`; badges/nav pills `rounded-full`.
 - Page content `mx-auto w-full max-w-[1200px] px-8` (Profile `max-w-[1000px]`); sections `gap-6`/`gap-8`; card padding `p-5`–`p-7`. Must work at 375px (use `px-4 sm:px-8`, stacking grids, horizontally scrolling tables).
 - No emoji, no exclamation marks, sentence case labels. Priority/status always show the word.
+- shadcn `Button` has no default `type` (the old `UiButton` defaulted to `button`): inside a `<form>`, every non-submit button needs `type="button"`, or it submits the form (since P3.T2a).
 - Icon-only buttons have `aria-label`. Focus: `focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2`.
 - No opacity modifiers on token colours (`bg-primary/50`).
 
