@@ -1,6 +1,7 @@
 ---
 description: "Express server clean architecture rules"
-trigger: always_on
+trigger: glob
+globs: "server/**"
 ---
 
 # Server Clean Architecture Rules (Express + SQLite)
