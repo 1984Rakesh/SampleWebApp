@@ -1,4 +1,6 @@
-export type BadgeTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+export type TaskStatusVariant = 'status-todo' | 'status-progress' | 'status-done';
+
+export type TaskPriorityVariant = 'priority-high' | 'priority-medium' | 'priority-low';
 
 export type DueDateTone = 'amber' | 'muted' | 'default';
 
@@ -7,9 +9,9 @@ export interface TaskItemViewState {
   title: string;
   description?: string;
   statusLabel: string;
-  statusTone: BadgeTone;
+  statusVariant: TaskStatusVariant;
   priorityLabel: string;
-  priorityTone: BadgeTone;
+  priorityVariant: TaskPriorityVariant;
   dueDate?: string;
   dueDateLabel?: string;
   dueDateTone: DueDateTone;

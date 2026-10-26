@@ -1,4 +1,5 @@
-import { UiFlex, UiIconButton } from '../../../../components/ui';
+import { Pencil, Trash2 } from 'lucide-react';
+import { Button } from '../../../../components/ui';
 import type { TaskItemViewState } from '../../models';
 
 interface TaskItemActionsProps {
@@ -14,22 +15,13 @@ export default function TaskItemActions({
   onDelete,
 }: TaskItemActionsProps) {
   return (
-    <UiFlex inline gap={0.5} role="group" ariaLabel={`Actions for ${task.title}`}>
-      <UiIconButton
-        icon="edit"
-        ariaLabel={`Edit ${task.title}`}
-        size="sm"
-        tooltip="Edit"
-        onClick={() => onEdit(task.id)}
-      />
-      <UiIconButton
-        icon="delete"
-        ariaLabel={`Delete ${task.title}`}
-        size="sm"
-        tooltip="Delete"
-        destructiveHover
-        onClick={() => onDelete(task.id)}
-      />
-    </UiFlex>
+    <div className="inline-flex gap-1" role="group" aria-label={`Actions for ${task.title}`}>
+      <Button type="button" variant="ghost" size="icon-sm" aria-label={`Edit ${task.title}`} title="Edit" onClick={() => onEdit(task.id)}>
+        <Pencil />
+      </Button>
+      <Button type="button" variant="ghost-destructive" size="icon-sm" aria-label={`Delete ${task.title}`} title="Delete" onClick={() => onDelete(task.id)}>
+        <Trash2 />
+      </Button>
+    </div>
   );
 }

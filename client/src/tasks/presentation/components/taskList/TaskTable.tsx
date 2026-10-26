@@ -1,5 +1,5 @@
 // @ds TaskTable v2026-10-20
-import { UiCheckbox, UiChip, UiFlex, UiTable, UiTableBody, UiTableCell, UiTableContainer, UiTableFooter, UiTableHead, UiTableRow, UiText } from '../../../../components/ui';
+import { Badge, Card, Checkbox, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, cn } from '../../../../components/ui';
 import TaskItemActions from './TaskItemActions';
 import type { TaskItemViewState } from '../../models';
 
@@ -7,21 +7,37 @@ interface TaskTableProps { tasks: TaskItemViewState[]; footer?: React.ReactNode;
 
 export default function TaskTable({ tasks, footer, onEdit, onDelete, onToggleStatus }: TaskTableProps) {
   return (
-    <UiTableContainer>
-      <UiTable ariaLabel="Tasks" fixed>
-        <UiTableHead><UiTableRow head><UiTableCell head width="checkbox" edge="start" hideLabel>Done</UiTableCell><UiTableCell head>Task</UiTableCell><UiTableCell head width="meta">Status</UiTableCell><UiTableCell head width="meta">Priority</UiTableCell><UiTableCell head width="meta">Due</UiTableCell><UiTableCell head width="actions" edge="end" align="right">Actions</UiTableCell></UiTableRow></UiTableHead>
-        <UiTableBody>{tasks.map((task) => (
-          <UiTableRow key={task.id}>
-            <UiTableCell edge="start"><UiCheckbox checked={task.isCompleted} ariaLabel={task.toggleAriaLabel} onChange={() => onToggleStatus(task.id)} /></UiTableCell>
-            <UiTableCell roomy><UiFlex column minWidth0><UiText weight="medium" strike={task.isCompleted} tone={task.isCompleted ? 'muted' : 'default'} noWrap>{task.title}</UiText>{task.description && <UiText variant="body2" tone="muted" noWrap>{task.description}</UiText>}</UiFlex></UiTableCell>
-            <UiTableCell><UiChip label={task.statusLabel} tone={task.statusTone} /></UiTableCell>
-            <UiTableCell><UiChip label={`• ${task.priorityLabel}`} tone={task.priorityTone} /></UiTableCell>
-            <UiTableCell nowrap><UiText variant="body2" tone={task.dueDateTone === 'amber' ? 'amber' : 'muted'} weight={task.dueDateTone === 'amber' ? 'medium' : undefined}>{task.dueDateLabel ?? '—'}</UiText></UiTableCell>
-            <UiTableCell align="right" edge="end"><TaskItemActions task={task} onEdit={onEdit} onDelete={onDelete} onToggleStatus={onToggleStatus} /></UiTableCell>
-          </UiTableRow>
-        ))}</UiTableBody>
-      </UiTable>
-      {footer && <UiTableFooter>{footer}</UiTableFooter>}
-    </UiTableContainer>
+    <Card className="gap-0 overflow-hidden py-0">
+      <div className="overflow-x-auto">
+        <Table aria-label="Tasks" className="min-w-[860px] table-fixed">
+          <TableHeader className="bg-muted/50">
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-12 pl-4"><span className="sr-only">Done</span></TableHead>
+              <TableHead>Task</TableHead>
+              <TableHead className="w-32">Status</TableHead>
+              <TableHead className="w-32">Priority</TableHead>
+              <TableHead className="w-32">Due</TableHead>
+              <TableHead className="w-24 pr-4 text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>{tasks.map((task) => (
+            <TableRow key={task.id}>
+              <TableCell className="w-12 pl-4"><Checkbox checked={task.isCompleted} aria-label={task.toggleAriaLabel} onCheckedChange={() => onToggleStatus(task.id)} /></TableCell>
+              <TableCell className="py-3">
+                <div className="flex min-w-0 flex-col">
+                  <span className={cn('truncate font-medium', task.isCompleted && 'line-through text-muted-foreground')}>{task.title}</span>
+                  {task.description && <span className="truncate text-sm text-muted-foreground">{task.description}</span>}
+                </div>
+              </TableCell>
+              <TableCell><Badge variant={task.statusVariant}>{task.statusLabel}</Badge></TableCell>
+              <TableCell><Badge variant={task.priorityVariant}>{task.priorityLabel}</Badge></TableCell>
+              <TableCell className={cn('text-sm', task.dueDateTone === 'amber' ? 'text-warning font-medium' : 'text-muted-foreground')}>{task.dueDateLabel ?? '—'}</TableCell>
+              <TableCell className="w-24 pr-4 text-right"><TaskItemActions task={task} onEdit={onEdit} onDelete={onDelete} onToggleStatus={onToggleStatus} /></TableCell>
+            </TableRow>
+          ))}</TableBody>
+        </Table>
+      </div>
+      {footer && <div className="flex items-center justify-between border-t px-6 py-3 text-sm text-muted-foreground">{footer}</div>}
+    </Card>
   );
 }

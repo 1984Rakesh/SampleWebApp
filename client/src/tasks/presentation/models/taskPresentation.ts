@@ -2,7 +2,7 @@ import type { Task } from '../../domain/models';
 import { TaskModel, TaskStatus, TaskPriority } from '../../domain/models';
 import type { SelectOption } from '../../../components/ui';
 import type { TaskFormData } from './TaskFormViewState';
-import type { BadgeTone, DueDateTone, TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
+import type { DueDateTone, TaskPriorityVariant, TaskStatusVariant, TaskCountsViewState, TaskItemViewState } from './TaskListViewState';
 
 // Display labels for backend TaskStatus values. The API enum strings
 // (TODO / IN_PROGRESS / COMPLETED) stay unchanged; only UI copy uses these.
@@ -12,16 +12,16 @@ export const TASK_STATUS_LABELS: Record<string, string> = {
   COMPLETED: 'Done',
 };
 
-const STATUS_TONES: Record<TaskStatus, BadgeTone> = {
-  [TaskStatus.TODO]: 'neutral',
-  [TaskStatus.IN_PROGRESS]: 'info',
-  [TaskStatus.COMPLETED]: 'success',
+const STATUS_VARIANTS: Record<TaskStatus, TaskStatusVariant> = {
+  [TaskStatus.TODO]: 'status-todo',
+  [TaskStatus.IN_PROGRESS]: 'status-progress',
+  [TaskStatus.COMPLETED]: 'status-done',
 };
 
-const PRIORITY_TONES: Record<TaskPriority, BadgeTone> = {
-  [TaskPriority.LOW]: 'success',
-  [TaskPriority.MEDIUM]: 'warning',
-  [TaskPriority.HIGH]: 'danger',
+const PRIORITY_VARIANTS: Record<TaskPriority, TaskPriorityVariant> = {
+  [TaskPriority.LOW]: 'priority-low',
+  [TaskPriority.MEDIUM]: 'priority-medium',
+  [TaskPriority.HIGH]: 'priority-high',
 };
 
 export function formatEnumLabel(value: string): string {
@@ -97,9 +97,9 @@ export function toTaskItemViewState(task: Task): TaskItemViewState {
     title: task.title,
     description: task.description,
     statusLabel: TASK_STATUS_LABELS[task.status],
-    statusTone: STATUS_TONES[task.status],
+    statusVariant: STATUS_VARIANTS[task.status],
     priorityLabel: formatEnumLabel(task.priority),
-    priorityTone: PRIORITY_TONES[task.priority],
+    priorityVariant: PRIORITY_VARIANTS[task.priority],
     dueDate: task.dueDate,
     dueDateLabel: dueDateInfo?.label,
     dueDateTone: dueDateInfo?.tone ?? 'muted',
