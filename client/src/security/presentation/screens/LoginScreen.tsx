@@ -1,19 +1,20 @@
 import type { FormEvent } from 'react';
+import { Link } from 'react-router-dom';
+import { Loader2, OctagonX } from 'lucide-react';
 import { useAuthViewModel } from '../hooks';
 import { Logo } from '../../../components/app';
 import {
-  UiAlert,
-  UiButton,
-  UiCard,
-  UiCardContent,
-  UiCardFooter,
-  UiCardHeader,
-  UiFlex,
-  UiLink,
-  UiPage,
-  UiStack,
-  UiText,
-  UiTextField,
+  Alert,
+  AlertDescription,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
 } from '../../../components/ui';
 
 export default function LoginScreen() {
@@ -26,64 +27,69 @@ export default function LoginScreen() {
   };
 
   return (
-    <UiPage>
-      <UiFlex column align="center" gap={3} fullWidth>
+    <main className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="flex w-full flex-col items-center gap-6">
         <Logo />
-        <UiCard maxWidth={384}>
-          <UiCardHeader
-            title="Sign In"
-            subtitle="Enter your email to sign in to your account."
-            centered
-          />
-          <UiCardContent>
+        <Card className="w-full max-w-[384px]">
+          <CardHeader className="text-center">
+            <CardTitle className="text-[28px] leading-8">Sign in</CardTitle>
+            <CardDescription>Enter your email to sign in to your account.</CardDescription>
+          </CardHeader>
+          <CardContent>
             {errorMessage && (
-              <UiAlert type="error" gutterBottom>
-                {errorMessage}
-              </UiAlert>
+              <Alert variant="destructive" className="mb-4">
+                <OctagonX />
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
             )}
 
-            <form onSubmit={handleSubmit} aria-label="Login form">
-              <UiStack spacing={2}>
-                <UiTextField
+            <form onSubmit={handleSubmit} aria-label="Login form" className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="email">
+                  Email
+                  <span aria-hidden="true" className="text-destructive">*</span>
+                </Label>
+                <Input
                   id="email"
-                  label="Email"
                   type="email"
                   value={email}
-                  onChange={setEmail}
+                  onChange={(event) => setEmail(event.target.value)}
                   required
+                  aria-required="true"
                   disabled={isSubmitting}
                   autoComplete="email"
                 />
-                <UiTextField
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="password">
+                  Password
+                  <span aria-hidden="true" className="text-destructive">*</span>
+                </Label>
+                <Input
                   id="password"
-                  label="Password"
                   type="password"
                   value={password}
-                  onChange={setPassword}
+                  onChange={(event) => setPassword(event.target.value)}
                   required
+                  aria-required="true"
                   disabled={isSubmitting}
                   autoComplete="current-password"
                 />
-                <UiButton
-                  type="submit"
-                  variant="solid"
-                  fullWidth
-                  isLoading={isSubmitting}
-                  disabled={isSubmitting}
-                >
-                  Sign In
-                </UiButton>
-              </UiStack>
+              </div>
+              <Button type="submit" className="w-full font-medium" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
+                Sign in
+              </Button>
             </form>
-          </UiCardContent>
-          <UiCardFooter centered>
-            <UiText variant="body2" tone="muted" as="span">
-              Don't have an account?
-            </UiText>
-            <UiLink to="/register">Sign up</UiLink>
-          </UiCardFooter>
-        </UiCard>
-      </UiFlex>
-    </UiPage>
+          </CardContent>
+          <CardFooter className="justify-center gap-1 text-sm">
+            <span className="text-muted-foreground">Don't have an account?</span>
+            <Button asChild variant="link" className="h-auto px-0">
+              <Link to="/register">Sign up</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </main>
   );
 }
