@@ -1,7 +1,7 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
 - Current phase: P3 — Screens use shadcn directly
-- Next: batch B2 = P3.T7 + P4.T1 (not dispatched)
+- Next task: P4.T2 (not dispatched)
 - Last updated: 2026-10-25
 
 ## Goal
@@ -34,11 +34,11 @@ Exit criteria: `grep -rE "\bUi[A-Z]" client/src --include='*.ts*' | grep -v '^cl
 - [x] P3.T4 — Task and delete dialogs · ui · PR #32 · deps P3.T3
 - [x] P3.T5 — Dashboard · ui · PR #33 · deps P2.T3
 - [x] P3.T6 — Comparison · ui · PR #34 · deps P2.T3 · batch B1
-- [ ] P3.T7 — App shell and toasts · ui · PR — · deps P2.T3 · batch B1
+- [x] P3.T7 — App shell and toasts · ui · PR #35 · deps P2.T3 · batch B1
 
 ## Phase 4 — Remove wrappers, docs, acceptance
 Exit criteria: no `client/src/components/ui/Ui*`; tests cover DS primitives; docs updated; browser walkthrough passes.
-- [ ] P4.T1 — Replace wrapper tests · test · PR — · deps P3.T1–P3.T7
+- [x] P4.T1 — Replace wrapper tests · test · PR #35 · deps P3.T1–P3.T7
 - [ ] P4.T2 — Delete the Ui* wrapper layer · refactor · PR — · deps P4.T1
 - [ ] P4.T3 — Vendor DS docs · setup · PR — · deps P4.T2
 - [ ] P4.T4 — Browser acceptance walkthrough · test · PR — · deps P4.T3
