@@ -1,7 +1,7 @@
 # Plan: shadcn direct UI (Tasks App DS)
 - Feature branch: feat/shadcn-direct-ui
 - Current phase: P3 — Screens use shadcn directly
-- Next task: P3.T4 (Devin Cloud Agent, Normal, playbook v5)
+- Next task: P3.T5 (not dispatched)
 - Last updated: 2026-10-25
 
 ## Goal
@@ -31,7 +31,7 @@ Exit criteria: `grep -rE "\bUi[A-Z]" client/src --include='*.ts*' | grep -v '^cl
 - [x] P3.T2 — Profile · ui · PR #29 · deps P2.T3
 - [x] P3.T2a — Profile form Cancel and card titles (fix-up of PR #29) · fix · PR #30 · deps P3.T2
 - [x] P3.T3 — Tasks list and table · ui · PR #31 · deps P2.T3
-- [~] P3.T4 — Task and delete dialogs · ui · PR — · deps P3.T3
+- [x] P3.T4 — Task and delete dialogs · ui · PR #32 · deps P3.T3
 - [ ] P3.T5 — Dashboard · ui · PR — · deps P2.T3
 - [ ] P3.T6 — Comparison · ui · PR — · deps P2.T3 · batch B1
 - [ ] P3.T7 — App shell and toasts · ui · PR — · deps P2.T3 · batch B1
