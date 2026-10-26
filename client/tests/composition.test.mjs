@@ -121,17 +121,20 @@ test('controlled navbar forwards actions and mobile drawer state through narrow 
   const entry = Navbar(props);
   assert.equal(entry.props.children[1].props.open, true);
   const toolbar = NavbarToolbar(entry.props.children[0].props);
-  const header = toolbar;
-  header.props.onToggleTheme();
-  header.props.onLogout();
-  for (const label of ['Open navigation', 'New task']) {
-    const action = descendants(header.props.leading).concat(descendants(header.props.actions)).find((item) => item.props['aria-label'] === label);
-    assert.ok(action);
+  const rendered = toolbar.type(toolbar.props);
+  const nodes = descendants(rendered);
+  for (const label of ['Open navigation', 'Toggle theme', 'Log out', 'New task']) {
+    const action = nodes.find((item) => item.props['aria-label'] === label);
+    assert.ok(action, `Missing ${label}`);
     action.props.onClick();
   }
-  assert.equal(NavbarDrawer(entry.props.children[1].props).props.open, true);
-  entry.props.children[1].props.onClose();
-  assert.deepEqual(calls, ['theme', 'logout', 'open', 'create', 'close']);
+  const drawer = NavbarDrawer(entry.props.children[1].props);
+  assert.equal(drawer.props.open, true);
+  drawer.props.onOpenChange(false);
+  const links = descendants(drawer).filter((item) => typeof item.props.to === 'string');
+  assert.deepEqual(links.map(({ props }) => ({ to: props.to, label: props.children })), view.links);
+  links[0].props.onClick();
+  assert.deepEqual(calls, ['open', 'theme', 'logout', 'create', 'close', 'close']);
 });
 
 test('presentation consumers fail clearly when App has not supplied dependencies', () => {
