@@ -13,8 +13,8 @@ final class LoginParams {
 
 abstract interface class LoginUseCase implements UseCase<User, LoginParams> {}
 
-class LoginUseCaseImpl implements LoginUseCase {
-  LoginUseCaseImpl(this._repository);
+final class LoginUseCaseImpl implements LoginUseCase {
+  const LoginUseCaseImpl(this._repository);
 
   final AuthRepository _repository;
 

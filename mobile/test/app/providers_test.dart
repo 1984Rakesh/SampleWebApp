@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tasks_mobile/app/providers.dart';
 import 'package:tasks_mobile/core/network/api_client.dart';
+import 'package:tasks_mobile/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:tasks_mobile/features/auth/domain/use_cases/login_use_case.dart';
 
 import '../core/network/api_client_test.dart' show FakeTokenStorage;
 
@@ -17,5 +19,14 @@ void main() {
 
     expect(dio.options.baseUrl, defaultApiBaseUrl());
     expect(dio.interceptors.whereType<AuthInterceptor>(), hasLength(1));
+  });
+
+  test('auth providers wire the real classes behind the interfaces', () {
+    final container = ProviderContainer.test(
+      overrides: [tokenStorageProvider.overrideWithValue(FakeTokenStorage())],
+    );
+
+    expect(container.read(authRepositoryProvider), isA<AuthRepositoryImpl>());
+    expect(container.read(loginUseCaseProvider), isA<LoginUseCaseImpl>());
   });
 }

@@ -10,7 +10,7 @@ String defaultApiBaseUrl() {
   if (_baseUrlOverride.isNotEmpty) {
     return _baseUrlOverride;
   }
-  return kIsWeb ? 'http://localhost:8080' : 'http://10.0.2.2:3001/api';
+  return kIsWeb ? 'http://localhost:3001/api' : 'http://10.0.2.2:3001/api';
 }
 
 Dio createDio({required TokenStorage tokenStorage, String? baseUrl}) {
