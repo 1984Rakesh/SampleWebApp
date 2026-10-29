@@ -11,15 +11,15 @@ class AuthRemoteDataSource {
     required String email,
     required String password,
   }) async {
-    final response = await _dio.post(
+    final response = await _dio.post<Map<String, dynamic>>(
       '/auth/login',
       data: {'email': email, 'password': password},
     );
-    return LoginResponseDto.fromJson(response.data);
+    return LoginResponseDto.fromJson(response.data!);
   }
 
   Future<UserDto> fetchCurrentUser() async {
-    final response = await _dio.get('/users/me');
-    return UserDto.fromJson(response.data);
+    final response = await _dio.get<Map<String, dynamic>>('/users/me');
+    return UserDto.fromJson(response.data ?? const {});
   }
 }

@@ -4,6 +4,7 @@ import 'package:tasks_mobile/app/providers.dart';
 import 'package:tasks_mobile/core/network/api_client.dart';
 import 'package:tasks_mobile/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:tasks_mobile/features/auth/domain/use_cases/login_use_case.dart';
+import 'package:tasks_mobile/features/auth/presentation/providers/auth_use_case_providers.dart';
 
 import '../core/network/api_client_test.dart' show FakeTokenStorage;
 
@@ -21,9 +22,12 @@ void main() {
     expect(dio.interceptors.whereType<AuthInterceptor>(), hasLength(1));
   });
 
-  test('auth providers wire the real classes behind the interfaces', () {
+  test('appOverrides bind the auth use cases to the real classes', () {
     final container = ProviderContainer.test(
-      overrides: [tokenStorageProvider.overrideWithValue(FakeTokenStorage())],
+      overrides: [
+        ...appOverrides,
+        tokenStorageProvider.overrideWithValue(FakeTokenStorage()),
+      ],
     );
 
     expect(container.read(authRepositoryProvider), isA<AuthRepositoryImpl>());

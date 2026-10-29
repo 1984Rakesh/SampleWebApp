@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -10,6 +11,7 @@ import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/domain/use_cases/login_use_case.dart';
 import '../features/auth/domain/use_cases/get_current_user_use_case.dart';
 import '../features/auth/domain/use_cases/logout_use_case.dart';
+import '../features/auth/presentation/providers/auth_use_case_providers.dart';
 
 final tokenStorageProvider = Provider<TokenStorage>(
   (ref) => SecureTokenStorage(const FlutterSecureStorage()),
@@ -29,14 +31,16 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   );
 });
 
-final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
-  return LoginUseCaseImpl(ref.watch(authRepositoryProvider));
-});
-
-final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>((ref) {
-  return GetCurrentUserUseCaseImpl(ref.watch(authRepositoryProvider));
-});
-
-final logoutUseCaseProvider = Provider<LogoutUseCase>((ref) {
-  return LogoutUseCaseImpl(ref.watch(authRepositoryProvider));
-});
+/// Binds each feature's use-case providers to the real Impls.
+/// main.dart passes this list to ProviderScope.
+final List<Override> appOverrides = [
+  loginUseCaseProvider.overrideWith(
+    (ref) => LoginUseCaseImpl(ref.watch(authRepositoryProvider)),
+  ),
+  getCurrentUserUseCaseProvider.overrideWith(
+    (ref) => GetCurrentUserUseCaseImpl(ref.watch(authRepositoryProvider)),
+  ),
+  logoutUseCaseProvider.overrideWith(
+    (ref) => LogoutUseCaseImpl(ref.watch(authRepositoryProvider)),
+  ),
+];

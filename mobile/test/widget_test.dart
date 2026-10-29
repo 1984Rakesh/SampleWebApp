@@ -12,6 +12,8 @@ import 'package:tasks_mobile/app/app.dart';
 void main() {
   testWidgets('show placeholder', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: TasksApp()));
-    expect(find.text('Tasks app - coming soon'), findsOneWidget);
+
+    expect(find.text('Welcome back'), findsOneWidget);
+    expect(find.text('Sign in'), findsOneWidget);
   });
 }

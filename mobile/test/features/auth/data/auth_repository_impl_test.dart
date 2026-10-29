@@ -144,6 +144,16 @@ void main() {
     });
   });
 
+  test('an empty body becomes UnknownFailure, not a crash', () async {
+    tokens.accessToken = 'abc';
+    server.answer = (_) => (200, null);
+
+    await expectLater(
+      repository.getCurrentUser(),
+      throwsA(isA<UnknownFailure>()),
+    );
+  });
+
   test('logout forgets the tokens without calling the server', () async {
     tokens.accessToken = 'abc';
 

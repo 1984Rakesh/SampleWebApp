@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasks_mobile/features/auth/presentation/screens/login_screen.dart';
 
 class TasksApp extends StatelessWidget {
   const TasksApp({super.key});
@@ -8,9 +9,7 @@ class TasksApp extends StatelessWidget {
     return MaterialApp(
       title: 'Tasks App',
       theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
-      home: const Scaffold(
-        body: Center(child: Text('Tasks app - coming soon')),
-      ),
+      home: const LoginScreen(),
     );
   }
 }
