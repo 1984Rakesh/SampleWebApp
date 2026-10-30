@@ -25,3 +25,5 @@ xcodebuild -scheme TasksApp -destination 'platform=iOS Simulator,name=iPhone 15,
 ```
 
 `iPhone 17` exists only on the iOS 26.3.1 runtime, so it needs no `OS=`. Also run `xcodebuild test -scheme <Scheme> -destination 'platform=iOS Simulator,name=iPhone 17'` inside each package you change (`Packages/Core` → `Core-Package`, `Packages/Features/Auth` → `Auth`, `Packages/Features/Tasks` → `Tasks`, `Packages/Features/Dashboard` → `Dashboard`, `Packages/Features/Profile` → `Profile`, `Packages/AppComposition` → `AppComposition`), then `git diff --check` at the repository root.
+
+CI (`.github/workflows/ios.yml`) runs every scheme above on iPhone 17 with Xcode 26.3 whenever `ios/**` changes. The iOS 17.5 run and the opt-in live-server tests stay local checks before a PR.
