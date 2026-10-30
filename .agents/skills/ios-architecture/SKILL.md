@@ -88,7 +88,8 @@ ios/
 1. `Core/DesignSystem` ports the web `client/src/index.css` tokens: colors in `Palette.swift` via dynamic `UIColor { traits in … }` (light and dark), radius `sm 9 · md 12 · lg 16 · card 18 · xl 20`, spacing scale. Fonts are SF Pro with Dynamic Type text styles.
 2. Views use static semantic tokens (`DS.color.primary`, `DS.radius.card`); no hard-coded colors or sizes in features.
 3. `DS*` components (`DSButton` styles, `DSTextField`, `DSSecureField`, `DSTextArea`, `DSCard`, `DSBadge`, `DSAvatar`, `DSProgress`, `DSEmptyState`, `DSErrorBanner`, `DSToast`, `DSSegmentedFilter`) take plain values (strings, `Tone`, closures), never feature or domain types.
-4. Every component supports Dynamic Type, 44 pt hit targets, VoiceOver labels on icon-only controls and checked contrast in both palettes.
+4. Every component supports Dynamic Type, 44 pt hit targets, VoiceOver labels on icon-only controls and checked contrast in both palettes. Text pairs meet WCAG 4.5:1 and control boundaries 3:1 in light and dark (checked 2026-10-30); text fields use `fieldBorder`, darker than the web `--input`, for that reason.
+5. At accessibility text sizes layouts reflow instead of truncating: `DSAdaptiveStack` turns rows into columns, `DSSegmentedFilter` becomes a menu, and grids size cards with `@ScaledMetric`. A list row is one VoiceOver element (`.accessibilityElement(children: .combine)`) with its own controls, such as a completion toggle, left separate.
 
 ## 9. Verification
 

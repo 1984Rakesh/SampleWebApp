@@ -21,7 +21,7 @@ struct DSFieldContainer<Field: View>: View {
                 .background(DS.color.surface, in: RoundedRectangle(cornerRadius: DS.radius.md))
                 .overlay {
                     RoundedRectangle(cornerRadius: DS.radius.md)
-                        .strokeBorder(error == nil ? DS.color.input : DS.color.danger)
+                        .strokeBorder(error == nil ? DS.color.fieldBorder : DS.color.danger)
                 }
             if let error {
                 Text(error)

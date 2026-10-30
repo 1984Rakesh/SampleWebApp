@@ -99,7 +99,7 @@ struct TaskRow: View {
                         .foregroundStyle(DS.color.textMuted)
                         .lineLimit(1)
                 }
-                HStack(spacing: DS.spacing.sm) {
+                DSAdaptiveStack {
                     DSBadge(state.priorityLabel, tone: state.priorityTone)
                     DSBadge(state.statusLabel, tone: state.statusTone)
                     if let dueText = state.dueText {
@@ -110,6 +110,8 @@ struct TaskRow: View {
                 }
             }
             .padding(.vertical, DS.spacing.sm)
+            // One VoiceOver element per task: title, details, priority, status and due date.
+            .accessibilityElement(children: .combine)
         }
     }
 }

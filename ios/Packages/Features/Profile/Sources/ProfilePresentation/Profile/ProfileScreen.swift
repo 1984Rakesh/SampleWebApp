@@ -51,7 +51,7 @@ struct ProfileScreen: View {
             }
         case .loaded(let content):
             DSCard {
-                HStack(spacing: DS.spacing.lg) {
+                DSAdaptiveStack(spacing: DS.spacing.lg) {
                     DSAvatar(initials: content.initials, size: 64)
                     VStack(alignment: .leading, spacing: DS.spacing.xs) {
                         Text(content.name)

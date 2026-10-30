@@ -14,22 +14,25 @@ protocol AuthInternalRouting: AnyObject {
 
 package final class AuthCoordinator: AuthFlow, AuthInternalRouting {
     private let navigationController = UINavigationController()
+    /// Off in tests, where there is no window for transitions to finish in.
+    private let animated: Bool
 
     package var rootViewController: UIViewController {
         navigationController
     }
 
-    package init() {
+    package init(animated: Bool = true) {
+        self.animated = animated
         navigationController.navigationBar.prefersLargeTitles = false
         navigationController.setViewControllers([makeLogin()], animated: false)
     }
 
     func showSignup() {
-        navigationController.pushViewController(makeSignup(), animated: true)
+        navigationController.pushViewController(makeSignup(), animated: animated)
     }
 
     func showLogin() {
-        navigationController.popToRootViewController(animated: true)
+        navigationController.popToRootViewController(animated: animated)
     }
 
     private func makeLogin() -> UIViewController {

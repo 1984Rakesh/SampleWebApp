@@ -26,13 +26,16 @@ protocol TasksInternalRouting: AnyObject {
 
 package final class TasksCoordinator: TasksFlow, TasksInternalRouting {
     private let navigationController = UINavigationController()
+    /// Off in tests, where there is no window for transitions to finish in.
+    private let animated: Bool
     private lazy var listViewModel = TaskListViewModel(router: self)
 
     package var rootViewController: UIViewController {
         navigationController
     }
 
-    package init() {
+    package init(animated: Bool = true) {
+        self.animated = animated
         navigationController.navigationBar.prefersLargeTitles = true
         let list = UIHostingController(rootView: TaskListContainer(viewModel: listViewModel))
         list.title = "Tasks"
@@ -58,7 +61,7 @@ package final class TasksCoordinator: TasksFlow, TasksInternalRouting {
     func showDetail(id: TaskID) {
         let detail = UIHostingController(rootView: TaskDetailContainer(viewModel: TaskDetailViewModel(id: id, router: self)))
         detail.navigationItem.largeTitleDisplayMode = .never
-        navigationController.pushViewController(detail, animated: true)
+        navigationController.pushViewController(detail, animated: animated)
     }
 
     func showForm(_ mode: TaskFormMode, onSaved: @escaping () -> Void) {
@@ -73,14 +76,14 @@ package final class TasksCoordinator: TasksFlow, TasksInternalRouting {
         sheet.modalPresentationStyle = .pageSheet
         sheet.sheetPresentationController?.detents = [.large()]
         sheet.sheetPresentationController?.prefersGrabberVisible = true
-        navigationController.present(sheet, animated: true)
+        navigationController.present(sheet, animated: animated)
     }
 
     func closeForm() {
-        navigationController.presentedViewController?.dismiss(animated: true)
+        navigationController.presentedViewController?.dismiss(animated: animated)
     }
 
     func closeDetail() {
-        navigationController.popToRootViewController(animated: true)
+        navigationController.popToRootViewController(animated: animated)
     }
 }

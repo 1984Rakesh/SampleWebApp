@@ -20,6 +20,8 @@ public struct DSColors: Sendable {
     public let dangerBorder: Color
     public let border: Color
     public let input: Color
+    /// Text-field outline. Darker than the web `--input` so the field boundary reaches WCAG 3:1 (ios §8.4).
+    public let fieldBorder: Color
     public let focus: Color
     public let divider: Color
     public let link: Color
@@ -45,6 +47,7 @@ public struct DSColors: Sendable {
         dangerBorder = Self.dynamic(light: .hex(0xF0C9C3), dark: .hex(0x3A2A2E))
         border = Self.dynamic(light: .hex(0xE4E7EE), dark: .hex(0x1E2430))
         input = Self.dynamic(light: .hex(0xCBD1DC), dark: .hex(0x2A3242))
+        fieldBorder = Self.dynamic(light: .hex(0x8A94A8), dark: .hex(0x6B778E))
         focus = Self.dynamic(light: .hex(0x4655D4), dark: .hex(0x8C9EFF))
         divider = Self.dynamic(light: .hex(0xECEDF3), dark: .hex(0x1B212C))
         link = Self.dynamic(light: .hex(0x3745B8), dark: .hex(0xA9B7FF))

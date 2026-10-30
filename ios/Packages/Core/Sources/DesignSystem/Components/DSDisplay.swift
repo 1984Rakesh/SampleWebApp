@@ -105,6 +105,7 @@ public struct DSSegmentedFilter<ID: Hashable>: View {
     let title: String
     let options: [Option]
     @Binding var selection: ID
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     public init(_ title: String, options: [Option], selection: Binding<ID>) {
         self.title = title
@@ -112,12 +113,26 @@ public struct DSSegmentedFilter<ID: Hashable>: View {
         _selection = selection
     }
 
+    /// Segments truncate at accessibility text sizes, so the control becomes a menu there (ios §8.4).
     public var body: some View {
-        Picker(title, selection: $selection) {
+        let picker = Picker(title, selection: $selection) {
             ForEach(options) { option in
                 Text(option.label).tag(option.id)
             }
         }
-        .pickerStyle(.segmented)
+        if dynamicTypeSize.isAccessibilitySize {
+            HStack {
+                Text(title)
+                    .font(DS.font.label)
+                    .foregroundStyle(DS.color.text)
+                Spacer()
+                picker
+                    .pickerStyle(.menu)
+                    .tint(DS.color.primary)
+            }
+            .frame(minHeight: DS.minimumHitTarget)
+        } else {
+            picker.pickerStyle(.segmented)
+        }
     }
 }

@@ -17,7 +17,8 @@ struct DashboardScreen: View {
     let state: DashboardViewState
     let send: (DashboardViewModel.Action) -> Void
 
-    private let columns = [GridItem(.adaptive(minimum: 150), spacing: DS.spacing.md)]
+    /// Grows with Dynamic Type, so large text gets fewer, wider cards.
+    @ScaledMetric(relativeTo: .largeTitle) private var cardMinimumWidth: CGFloat = 150
 
     var body: some View {
         ScrollView {
@@ -61,7 +62,7 @@ struct DashboardScreen: View {
             if content.isEmpty {
                 DSEmptyState(systemImage: "checklist", title: "No tasks yet", message: "Add tasks in the Tasks tab to see your progress here.")
             }
-            LazyVGrid(columns: columns, spacing: DS.spacing.md) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: cardMinimumWidth), spacing: DS.spacing.md)], spacing: DS.spacing.md) {
                 ForEach(content.cards) { card in
                     StatCard(state: card) { send(.cardTapped(id: card.id)) }
                 }

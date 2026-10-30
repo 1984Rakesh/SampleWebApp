@@ -90,15 +90,14 @@ private struct DetailRow: View {
     var isAlert = false
 
     var body: some View {
-        HStack {
+        DSAdaptiveStack {
             Text(label)
                 .font(DS.font.label)
                 .foregroundStyle(DS.color.textMuted)
-            Spacer()
+            Spacer(minLength: 0)
             Text(value)
                 .font(DS.font.callout)
                 .foregroundStyle(isAlert ? DS.color.danger : DS.color.text)
-                .multilineTextAlignment(.trailing)
         }
         .accessibilityElement(children: .combine)
     }

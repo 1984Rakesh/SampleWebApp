@@ -24,6 +24,7 @@ let package = Package(
         .testTarget(name: "SharedDomainTests", dependencies: ["SharedDomain"]),
         .testTarget(name: "NetworkingTests", dependencies: ["Networking", "SharedDomain"]),
         .testTarget(name: "SecureStorageTests", dependencies: ["SecureStorage"]),
+        .testTarget(name: "DesignSystemTests", dependencies: ["DesignSystem", "SharedDomain"], swiftSettings: mainActorByDefault),
     ],
     swiftLanguageModes: [.v6]
 )
