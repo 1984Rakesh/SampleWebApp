@@ -1,8 +1,8 @@
 import DesignSystem
 import SwiftUI
 
-/// Temporary signed-in root until the tab bar arrives with Tasks (P2), Dashboard (P3) and Profile (P4).
-struct SignedInPlaceholderScreen: View {
+/// Temporary Account tab with logout until the Profile feature arrives (P4).
+struct AccountPlaceholderScreen: View {
     let name: String
     let onLogout: () -> Void
 
@@ -22,5 +22,5 @@ struct SignedInPlaceholderScreen: View {
 }
 
 #Preview {
-    SignedInPlaceholderScreen(name: "Ada Lovelace") {}
+    AccountPlaceholderScreen(name: "Ada Lovelace") {}
 }

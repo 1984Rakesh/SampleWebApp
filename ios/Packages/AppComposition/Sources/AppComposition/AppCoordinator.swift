@@ -1,24 +1,29 @@
 import AuthFeature
 import Networking
 import SwiftUI
+import TasksFeature
 import UIKit
 
-/// What the shell needs from the session, so tests can drive the root swap without Auth's internals.
-struct SessionServices {
+/// What the shell needs from the features, so tests can drive the root swap without their internals.
+struct AppServices {
     let restore: any RestoreSessionUseCase
     let observe: any ObserveSessionUseCase
     let logout: any LogoutUseCase
     let makeAuthFlow: () -> any AuthFlow
+    let makeTasksFlow: () -> any TasksFlow
+    /// Drops every feature's user-scoped registrations (ios §7.4).
+    let resetUserSessions: () -> Void
 }
 
 /// Owns the window and its root (ios §6.4): splash while the session is restored, then the Auth flow
-/// or the signed-in shell, swapped whenever the session changes. It never navigates inside a feature.
+/// or the signed-in tab bar, swapped whenever the session changes. It never navigates inside a feature.
 public final class AppCoordinator: Coordinator {
     static let keychainService = "dev.samplewebapp.TasksApp.session"
 
     private let window: UIWindow
-    private let session: SessionServices
+    private let services: AppServices
     private var authFlow: (any AuthFlow)?
+    private var main: MainCoordinator?
     private var renderedState: SessionState?
 
     public convenience init(window: UIWindow, config: AppConfig) {
@@ -26,28 +31,31 @@ public final class AppCoordinator: Coordinator {
             publicClient: URLSessionHTTPClient(baseURL: config.apiBaseURL),
             keychainService: Self.keychainService
         )
+        TasksAssembly.configure(client: AuthAssembly.authenticatedClient())
         self.init(
             window: window,
-            session: SessionServices(
+            services: AppServices(
                 restore: AuthAssembly.restoreSession(),
                 observe: AuthAssembly.observeSession(),
                 logout: AuthAssembly.logout(),
-                makeAuthFlow: AuthAssembly.makeFlow
+                makeAuthFlow: AuthAssembly.makeFlow,
+                makeTasksFlow: TasksAssembly.makeFlow,
+                resetUserSessions: TasksAssembly.resetSession
             )
         )
     }
 
-    init(window: UIWindow, session: SessionServices) {
+    init(window: UIWindow, services: AppServices) {
         self.window = window
-        self.session = session
+        self.services = services
     }
 
     public func start() {
         setRoot(UIHostingController(rootView: SplashScreen()), animated: false)
         window.makeKeyAndVisible()
-        Task { [weak self, session] in
-            _ = await session.restore.execute()
-            for await state in await session.observe.execute() {
+        Task { [weak self, services] in
+            _ = await services.restore.execute()
+            for await state in await services.observe.execute() {
                 guard let self else { return }
                 self.render(state)
             }
@@ -59,16 +67,19 @@ public final class AppCoordinator: Coordinator {
         renderedState = state
         switch state {
         case .signedOut:
-            let flow = session.makeAuthFlow()
+            main = nil
+            services.resetUserSessions()
+            let flow = services.makeAuthFlow()
             authFlow = flow
             setRoot(flow.rootViewController, animated: true)
         case .signedIn(let account):
             authFlow = nil
-            let logout = session.logout
-            let home = SignedInPlaceholderScreen(name: account.name.isEmpty ? account.email : account.name) {
+            let logout = services.logout
+            let main = MainCoordinator(account: account, tasksFlow: services.makeTasksFlow()) {
                 Task { await logout.execute() }
             }
-            setRoot(UIHostingController(rootView: home), animated: true)
+            self.main = main
+            setRoot(main.tabBarController, animated: true)
         }
     }
 

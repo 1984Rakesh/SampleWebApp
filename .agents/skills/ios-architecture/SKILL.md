@@ -45,6 +45,7 @@ ios/
 2. `DomainError` (SharedDomain) cases: `validation`, `unauthorized`, `notFound`, `conflict`, plus iOS additions `unavailable` (offline, timeout, 5xx) and `cancelled`, each carrying a message except `cancelled`.
 3. Tri-state patches use `Patch<Value> { keep, clear, set(Value) }` (shared §2).
 4. Domain validators (title, email, password, name) are authoritative; ViewModels call them for field errors.
+5. Domain imports no Foundation: instants are `Timestamp` and text helpers (`trimmedWhitespace`) come from SharedDomain. Data converts at the boundary; Presentation formats.
 
 ## 4. Data and Networking
 
@@ -52,7 +53,8 @@ ios/
 2. Request and response DTOs are separate `Codable` structs per feature. Mappers normalize, validate, then build domain values; `Patch` maps to omitted / `null` / value.
 3. Repositories translate `HTTPError` to `DomainError` (shared §4/§5 status mapping, backend message kept), `URLError`/5xx to `.unavailable`, and `CancellationError`/`URLError.cancelled` to `.cancelled`.
 4. Auth owns `TokenStore` (Keychain) and `AuthenticatedHTTPClient`, a decorator that adds the bearer token, coalesces concurrent refreshes in an actor, retries once, and clears the session if refresh fails. Other features receive it only as `any HTTPClient`.
-5. Base URL comes from `.xcconfig` per configuration; Debug allows an ATS exception for localhost only. No caching: screens refetch on appear and on pull-to-refresh.
+5. Due dates are calendar days: read `YYYY-MM-DD` (the web client's format, as UTC midnight) or a full ISO timestamp, and write `YYYY-MM-DD`. Presentation keeps the same year/month/day when converting to and from the user's calendar (`DueDay`), and treats a task as overdue once its due day is before today.
+6. Base URL comes from `.xcconfig` per configuration; Debug allows an ATS exception for localhost only. No caching: screens refetch on appear and on pull-to-refresh.
 
 ## 5. Presentation
 
@@ -61,6 +63,7 @@ ios/
 3. Async content uses `Loadable<Value>` (`idle / loading / loaded / failed(message)`); `.cancelled` is ignored silently.
 4. Form errors appear on first submit, then update live.
 5. Previews use ViewState fixtures, not ViewModels.
+6. `Loadable` and `ChoiceOption` live in DesignSystem. Presenters that format dates take injectable `now`, `calendar` and `locale`. Lists reload on appear and on pull-to-refresh (awaiting the returned task); a new load cancels the previous one so a stale response never wins; after a first successful load, failures show a banner instead of replacing the content.
 
 ## 6. Navigation (shared §9)
 
@@ -69,13 +72,14 @@ ios/
 3. Outbound needs are `public protocol <F>ExternalRouting: AnyObject` in the feature's own vocabulary. AppComposition implements them and maps types between features.
 4. AppCoordinator owns the window: splash while restoring the session, then root swap between the Auth flow and `MainCoordinator` (a `UITabBarController` with `viewControllers` and `UITabBarItem`s, one tab per feature flow; the iOS 18 `UITab` API is not used) driven by `SessionRepository.sessionChanges`. Deep links are out of scope.
 5. ViewModels and coordinators hold routers `weak`. Sheets that change data take an `onSaved` callback so the presenting screen refetches.
+6. Coordinators own UIKit chrome: titles, bar button items and sheet presentation (`UINavigationController` with a Cancel item, `.pageSheet`). Screens stay free of navigation APIs.
 
 ## 7. Dependency Injection (shared §11)
 
 1. Factory (hmlongco/Factory 2.4.x, module `Factory`; tests use `FactoryTesting`) is the DI container. Each feature defines `package final class <F>Container: SharedContainer` with `@TaskLocal package static var shared = <F>Container()` and its own `manager`; no feature registers in `Container.shared` or another feature's container.
 2. The container class and its keys are `nonisolated` and live in `<F>Presentation/DI/`: use-case keys default to the domain `Default…` implementations; repository keys fail fast until `<F>Assembly.configure(...)` registers the Data implementations. Keys for Core types Presentation may not import (e.g. `HTTPClient`) are declared in `<F>Feature`.
 3. ViewModels resolve use cases with `@Injected(\<F>Container.key)` marked `@ObservationIgnored`. `@Injected` resolves when the ViewModel is created, so tests register stubs first. ViewModels and routers are never registered: coordinators construct ViewModels and pass themselves as router.
-4. User-scoped registrations use a custom `.session` scope. On sign-out App calls every `<F>Assembly.resetSession()`.
+4. User-scoped registrations use the feature's own `<F>Container.sessionScope = Scope.Cached()` (a static on the container, not a `Scope` extension, so features never clash). On sign-out App calls every `<F>Assembly.resetSession()`.
 5. Each feature's tests declare a trait `ContainerTrait(shared: <F>Container.$shared, container: <F>Container())` and override registrations inside it, so parallel tests each get their own container. `.serialized` is only a fallback for a suite that cannot use the trait.
 
 ## 8. Design System

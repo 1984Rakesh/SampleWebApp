@@ -16,6 +16,7 @@ let package = Package(
     dependencies: [
         .package(path: "../Core"),
         .package(path: "../Features/Auth"),
+        .package(path: "../Features/Tasks"),
     ],
     targets: [
         .target(
@@ -24,12 +25,17 @@ let package = Package(
                 .product(name: "DesignSystem", package: "Core"),
                 .product(name: "Networking", package: "Core"),
                 .product(name: "AuthFeature", package: "Auth"),
+                .product(name: "TasksFeature", package: "Tasks"),
             ],
             swiftSettings: mainActorByDefault
         ),
         .testTarget(
             name: "AppCompositionTests",
-            dependencies: ["AppComposition", .product(name: "AuthFeature", package: "Auth")],
+            dependencies: [
+                "AppComposition",
+                .product(name: "AuthFeature", package: "Auth"),
+                .product(name: "TasksFeature", package: "Tasks"),
+            ],
             swiftSettings: mainActorByDefault
         ),
     ],
