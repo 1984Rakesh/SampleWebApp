@@ -1,13 +1,7 @@
 import { createContext, useContext } from 'react';
-import type { Account, AuthSession } from '../../domain/models';
+import type { AuthSessionState } from '../contracts';
 
-export interface AuthSessionState {
-  user: Account | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  setSession(session: AuthSession): void;
-  signOut(): void;
-}
+export type { AuthSessionState };
 export const AuthSessionContext = createContext<AuthSessionState | undefined>(undefined);
 export function useAuth(): AuthSessionState {
   const value = useContext(AuthSessionContext);

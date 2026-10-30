@@ -2,9 +2,9 @@ import express, { type Express } from 'express';
 import cors from 'cors';
 import { errorMiddleware, requestLogger } from '../foundation/http';
 import type { AppConfig } from './config';
-import type { Container } from './container';
+import type { Composition } from './composition';
 
-export function createApp(config: AppConfig, { routers }: Container): Express {
+export function createApp(config: AppConfig, { routers }: Composition): Express {
   const app = express();
 
   // Middleware

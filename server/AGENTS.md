@@ -4,7 +4,7 @@ Follow the [server rules](../.agents/skills/server-architecture/SKILL.md), [shar
 
 ## Layout
 
-`src/` holds features (`security`, `profile`, `tasks`, each with domain/infrastructure/presentation), `app/` (config, container, createApp), `foundation/` (database, persistence, http), `shared/domain/`, and thin `server.ts`. No client-only modules (dashboard, comparison, components) on the server.
+`src/` holds features (`security`, `profile`, `tasks`, each with domain/infrastructure/presentation plus a root `assembly.ts` and public `index.ts`), `app/` (config, composition, createApp), `foundation/` (database, persistence, http), `shared/domain/`, and thin `server.ts`. No client-only modules (dashboard, comparison, components) on the server.
 
 ## Verification
 

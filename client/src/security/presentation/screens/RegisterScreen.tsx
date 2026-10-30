@@ -2,6 +2,7 @@ import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2, OctagonX } from 'lucide-react';
 import { useAuthViewModel } from '../hooks';
+import { SecurityRoute } from '../contracts';
 import { Logo } from '../../../components/app';
 import {
   Alert,
@@ -109,7 +110,7 @@ export default function RegisterScreen() {
           <CardFooter className="justify-center gap-1 text-sm">
             <span className="text-muted-foreground">Already have an account?</span>
             <Button asChild variant="link" className="h-auto px-0">
-              <Link to="/login">Sign in</Link>
+              <Link to={SecurityRoute.login}>Sign in</Link>
             </Button>
           </CardFooter>
         </Card>

@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '../../../components/ui';
 const PAGE_CLASS = 'min-h-screen bg-background px-4 py-4 md:px-8 md:pt-10 md:pb-16';
 
 export default function DashboardScreen() {
-  const { dashboard, statusLabels, isLoading, errorMessage, toggleTaskStatus } = useDashboardViewModel();
+  const { dashboard, statusLabels, isLoading, errorMessage, toggleTaskStatus, links } = useDashboardViewModel();
   if (isLoading) return <main className={PAGE_CLASS}><LoadingSpinner size="lg" text="Loading dashboard..." /></main>;
 
   return (
@@ -27,8 +27,8 @@ export default function DashboardScreen() {
           )}
           <DashboardStats counts={dashboard.counts} statusLabels={statusLabels} total={dashboard.total} dueToday={dashboard.dueToday} dueThisWeek={dashboard.dueThisWeek} />
           <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <DashboardRecentTasks tasks={dashboard.recentTasks} onToggle={toggleTaskStatus} />
-            <DashboardProgress counts={dashboard.counts} statusLabels={statusLabels} total={dashboard.total} percent={dashboard.completionPercent} />
+            <DashboardRecentTasks tasks={dashboard.recentTasks} tasksHref={links.tasks} onToggle={toggleTaskStatus} />
+            <DashboardProgress counts={dashboard.counts} statusLabels={statusLabels} total={dashboard.total} percent={dashboard.completionPercent} tasksHref={links.tasks} profileHref={links.profile} />
           </div>
         </div>
       </div>

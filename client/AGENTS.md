@@ -4,7 +4,7 @@ Follow the [client rules](../.agents/skills/client-architecture/SKILL.md), [shar
 
 ## Layout
 
-`src/` holds features (`security`, `profile`, `tasks` with domain/data/presentation; `dashboard`, `comparison` presentation-only), `app/` (composition, providers, router), `foundation/` (network, session, theme), `shared/` (domain, data), `components/` (ui, app, feedback, layout), and thin `App.tsx`/`main.tsx`.
+`src/` holds features (`security`, `profile`, `tasks` with domain/data/presentation; `dashboard`, `comparison` presentation-only; each with a root `assembly.tsx` and public `index.ts`), `app/` (composition, providers, router), `foundation/` (network, session, theme), `shared/` (domain, data), `components/` (ui, app, feedback, layout), and thin `App.tsx`/`main.tsx`.
 
 UI source of truth: [docs/design-system/](./docs/design-system/README.md) (tokens in `globals.css`, one spec per component in `components/*.md`). Never import `components/bundle.js`.
 

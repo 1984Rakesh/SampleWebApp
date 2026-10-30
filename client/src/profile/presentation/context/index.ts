@@ -1,1 +1,1 @@
-export { ProfileUseCasesContext, useUserUseCases } from './ProfileUseCasesContext';
+export { ProfileUseCasesContext, useUserUseCases, type ProfileUseCases } from './ProfileUseCasesContext';

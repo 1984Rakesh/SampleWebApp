@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useAuth, useAuthUseCases } from '../context';
 import { useNavigate } from 'react-router-dom';
+import { useAuth, useAuthUseCases, useSecurityRouting } from '../context';
+import { SecurityRoute } from '../contracts';
 
 const toErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
@@ -8,6 +9,7 @@ const toErrorMessage = (error: unknown, fallback: string) =>
 export function useAuthViewModel() {
   const { user, isLoading, isAuthenticated, setSession, signOut } = useAuth();
   const authUseCases = useAuthUseCases();
+  const { homePath } = useSecurityRouting();
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
@@ -20,7 +22,7 @@ export function useAuthViewModel() {
     try {
       const session = await authUseCases.login({ email: loginEmail, password: loginPassword });
       setSession(session);
-      navigate('/dashboard');
+      navigate(homePath);
       return true;
     } catch (error) {
       setErrorMessage(toErrorMessage(error, 'Login failed'));
@@ -41,7 +43,7 @@ export function useAuthViewModel() {
         password: registerPassword,
       });
       setSession(session);
-      navigate('/dashboard');
+      navigate(homePath);
       return true;
     } catch (error) {
       setErrorMessage(toErrorMessage(error, 'Registration failed'));
@@ -51,7 +53,7 @@ export function useAuthViewModel() {
 
   const handleLogout = () => {
     signOut();
-    navigate('/login');
+    navigate(SecurityRoute.login);
   };
 
   return {

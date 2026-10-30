@@ -2,18 +2,22 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../../components/layout';
 import { useColorMode } from '../../foundation/theme';
-import { useAuth } from '../../security/presentation/context';
-import { TaskDialog } from '../../tasks/presentation/components';
+import { ComparisonRoute } from '../../comparison';
+import { DashboardRoute } from '../../dashboard';
+import { ProfileRoute } from '../../profile';
+import { SecurityRoute } from '../../security';
+import { TasksRoute } from '../../tasks';
+import { security, tasks } from './features';
 
 const links = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/tasks', label: 'Tasks' },
-  { to: '/profile', label: 'Profile' },
-  { to: '/comparison', label: 'Comparison' },
+  { to: DashboardRoute.home, label: 'Dashboard' },
+  { to: TasksRoute.list, label: 'Tasks' },
+  { to: ProfileRoute.profile, label: 'Profile' },
+  { to: ComparisonRoute.comparison, label: 'Comparison' },
 ];
 
 export default function AppNavbar() {
-  const { user, isAuthenticated, signOut } = useAuth();
+  const { user, isAuthenticated, signOut } = security.useSession();
   const { resolvedMode, toggleMode } = useColorMode();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -24,7 +28,7 @@ export default function AppNavbar() {
     setDrawerOpen(false);
     setTaskDialogOpen(false);
     signOut();
-    navigate('/login');
+    navigate(SecurityRoute.login);
   };
 
   return (
@@ -35,8 +39,8 @@ export default function AppNavbar() {
           initial: user?.name.trim().charAt(0).toUpperCase() || 'U',
           mode: resolvedMode,
           links,
-          brand: { label: 'Clean Architecture', mark: '✓', to: '/dashboard' },
-          profilePath: '/profile',
+          brand: { label: 'Clean Architecture', mark: '✓', to: DashboardRoute.home },
+          profilePath: ProfileRoute.profile,
         }}
         drawerOpen={drawerOpen}
         onOpenNavigation={() => setDrawerOpen(true)}
@@ -45,7 +49,7 @@ export default function AppNavbar() {
         onLogout={logout}
         onCreateTask={() => setTaskDialogOpen(true)}
       />
-      {taskDialogOpen && <TaskDialog key="navbar-create" open onClose={() => setTaskDialogOpen(false)} />}
+      {taskDialogOpen && <tasks.CreateTaskDialog key="navbar-create" open onClose={() => setTaskDialogOpen(false)} />}
     </>
   );
 }

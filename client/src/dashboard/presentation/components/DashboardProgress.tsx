@@ -4,7 +4,14 @@ import { ChevronRight, List, UserRound } from 'lucide-react';
 import type { DashboardStatusLabels, DashboardTaskCounts } from '../models';
 import { Card, CardContent, CardHeader, CardTitle, cn } from '../../../components/ui';
 
-interface DashboardProgressProps { counts: DashboardTaskCounts; statusLabels: DashboardStatusLabels; total: number; percent: number }
+interface DashboardProgressProps {
+  counts: DashboardTaskCounts;
+  statusLabels: DashboardStatusLabels;
+  total: number;
+  percent: number;
+  tasksHref: string;
+  profileHref: string;
+}
 
 interface LinkCardProps { to: string; icon: ReactNode; iconClassName: string; title: string; description: string }
 
@@ -23,7 +30,7 @@ function LinkCard({ to, icon, iconClassName, title, description }: LinkCardProps
   );
 }
 
-export default function DashboardProgress({ counts, statusLabels, total, percent }: DashboardProgressProps) {
+export default function DashboardProgress({ counts, statusLabels, total, percent, tasksHref, profileHref }: DashboardProgressProps) {
   const legend = [
     { label: statusLabels.completed, swatch: 'bg-chart-1' },
     { label: statusLabels.inProgress, swatch: 'bg-chart-2' },
@@ -62,14 +69,14 @@ export default function DashboardProgress({ counts, statusLabels, total, percent
         </CardContent>
       </Card>
       <LinkCard
-        to="/tasks"
+        to={tasksHref}
         icon={<List className="size-4" aria-hidden="true" />}
         iconClassName="bg-status-progress text-status-progress-foreground"
         title="Manage tasks"
         description="Create, edit and organize"
       />
       <LinkCard
-        to="/profile"
+        to={profileHref}
         icon={<UserRound className="size-4" aria-hidden="true" />}
         iconClassName="bg-secondary text-muted-foreground"
         title="Your profile"

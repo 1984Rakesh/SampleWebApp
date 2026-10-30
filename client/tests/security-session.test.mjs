@@ -35,7 +35,9 @@ before(async () => {
   authMapper = await load('security/data/mappers/AuthMapper.ts');
   authApi = await load('security/data/api/AuthApi.ts');
   authData = await load('security/data/repositories/HttpAuthRepository.ts');
-  profileSession = await load('app/composition/profileSession.ts');
+  const { bindProfileSession } = await load('profile/data/repositories/SessionBoundProfileRepository.ts');
+  const { toProfileSession } = await load('app/composition/profileSession.ts');
+  profileSession = { bindProfileSession: (source, sessions) => bindProfileSession(source, toProfileSession(sessions)) };
 });
 after(async () => { await vite?.close(); });
 

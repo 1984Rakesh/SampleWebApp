@@ -1,17 +1,7 @@
 import { createContext, useContext } from 'react';
-import type { DashboardStatusLabels, DashboardTaskCounts, DashboardTaskItem } from '../models';
+import type { DashboardCapabilities } from '../contracts';
 
-export interface DashboardCapabilities {
-  profileName: string;
-  isProfileLoading: boolean;
-  taskItems: DashboardTaskItem[];
-  counts: DashboardTaskCounts;
-  statusLabels: DashboardStatusLabels;
-  isTasksLoading: boolean;
-  errorMessage?: string;
-  toggleTaskStatus(id: string): Promise<void>;
-}
-
+export type { DashboardCapabilities };
 export const DashboardCapabilitiesContext = createContext<DashboardCapabilities | undefined>(undefined);
 
 export function useDashboardCapabilities(): DashboardCapabilities {
