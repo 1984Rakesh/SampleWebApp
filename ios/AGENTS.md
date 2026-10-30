@@ -15,7 +15,7 @@ Requires Xcode 26.3 (Swift 6.2, iOS 26 SDK). Deployment target is iOS 17.0.
 Latest OS (every change):
 
 ```bash
-xcodebuild -scheme TasksApp -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.3' build test
+xcodebuild -scheme TasksApp -destination 'platform=iOS Simulator,name=iPhone 17' build test
 ```
 
 Minimum OS (before opening a PR):
@@ -24,4 +24,4 @@ Minimum OS (before opening a PR):
 xcodebuild -scheme TasksApp -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' build test
 ```
 
-Also run `xcodebuild test -scheme <Package> -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.3'` for each package you change, then `git diff --check` at the repository root.
+`iPhone 17` exists only on the iOS 26.3.1 runtime, so it needs no `OS=`. Also run `xcodebuild test -scheme <Scheme> -destination 'platform=iOS Simulator,name=iPhone 17'` inside each package you change (`Packages/Core` → `Core-Package`, `Packages/AppComposition` → `AppComposition`), then `git diff --check` at the repository root.

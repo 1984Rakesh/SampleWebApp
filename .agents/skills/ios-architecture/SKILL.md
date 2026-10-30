@@ -36,7 +36,7 @@ ios/
 1. No `@unchecked Sendable`, `nonisolated(unsafe)` or `@preconcurrency import`. Fix the type instead.
 2. Models, DTOs and ViewState are `struct`/`enum` with Sendable members. Use cases, repositories and HTTP clients are `struct`s with only `let` Sendable properties; create `JSONDecoder`/`JSONEncoder` per call rather than storing them.
 3. Mutable shared state (in-flight refresh, session broadcast) is an `actor`. Small synchronous state (an in-memory token cache) may use `OSAllocatedUnfairLock` from `os` (iOS 16+, Sendable) instead; `Mutex` needs iOS 18 and is not used. `AsyncStream` has one consumer; fan-out goes through an actor that owns the continuations.
-4. Presentation, `<F>Feature`, AppComposition and DesignSystem targets use `.defaultIsolation(MainActor.self)` (Swift 6.2). Domain, Data and the other Core targets keep nonisolated defaults and do not enable `NonisolatedNonsendingByDefault`, so their async work leaves the main actor; if that feature is ever enabled there, mark decoding and other heavy Data work `@concurrent`.
+4. Presentation, `<F>Feature`, AppComposition and DesignSystem targets use `.defaultIsolation(MainActor.self)` plus the `InferIsolatedConformances` upcoming feature (Swift 6.2); the app target sets `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`. Closures UIKit may call off the main thread (e.g. `UIColor` dynamic providers) are created inside `nonisolated` functions. Domain, Data and the other Core targets keep nonisolated defaults and do not enable `NonisolatedNonsendingByDefault`, so their async work leaves the main actor; if that feature is ever enabled there, mark decoding and other heavy Data work `@concurrent`.
 5. Closures crossing isolation are `@Sendable` or `@MainActor`. Screens start work with `.task {}` so it is cancelled on disappear.
 
 ## 3. Domain
@@ -72,11 +72,11 @@ ios/
 
 ## 7. Dependency Injection (shared §11)
 
-1. Factory (`FactoryKit`) is the DI container. Each feature defines `package final class <F>Container: SharedContainer` with its own `manager`; no feature registers in `Container.shared` or another feature's container.
+1. Factory (hmlongco/Factory 2.4.x, module `Factory`; tests use `FactoryTesting`) is the DI container. Each feature defines `package final class <F>Container: SharedContainer` with `@TaskLocal package static var shared = <F>Container()` and its own `manager`; no feature registers in `Container.shared` or another feature's container.
 2. ViewModels, factories and coordinators resolve with `@Injected(\<F>Container.key)`; inside `@Observable` classes mark them `@ObservationIgnored`. Routers are passed at construction, never registered.
 3. Cross-feature keys in a feature container have an unregistered default that fails fast; App fills them only through `<F>Assembly.configure(...)`.
 4. User-scoped registrations use a custom `.session` scope. On sign-out App calls every `<F>Assembly.resetSession()`.
-5. Tests override registrations inside the FactoryTesting `.container` trait (or a feature trait) so parallel tests stay isolated; if a custom container cannot be isolated, mark that suite `.serialized`.
+5. Each feature's tests declare a trait `ContainerTrait(shared: <F>Container.$shared, container: <F>Container())` and override registrations inside it, so parallel tests each get their own container. `.serialized` is only a fallback for a suite that cannot use the trait.
 
 ## 8. Design System
 
@@ -87,14 +87,15 @@ ios/
 
 ## 9. Verification
 
-- `xcodebuild build test` for the app scheme and `xcodebuild test` for each changed package scheme, on the latest simulator (iPhone 17, iOS 26.3) and before a PR also on the minimum (iPhone 15, iOS 17.5), plus `git diff --check` at the repository root. Packages are iOS-only, so plain `swift test` on macOS is not used.
+- `xcodebuild test` for the `TasksApp` scheme and for each changed package scheme (`Core-Package`, `AppComposition`, `<Feature>-Package`), on the latest simulator (iPhone 17, iOS 26.3.1) and before a PR also on the minimum (iPhone 15, iOS 17.5), plus `git diff --check` at the repository root. Packages are iOS-only, so plain `swift test` on macOS is not used.
+- Package tests run without a host app, so the Keychain is unavailable there (errSecMissingEntitlement); Keychain-dependent tests skip in packages and run hosted in `TasksAppTests`.
 - Tests use Swift Testing: ViewModels with stubbed use cases, presentation mappers, data mappers and error translation.
 - The dependency rule is enforced by SPM target dependencies; never add a target dependency that §1 forbids. Manual review: ViewState vs entity rendering, `public` surface limited to shared §10, no `@unchecked`, error translation, tri-state patches.
 
 ## 10. Toolchain and Platform APIs
 
 1. Toolchain: Xcode 26.3, Swift 6.2 (`// swift-tools-version: 6.2`, `.swiftLanguageMode(.v6)`), iOS 26 SDK. Every package declares `platforms: [.iOS(.v17)]`; the app target's deployment target is iOS 17.0.
-2. Freely usable (iOS 17 and earlier): `@Observable`, typed throws, `OSAllocatedUnfairLock`, `UITabBarController.viewControllers`, `@Entry` environment values (back-deployed macro), `.task`, `.refreshable`, `UISheetPresentationController` detents, `#Preview`. Not used: iOS 18 APIs such as `Mutex`, `UITab` and `@Previewable`; previews pass ViewState fixtures instead.
+2. Freely usable (iOS 17 and earlier): `@Observable`, typed throws, `OSAllocatedUnfairLock`, `UITabBarController.viewControllers`, `@Entry` environment values (back-deployed macro), `.task`, `.refreshable`, `UISheetPresentationController` detents, `#Preview` and `@Previewable` (back-deployed macro). Not used: iOS 18 APIs such as `Mutex` and `UITab`. Screen previews still pass ViewState fixtures (ios §5.5).
 3. iOS 26-only APIs (`glassEffect`, `Task.immediate`, `UIHostingController` scene bridging, automatic UIKit observation tracking) are used only behind `if #available(iOS 26, *)` with an iOS 17 fallback (likewise any iOS 18 API, behind `#available(iOS 18, *)`), and only inside `Core/DesignSystem` or AppComposition, never in feature code.
 4. Building with the iOS 26 SDK adopts Liquid Glass for system bars on iOS 26. Do not opt out (`UIDesignRequiresCompatibility`) and do not force opaque bar appearances; DesignSystem tokens style content, not system chrome.
 5. Raise the deployment target only together with this section, `ios/AGENTS.md` and `plans/RULES.md`, and delete the `#available` fallbacks it makes dead.
