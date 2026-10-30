@@ -69,10 +69,11 @@ ios/
 
 1. Navigation is UIKit; every screen is hosted in a `UIHostingController`. SwiftUI screens never touch UIKit or routers directly; ViewModels call routing protocols.
 2. Each feature owns a coordinator in `<F>Presentation/Navigation/` that implements its internal routing protocol (internal) and its inbound `public protocol <F>Flow` with `handle(_ route: <F>Route)`.
-3. Outbound needs are `public protocol <F>ExternalRouting: AnyObject` in the feature's own vocabulary. AppComposition implements them and maps types between features in `CrossFeatureAdapters.swift` (e.g. `DashboardTaskFilter` → `TasksRoute`, `TaskItem` → `DashboardTask`). Adapters resolve the other feature's use case per call, so a sign-out's session reset is honored.
+3. Outbound needs are `public protocol <F>ExternalRouting: AnyObject` in the feature's own vocabulary. AppComposition implements them and maps types between features in `CrossFeatureAdapters.swift` (e.g. `DashboardTaskFilter` → `TasksRoute`, `TaskItem` → `DashboardTask`, Profile's `SessionEnding` → Auth's `LogoutUseCase`). Adapters resolve the other feature's use case per call, so a sign-out's session reset is honored.
 4. AppCoordinator owns the window: splash while restoring the session, then root swap between the Auth flow and `MainCoordinator` (a `UITabBarController` with `viewControllers` and `UITabBarItem`s, one tab per feature flow; the iOS 18 `UITab` API is not used) driven by `SessionRepository.sessionChanges`. Deep links are out of scope.
 5. ViewModels and coordinators hold routers `weak`. Sheets that change data take an `onSaved` callback so the presenting screen refetches.
 6. Coordinators own UIKit chrome: titles, bar button items and sheet presentation (`UINavigationController` with a Cancel item, `.pageSheet`). Screens stay free of navigation APIs.
+7. Actions owned by another feature are consumer-owned domain contracts, not routes: Profile signs out through its own `SessionEnding`, which App backs with Auth's logout, and the session stream swaps the root.
 
 ## 7. Dependency Injection (shared §11)
 

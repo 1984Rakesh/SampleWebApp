@@ -1,6 +1,7 @@
 import AuthFeature
 import DashboardFeature
 import Networking
+import ProfileFeature
 import SwiftUI
 import TasksFeature
 import UIKit
@@ -9,10 +10,10 @@ import UIKit
 struct AppServices {
     let restore: any RestoreSessionUseCase
     let observe: any ObserveSessionUseCase
-    let logout: any LogoutUseCase
     let makeAuthFlow: () -> any AuthFlow
     let makeTasksFlow: () -> any TasksFlow
     let makeDashboardFlow: (String, any DashboardExternalRouting) -> any DashboardFlow
+    let makeProfileFlow: () -> any ProfileFlow
     /// Drops every feature's user-scoped registrations (ios §7.4).
     let resetUserSessions: () -> Void
 }
@@ -35,16 +36,23 @@ public final class AppCoordinator: Coordinator {
         )
         TasksAssembly.configure(client: AuthAssembly.authenticatedClient())
         DashboardAssembly.configure(taskSource: TasksDashboardSource(getTasks: { TasksAssembly.getTasks() }))
+        ProfileAssembly.configure(
+            client: AuthAssembly.authenticatedClient(),
+            sessionEnding: AuthSessionEnding(logout: AuthAssembly.logout())
+        )
         self.init(
             window: window,
             services: AppServices(
                 restore: AuthAssembly.restoreSession(),
                 observe: AuthAssembly.observeSession(),
-                logout: AuthAssembly.logout(),
                 makeAuthFlow: AuthAssembly.makeFlow,
                 makeTasksFlow: TasksAssembly.makeFlow,
                 makeDashboardFlow: { DashboardAssembly.makeFlow(displayName: $0, router: $1) },
-                resetUserSessions: TasksAssembly.resetSession
+                makeProfileFlow: ProfileAssembly.makeFlow,
+                resetUserSessions: {
+                    TasksAssembly.resetSession()
+                    ProfileAssembly.resetSession()
+                }
             )
         )
     }
@@ -78,14 +86,12 @@ public final class AppCoordinator: Coordinator {
             setRoot(flow.rootViewController, animated: true)
         case .signedIn(let account):
             authFlow = nil
-            let logout = services.logout
             let main = MainCoordinator(
                 account: account,
                 tasksFlow: services.makeTasksFlow(),
+                profileFlow: services.makeProfileFlow(),
                 makeDashboardFlow: services.makeDashboardFlow
-            ) {
-                Task { await logout.execute() }
-            }
+            )
             self.main = main
             setRoot(main.tabBarController, animated: true)
         }

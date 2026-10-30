@@ -4,6 +4,7 @@ import Testing
 import UIKit
 import AuthFeature
 import DashboardFeature
+import ProfileFeature
 import SharedDomain
 import TasksFeature
 @testable import AppComposition
@@ -52,7 +53,8 @@ import TasksFeature
         try await waitUntil { harness.window.rootViewController is UITabBarController }
         let tabs = try #require(harness.window.rootViewController as? UITabBarController)
         #expect(tabs.viewControllers?[1] === harness.tasksFlow.rootViewController)
-        #expect(tabs.viewControllers?.map { $0.tabBarItem.title } == ["Dashboard", "Tasks", "Account"])
+        #expect(tabs.viewControllers?.map { $0.tabBarItem.title } == ["Dashboard", "Tasks", "Profile"])
+        #expect(tabs.viewControllers?[2] === harness.profileFlow.rootViewController)
         #expect(harness.dashboards.flows.first?.displayName == "Ada")
 
         harness.dashboards.flows.first?.router?.openTasks(.overdue)
@@ -86,6 +88,7 @@ final class Harness {
     let changes: AsyncStream<SessionState>.Continuation
     let authFlow = StubAuthFlow()
     let tasksFlow = StubTasksFlow()
+    let profileFlow = StubProfileFlow()
     let dashboards = DashboardRecorder()
     let resets = Counter()
     let coordinator: AppCoordinator
@@ -93,18 +96,22 @@ final class Harness {
     init() {
         let (stream, continuation) = AsyncStream.makeStream(of: SessionState.self)
         changes = continuation
-        let (authFlow, tasksFlow, resets) = (authFlow, tasksFlow, resets)
+        let (authFlow, tasksFlow, profileFlow, resets) = (authFlow, tasksFlow, profileFlow, resets)
         let dashboards = dashboards
         coordinator = AppCoordinator(window: window, services: AppServices(
             restore: StubRestore(),
             observe: StubObserve(stream: stream),
-            logout: StubLogout(),
             makeAuthFlow: { authFlow },
             makeTasksFlow: { tasksFlow },
             makeDashboardFlow: { name, router in dashboards.make(name, router) },
+            makeProfileFlow: { profileFlow },
             resetUserSessions: { resets.count += 1 }
         ))
     }
+}
+
+final class StubProfileFlow: ProfileFlow {
+    let rootViewController = UIViewController()
 }
 
 final class DashboardRecorder {
@@ -152,6 +159,21 @@ final class StubDashboardFlow: DashboardFlow {
     }
 }
 
+@Suite struct SessionEndingAdapterTests {
+    @Test func endsSessionThroughAuthLogout() async {
+        let logout = RecordingLogout()
+
+        await AuthSessionEnding(logout: logout).endSession()
+
+        #expect(await logout.calls == 1)
+    }
+}
+
+actor RecordingLogout: LogoutUseCase {
+    private(set) var calls = 0
+    func execute() async { calls += 1 }
+}
+
 struct StubGetTasks: GetTasksUseCase {
     let tasks: [TaskItem]
     func execute(_ filter: TaskFilter) async throws(DomainError) -> [TaskItem] { tasks }
@@ -178,8 +200,4 @@ struct StubRestore: RestoreSessionUseCase {
 struct StubObserve: ObserveSessionUseCase {
     let stream: AsyncStream<SessionState>
     func execute() async -> AsyncStream<SessionState> { stream }
-}
-
-struct StubLogout: LogoutUseCase {
-    func execute() async {}
 }

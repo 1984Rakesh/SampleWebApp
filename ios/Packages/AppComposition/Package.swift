@@ -18,6 +18,7 @@ let package = Package(
         .package(path: "../Features/Auth"),
         .package(path: "../Features/Tasks"),
         .package(path: "../Features/Dashboard"),
+        .package(path: "../Features/Profile"),
     ],
     targets: [
         .target(
@@ -28,6 +29,7 @@ let package = Package(
                 .product(name: "AuthFeature", package: "Auth"),
                 .product(name: "TasksFeature", package: "Tasks"),
                 .product(name: "DashboardFeature", package: "Dashboard"),
+                .product(name: "ProfileFeature", package: "Profile"),
             ],
             swiftSettings: mainActorByDefault
         ),
@@ -38,6 +40,7 @@ let package = Package(
                 .product(name: "AuthFeature", package: "Auth"),
                 .product(name: "TasksFeature", package: "Tasks"),
                 .product(name: "DashboardFeature", package: "Dashboard"),
+                .product(name: "ProfileFeature", package: "Profile"),
             ],
             swiftSettings: mainActorByDefault
         ),

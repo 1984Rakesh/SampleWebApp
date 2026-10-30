@@ -1,6 +1,6 @@
 import AuthFeature
 import DashboardFeature
-import SwiftUI
+import ProfileFeature
 import TasksFeature
 import UIKit
 
@@ -9,21 +9,22 @@ final class MainCoordinator: DashboardExternalRouting {
     enum Tab: Int {
         case dashboard
         case tasks
-        case account
+        case profile
     }
 
     let tabBarController = UITabBarController()
     private let tasksFlow: any TasksFlow
+    private let profileFlow: any ProfileFlow
     private var dashboardFlow: (any DashboardFlow)?
 
     init(
         account: Account,
         tasksFlow: any TasksFlow,
-        makeDashboardFlow: (String, any DashboardExternalRouting) -> any DashboardFlow,
-        onLogout: @escaping () -> Void
+        profileFlow: any ProfileFlow,
+        makeDashboardFlow: (String, any DashboardExternalRouting) -> any DashboardFlow
     ) {
         self.tasksFlow = tasksFlow
-        let displayName = account.name.isEmpty ? account.email : account.name
+        self.profileFlow = profileFlow
 
         let dashboardFlow = makeDashboardFlow(account.name, self)
         self.dashboardFlow = dashboardFlow
@@ -33,12 +34,10 @@ final class MainCoordinator: DashboardExternalRouting {
         let tasks = tasksFlow.rootViewController
         tasks.tabBarItem = UITabBarItem(title: "Tasks", image: UIImage(systemName: "checklist"), tag: Tab.tasks.rawValue)
 
-        let accountScreen = UIHostingController(rootView: AccountPlaceholderScreen(name: displayName, onLogout: onLogout))
-        accountScreen.title = "Account"
-        let accountTab = UINavigationController(rootViewController: accountScreen)
-        accountTab.tabBarItem = UITabBarItem(title: "Account", image: UIImage(systemName: "person.crop.circle"), tag: Tab.account.rawValue)
+        let profile = profileFlow.rootViewController
+        profile.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person.crop.circle"), tag: Tab.profile.rawValue)
 
-        tabBarController.viewControllers = [dashboard, tasks, accountTab]
+        tabBarController.viewControllers = [dashboard, tasks, profile]
     }
 
     // MARK: DashboardExternalRouting

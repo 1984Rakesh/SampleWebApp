@@ -1,4 +1,6 @@
+import AuthFeature
 import DashboardFeature
+import ProfileFeature
 import SharedDomain
 import TasksFeature
 
@@ -23,6 +25,15 @@ struct TasksDashboardSource: DashboardTaskSource {
         case .high: .high
         }
         return DashboardTask(status: status, priority: priority, dueDate: task.dueDate)
+    }
+}
+
+/// Backs Profile's `SessionEnding` with Auth's logout; the session stream then swaps the root.
+struct AuthSessionEnding: SessionEnding {
+    let logout: any LogoutUseCase
+
+    func endSession() async {
+        await logout.execute()
     }
 }
 
