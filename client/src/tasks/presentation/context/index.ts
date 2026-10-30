@@ -1,1 +1,1 @@
-export { TaskUseCasesContext, useTaskUseCases } from './TaskUseCasesContext';
+export { TaskUseCasesContext, useTaskUseCases, type TaskUseCases } from './TaskUseCasesContext';

@@ -8,6 +8,8 @@ const ROOTS = '(?:app|foundation|shared|components|assets)';
 // Features are the top-level src folders that are not App, foundation, shared, components or assets.
 const FEATURE_NAME = `(?!${ROOTS}/)[^/]+`;
 const FEATURE = `^src/${FEATURE_NAME}/`;
+const FEATURE_BARREL = `^src/${FEATURE_NAME}/index\\.ts$`;
+const FEATURE_ROOT_FILE = `${FEATURE}(?!(?:index\\.ts|assembly\\.tsx)$)[^/]+$`;
 const APP = '^src/(?:app/|App\\.tsx$)';
 // shared §7: <feature>/<layer>/<sub>/, or <root>/<sub>/ for app, foundation, shared and components.
 const MODULE_FOLDER = `src/(?:(?:app|foundation|shared|components)/[^/]+|${FEATURE_NAME}/[^/]+/[^/]+)/`;
@@ -102,7 +104,7 @@ module.exports = {
     {
       name: 'feature-not-to-app',
       severity: 'error',
-      comment: 'shared §1 App Owns Composition / client §1: features never import App.',
+      comment: 'shared §1 App Owns Cross-Feature Composition / client §1: features never import App.',
       from: { path: FEATURE },
       to: { path: APP },
     },
@@ -110,9 +112,70 @@ module.exports = {
       name: 'feature-not-to-sibling-feature',
       severity: 'error',
       comment:
-        'shared §1 App Owns Composition / client §5.4: features never import sibling features; App injects consumer-owned contracts.',
+        'shared §1 App Owns Cross-Feature Composition / client §5.4: features never import sibling features; App injects consumer-owned contracts.',
       from: { path: `^src/(${FEATURE_NAME})/` },
       to: { path: FEATURE, pathNot: '^src/$1/' },
+    },
+    {
+      name: 'app-only-to-feature-public-barrel',
+      severity: 'error',
+      comment:
+        'shared §10 Only Contracts Are Public / client §3.4: App reaches a feature only through its public src/<feature>/index.ts.',
+      from: { path: APP },
+      to: { path: FEATURE, pathNot: FEATURE_BARREL },
+    },
+    {
+      name: 'feature-barrel-only-contracts-and-assembly',
+      severity: 'error',
+      comment:
+        'shared §10 Only Contracts Are Public / client §3.4: a feature barrel re-exports only its assembly, domain models, repository contracts and presentation/contracts (route types, outbound contracts).',
+      from: { path: `^src/(${FEATURE_NAME})/index\\.ts$` },
+      to: {
+        pathNot: [
+          '^src/$1/assembly\\.tsx$',
+          '^src/$1/domain/(?:models|repositories)/index\\.ts$',
+          '^src/$1/presentation/contracts/index\\.ts$',
+        ],
+      },
+    },
+    {
+      name: 'feature-assembly-only-from-feature-barrel',
+      severity: 'error',
+      comment: 'shared §10 Feature Assembly / client §3.4: the assembly is published only through its feature barrel.',
+      from: { pathNot: FEATURE_BARREL },
+      to: { path: `${FEATURE}assembly\\.tsx$` },
+    },
+    {
+      name: 'feature-barrel-only-from-app',
+      severity: 'error',
+      comment:
+        'shared §10 Feature Assembly / client §3.4: only App imports a feature barrel; feature internals never import their own barrel.',
+      from: { pathNot: APP },
+      to: { path: FEATURE_BARREL },
+    },
+    {
+      name: 'feature-root-only-barrel-and-assembly',
+      severity: 'error',
+      comment:
+        'shared §10 / client §6.1: a feature root holds only index.ts and assembly.tsx; everything else lives in <feature>/<layer>/<sub>/.',
+      from: { path: FEATURE_ROOT_FILE },
+      to: {},
+    },
+    {
+      name: 'feature-root-only-barrel-and-assembly',
+      severity: 'error',
+      comment:
+        'shared §10 / client §6.1: a feature root holds only index.ts and assembly.tsx; everything else lives in <feature>/<layer>/<sub>/.',
+      from: {},
+      to: { path: FEATURE_ROOT_FILE },
+    },
+    {
+      name: 'feature-routing-only-in-presentation-and-assembly',
+      severity: 'error',
+      comment:
+        'shared §9 Internal Navigation / client §4.4: a feature navigates only from its presentation layer, and its assembly declares its routes; domain and data never touch the router.',
+      from: { path: `^src/${FEATURE_NAME}/(?:domain|data)/` },
+      to: { path: '(?:^|/)node_modules/(?:react-router|react-router-dom)/' },
     },
     {
       name: 'presentation-not-to-data',

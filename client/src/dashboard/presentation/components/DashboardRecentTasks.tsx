@@ -4,16 +4,16 @@ import type { DashboardTaskItem } from '../models';
 import { ChecklistRow } from '../../../components/app';
 import { Button, Card, CardAction, CardHeader, CardTitle } from '../../../components/ui';
 
-interface DashboardRecentTasksProps { tasks: DashboardTaskItem[]; onToggle: (id: string) => void }
+interface DashboardRecentTasksProps { tasks: DashboardTaskItem[]; tasksHref: string; onToggle: (id: string) => void }
 
-export default function DashboardRecentTasks({ tasks, onToggle }: DashboardRecentTasksProps) {
+export default function DashboardRecentTasks({ tasks, tasksHref, onToggle }: DashboardRecentTasksProps) {
   return (
     <Card className="gap-0 overflow-hidden py-0">
       <CardHeader className="items-center pt-5 pb-3">
         <CardTitle className="text-[22px] leading-7 tracking-tight">Recent tasks</CardTitle>
         <CardAction>
           <Button asChild variant="link" size="sm" className="h-auto px-0">
-            <Link to="/tasks">
+            <Link to={tasksHref}>
               View all
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>

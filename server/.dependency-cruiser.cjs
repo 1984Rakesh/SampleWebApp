@@ -10,6 +10,7 @@ const ROOTS = '(?:app|foundation|shared)';
 // Features are the top-level src folders that are not App, foundation or shared.
 const FEATURE_NAME = `(?!${ROOTS}/)[^/]+`;
 const FEATURE = `^src/${FEATURE_NAME}/`;
+const FEATURE_BARREL = `^src/${FEATURE_NAME}/index\\.ts$`;
 const APP = '^src/(?:app/|server\\.ts$)';
 // server §5.1: <feature>/<layer>/<sub>/, or <root>/<sub>/ for app, foundation and shared.
 const MODULE_FOLDER = `src/(?:${ROOTS}/[^/]+|${FEATURE_NAME}/[^/]+/[^/]+)/`;
@@ -84,7 +85,7 @@ module.exports = {
     {
       name: 'feature-not-to-app',
       severity: 'error',
-      comment: 'shared §1 App Owns Composition / server §1: features never import App.',
+      comment: 'shared §1 App Owns Cross-Feature Composition / server §1: features never import App.',
       from: { path: FEATURE },
       to: { path: APP },
     },
@@ -92,9 +93,57 @@ module.exports = {
       name: 'feature-not-to-sibling-feature',
       severity: 'error',
       comment:
-        'shared §1 App Owns Composition / server §1: features never import sibling features; App injects consumer-owned ports.',
+        'shared §1 App Owns Cross-Feature Composition / server §1: features never import sibling features; App injects consumer-owned ports.',
       from: { path: `^src/(${FEATURE_NAME})/` },
       to: { path: FEATURE, pathNot: '^src/$1/' },
+    },
+    {
+      name: 'app-only-to-feature-public-barrel',
+      severity: 'error',
+      comment:
+        'shared §10 Only Contracts Are Public / server §6: App reaches a feature only through its public src/<feature>/index.ts.',
+      from: { path: APP },
+      to: { path: FEATURE, pathNot: FEATURE_BARREL },
+    },
+    {
+      name: 'feature-barrel-only-contracts-and-assembly',
+      severity: 'error',
+      comment:
+        'shared §10 Only Contracts Are Public / server §6: a feature barrel re-exports only its assembly and domain contracts (models, ports).',
+      from: { path: `^src/(${FEATURE_NAME})/index\\.ts$` },
+      to: { pathNot: ['^src/$1/assembly\\.ts$', '^src/$1/domain/(?:models|ports)/index\\.ts$'] },
+    },
+    {
+      name: 'feature-assembly-only-from-feature-barrel',
+      severity: 'error',
+      comment:
+        'shared §10 Feature Assembly / server §6: the assembly is published only through its feature barrel.',
+      from: { pathNot: FEATURE_BARREL },
+      to: { path: `${FEATURE}assembly\\.ts$` },
+    },
+    {
+      name: 'feature-barrel-only-from-app',
+      severity: 'error',
+      comment:
+        'shared §10 Feature Assembly / server §6: only App imports a feature barrel; feature internals never import their own barrel.',
+      from: { pathNot: APP },
+      to: { path: FEATURE_BARREL },
+    },
+    {
+      name: 'feature-root-only-barrel-and-assembly',
+      severity: 'error',
+      comment:
+        'shared §10 / server §5.1: a feature root holds only index.ts and assembly.ts; everything else lives in <feature>/<layer>/<sub>/.',
+      from: { path: `${FEATURE}(?!(?:index|assembly)\\.ts$)[^/]+$` },
+      to: {},
+    },
+    {
+      name: 'feature-root-only-barrel-and-assembly',
+      severity: 'error',
+      comment:
+        'shared §10 / server §5.1: a feature root holds only index.ts and assembly.ts; everything else lives in <feature>/<layer>/<sub>/.',
+      from: {},
+      to: { path: `${FEATURE}(?!(?:index|assembly)\\.ts$)[^/]+$` },
     },
     {
       name: 'presentation-not-to-infrastructure',
@@ -145,7 +194,7 @@ module.exports = {
     {
       name: 'foundation-not-to-features-or-app',
       severity: 'error',
-      comment: 'shared §1 App Owns Composition / server §1 table: foundation never imports features or App.',
+      comment: 'shared §1 App Owns Cross-Feature Composition / server §1 table: foundation never imports features or App.',
       from: { path: '^src/foundation/' },
       to: { path: [FEATURE, APP] },
     },

@@ -16,7 +16,8 @@ Extend the [shared rules](../clean-architecture/SKILL.md). Inside a feature: Pre
 | Feature presentation | Own domain/presentation, `foundation/http`, `shared/domain` | Other features, infrastructure, App, SQLite/bcrypt/JWT, `process.env` |
 | Foundation | Own generic modules, `shared/domain`, technical libraries | Features, App, business policy, `process.env` |
 | Shared domain | Itself only | Frameworks, foundation, App, features |
-| App / bootstrap | All layers, for composition | Business rules, inline SQL, unvalidated request handling |
+| Feature assembly (`<feature>/assembly.ts`) | Own layers, generic foundation | Other features, App, Express/Zod imports (use `foundation/http` types) |
+| App / bootstrap | Feature barrels (`src/<feature>/index.ts`), foundation | Feature internals, business rules, inline SQL, unvalidated request handling |
 
 Features that share a table own separate ports and adapters; App gives both adapters the same database. Cross-feature capabilities are consumer-owned ports injected by App.
 
@@ -55,6 +56,6 @@ Features that share a table own separate ports and adapters; App gives both adap
 
 ## 6. App and Verification
 
-- Only `app/config.ts` reads `process.env` and rejects missing/default production JWT secrets; `dotenv` only in `server.ts` and `app/`. Only `app/container.ts` constructs adapters, use cases, controllers and routers (legacy until the shared §8 migration to per-feature assemblies, shared §10); `app/createApp.ts` mounts middleware and routes; `server.ts` configures, migrates, awaits the seed, then listens.
+- Only `app/config.ts` reads `process.env` and rejects missing/default production JWT secrets; `dotenv` only in `server.ts` and `app/`. Each feature's `assembly.ts` constructs its own adapters, use cases, controllers and router from cross-feature dependencies (database, JWT config, auth middleware) and is exported, with its dependency/result types, from `src/<feature>/index.ts` (shared §10). `app/composition.ts` creates the database, calls each assembly and links them (security's auth middleware and password hashing go to the other features and the seed); `app/createApp.ts` mounts middleware and routes; `server.ts` configures, migrates, awaits the seed, then listens.
 - `src` uses only packages in `dependencies`, never devDependencies; every import resolves.
 - Run `npm run build`, `npm test`, `npm run test:startup`, `npm run check:architecture` and `git diff --check`. Test safety rules are in [server/AGENTS.md](../../../server/AGENTS.md).

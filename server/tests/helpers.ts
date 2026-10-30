@@ -5,7 +5,7 @@ import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import type { TestContext } from 'node:test';
 import { loadConfig } from '../src/app/config';
-import { createContainer } from '../src/app/container';
+import { createComposition } from '../src/app/composition';
 import { createApp } from '../src/app/createApp';
 import { runMigrations } from '../src/foundation/database/migrations';
 import type { AuthResponse } from '../src/security/presentation/schemas/AuthDto';
@@ -16,8 +16,8 @@ export async function createTestServer(t: TestContext) {
     JWT_SECRET: randomUUID(),
     DB_PATH: ':memory:',
   });
-  const container = createContainer(config);
-  const server = createServer(createApp(config, container));
+  const composition = createComposition(config);
+  const server = createServer(createApp(config, composition));
   t.after(async () => {
     if (server.listening) {
       const closed = once(server, 'close');
@@ -25,9 +25,9 @@ export async function createTestServer(t: TestContext) {
       server.closeAllConnections();
       await closed;
     }
-    container.db.close();
+    composition.db.close();
   });
-  runMigrations(container.db);
+  runMigrations(composition.db);
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
   const { port } = server.address() as AddressInfo;
@@ -58,7 +58,7 @@ export async function createTestServer(t: TestContext) {
     return response.body;
   }
 
-  return { request, register, config, seed: container.seed };
+  return { request, register, config, seed: composition.seed };
 }
 
 export function assertError(response: { status: number; body: unknown }, status: number): void {

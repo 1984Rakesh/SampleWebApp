@@ -66,7 +66,6 @@ Change every client (web, iOS) and the server together. `server/tests/client-con
 - dependency-cruiser on each side (`npm run check:architecture`); every rule is error-level. Never weaken, downgrade or `ignore` a rule; fix the code or raise a blocker.
 - Manual review (tools do not check): component-library prop leakage, ViewState vs entity rendering, tri-state patches, error translation, normalize-then-validate, use-case coverage.
 - Existing violations are not precedents; fix those inside the task's scope, with regression tests.
-- Known violations awaiting a dedicated migration (added 2026-10-30): web client routing and composition predate §9–§11 (App owns every route and constructs every adapter); server composition predates §10 (`app/container.ts` constructs every adapter). Do not extend these patterns; new features follow §9–§11.
 
 ## 9. Feature Screens and Navigation
 
