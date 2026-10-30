@@ -5,6 +5,7 @@ Applies to every plan in `plans/`. The Manager (Claude) owns this file; Devin re
 ## Stack
 - **client/** — React 19, Vite 8, TypeScript 6, Tailwind CSS v4, vendored shadcn/ui (radix-ui, lucide-react), TanStack Query, Axios, Zod, React Router 7. Lint: oxlint. Tests: Node test runner + Vite SSR (`client/tests/*.test.mjs`).
 - **server/** — Express 5, better-sqlite3, bcrypt, jsonwebtoken, Zod, TypeScript 7 (no JS compiler API). Tests: tsx + Node test runner (`server/tests/*.test.ts`), compiled startup smoke test.
+- **ios/** — SwiftUI (iOS 17+, Swift 6) with UIKit navigation, local SPM packages, FactoryKit DI, Swift Testing.
 - No root package.json. Each side installs and verifies on its own.
 
 ## Architecture
@@ -12,6 +13,7 @@ The authoritative rules are in the repo:
 - Root: `AGENTS.md`, `.agents/skills/clean-architecture/SKILL.md`
 - Client: `client/AGENTS.md`, `.agents/skills/client-architecture/SKILL.md`
 - Server: `server/AGENTS.md`, `.agents/skills/server-architecture/SKILL.md`
+- iOS: `ios/AGENTS.md`, `.agents/skills/ios-architecture/SKILL.md`
 
 The rule files are skills, loaded only when invoked. Workers invoke one only when the task's Read only line names it (domain, data, API or module-structure changes); for other tasks the summary below, the task file and `check:architecture` cover it. Summary:
 ```
@@ -19,8 +21,9 @@ Building blocks: Foundation → Features → App
 Imports:         App → Features / Foundation
 Inside feature:  Presentation → Domain ← Data (client) / Infrastructure (server)
 ```
-- Domains are pure TypeScript: only own domain + `shared/domain`.
+- Domains are pure language code (TypeScript, Swift): only own domain + `shared/domain`.
 - Features never import App or sibling features; cross-feature needs are consumer-owned contracts injected by App.
+- A feature owns all its screens and its internal navigation; App only links features (shared §9). Features expose only contracts plus one assembly (shared §10). DI containers per shared §11.
 - shadcn/ui primitives are generated into `client/src/components/ui/` and exported, with `cn`, from its `index.ts` barrel. Feature `presentation/screens|components`, `components/layout|feedback`, `src/app/` and `App.tsx` import them from that barrel (never `components/ui/<file>.tsx`), plus `lucide-react` and `sonner`. radix-ui, cva, clsx and tailwind-merge stay inside `components/ui` and `components/app`. Domain, data, foundation, shared, ViewModels, presentation models, hooks and contexts stay UI-library free (client rules §4.7).
 - **Enforcement:** dependency-cruiser, per side (`client/.dependency-cruiser.cjs`, `server/.dependency-cruiser.cjs`), run with `npm run check:architecture`. All rules are `error`. Rules the tool can't check (prop leakage, ViewState vs entity rendering, tri-state patches, error translation) stay manual review items.
 - Fix existing violations inside your task's scope only; never weaken or `ignore` a dependency-cruiser rule to make a check pass. Raise it as a blocker instead.

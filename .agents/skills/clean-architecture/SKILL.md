@@ -17,7 +17,7 @@ Inside feature:  Presentation → Domain ← Data (client) / Infrastructure (ser
 
 - **App Owns Cross-Feature Composition**: App supplies cross-feature dependencies, links features (§9), owns the shell (root switch, tabs/navbar) and adapts cross-feature contracts. Each feature's assembly builds that feature's own internals (§10). Features never import App or sibling features; they declare narrow consumer-owned contracts that App injects. DI containers only as §11 allows.
 - **Foundation**: generic technical capabilities only. It never imports features or App and holds no business policy.
-- **Feature-First Layout**: each feature lives in `src/<feature>/` with only the layers it needs. No empty layers for symmetry, no top-level layer-first roots.
+- **Feature-First Layout**: each feature lives in `src/<feature>/` (web and server; iOS uses `Packages/Features/<Feature>/`, see the iOS rules) with only the layers it needs. No empty layers for symmetry, no top-level layer-first roots.
 - **Domain Independence**: domain is pure language code (TypeScript, Swift): its own models, contracts and use cases plus `shared/domain`. No frameworks, HTTP clients, database drivers, validation libraries, foundation, environment/browser/Node APIs or outer layers.
 - **One-Way Dependencies Within Domain**: use cases depend on contracts and models; contracts depend only on models, never on use cases.
 - **Pure, Narrow Shared Kernel**: `shared/domain` holds only framework-free common errors and value rules; no feature entities, DTOs or framework types.
@@ -42,7 +42,7 @@ Inside feature:  Presentation → Domain ← Data (client) / Infrastructure (ser
 
 ## 5. API Contract
 
-Change client and server together.
+Change every client (web, iOS) and the server together. `server/tests/client-contract.test.ts` checks only the web client; iOS DTO changes need manual review against the server schemas.
 - JSON fields camelCase; timestamps ISO-8601 UTC; every error is `{ error: string }`.
 - 200 read/update · 201 create · 204 delete (empty) · 400 validation/malformed · 401 unauthorized · 404 missing or not owned · 409 conflict · 500 `{ error: "Internal server error" }`.
 - Identity comes only from the verified access token; clients never send `userId`.
