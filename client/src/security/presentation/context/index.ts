@@ -1,2 +1,3 @@
 export { AuthSessionContext, useAuth } from './AuthSessionContext';
-export { AuthUseCasesContext, useAuthUseCases } from './AuthUseCasesContext';
+export { AuthUseCasesContext, useAuthUseCases, type AuthUseCases } from './AuthUseCasesContext';
+export { SecurityRoutingContext, useSecurityRouting } from './SecurityRoutingContext';

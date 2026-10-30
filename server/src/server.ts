@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { loadConfig } from './app/config';
-import { createContainer } from './app/container';
+import { createComposition } from './app/composition';
 import { createApp } from './app/createApp';
 import { runMigrations } from './foundation/database';
 
@@ -8,15 +8,15 @@ import { runMigrations } from './foundation/database';
 async function startServer(): Promise<void> {
   try {
     const config = loadConfig();
-    const container = createContainer(config);
+    const composition = createComposition(config);
 
     // Run migrations
-    runMigrations(container.db);
+    runMigrations(composition.db);
 
     // Seed database
-    await container.seed();
+    await composition.seed();
 
-    createApp(config, container).listen(config.port, () => {
+    createApp(config, composition).listen(config.port, () => {
       console.log(`Server is running on port ${config.port}`);
       console.log(`CORS origin: ${config.corsOrigin}`);
     });

@@ -15,8 +15,8 @@ let authUseCases;
 let profileUseCases;
 let useCases;
 let guards;
-let AuthProvider;
-let FeatureUseCasesProvider;
+let features;
+let FeatureProviders;
 let AppNavbar;
 let ColorModeContext;
 
@@ -33,8 +33,8 @@ before(async () => {
   profileUseCases = await vite.ssrLoadModule('/src/profile/presentation/context/ProfileUseCasesContext.ts');
   useCases = await vite.ssrLoadModule('/src/tasks/presentation/context/TaskUseCasesContext.ts');
   guards = await vite.ssrLoadModule('/src/app/router/routeGuards.tsx');
-  ({ AuthProvider } = await vite.ssrLoadModule('/src/app/providers/AuthProvider.tsx'));
-  ({ FeatureUseCasesProvider } = await vite.ssrLoadModule('/src/app/providers/FeatureUseCasesProvider.tsx'));
+  features = await vite.ssrLoadModule('/src/app/composition/features.ts');
+  ({ FeatureProviders } = await vite.ssrLoadModule('/src/app/providers/FeatureProviders.tsx'));
   AppNavbar = (await vite.ssrLoadModule('/src/app/composition/AppNavbar.tsx')).default;
   ({ ColorModeContext } = await vite.ssrLoadModule('/src/foundation/theme/useColorMode.ts'));
 });
@@ -161,11 +161,11 @@ test('App supplies actual use-case capabilities without consumer imports of App 
     return createElement('span', null, 'injected');
   }
   const element = createElement(QueryClientProvider, { client: queryClient },
-    createElement(AuthProvider, null, createElement(FeatureUseCasesProvider, null, createElement(Probe))));
+    createElement(FeatureProviders, null, createElement(Probe)));
   assert.ok(renderToStaticMarkup(element).includes('injected'));
 });
 
-test('App auth provider preserves stored-session hydration and signout clears storage and cache', (t) => {
+test('security assembly provider preserves stored-session hydration and signout clears storage and cache', (t) => {
   const store = storage(t, {
     accessToken: 'test-access', refreshToken: 'test-refresh',
     user: JSON.stringify({ id: 'user-1', name: 'Stored User', email: 'stored@example.test' }),
@@ -176,7 +176,7 @@ test('App auth provider preserves stored-session hydration and signout clears st
   let state;
   function Probe() { state = authContext.useAuth(); return createElement('span', null, state.user?.name); }
   const html = renderToStaticMarkup(createElement(QueryClientProvider, { client: queryClient },
-    createElement(AuthProvider, null, createElement(Probe))));
+    createElement(features.security.Provider, null, createElement(Probe))));
   assert.ok(html.includes('Stored User'));
   assert.equal(state.isAuthenticated, true);
   state.signOut();
@@ -184,7 +184,7 @@ test('App auth provider preserves stored-session hydration and signout clears st
   assert.equal(queryClient.getQueryCache().getAll().length, 0);
 });
 
-test('App auth provider clears invalid persisted sessions', (t) => {
+test('security assembly provider clears invalid persisted sessions', (t) => {
   const store = storage(t, { accessToken: 'test-access', refreshToken: 'test-refresh', user: '{invalid' });
   const queryClient = new QueryClient();
   t.after(() => queryClient.clear());
@@ -195,7 +195,7 @@ test('App auth provider clears invalid persisted sessions', (t) => {
     return null;
   }
   renderToStaticMarkup(createElement(QueryClientProvider, { client: queryClient },
-    createElement(AuthProvider, null, createElement(Probe))));
+    createElement(features.security.Provider, null, createElement(Probe))));
   for (const key of ['accessToken', 'refreshToken', 'user']) assert.equal(store.getItem(key), null);
 });
 
@@ -216,4 +216,13 @@ test('App navbar reads session and theme directly without mounting an auth form 
   assert.equal(renderToStaticMarkup(withSession(element, sessionState())), '');
   const html = renderToStaticMarkup(withSession(element, sessionState({ isAuthenticated: true, user: { name: 'Current Name' } })));
   for (const text of ['Current Name', 'Dashboard', 'Tasks', 'Profile', 'Comparison']) assert.ok(html.includes(text));
+});
+
+test('feature assemblies own their route entries and App only mounts them', () => {
+  const paths = (feature) => feature.routes.map((route) => route.path);
+  assert.deepEqual(paths(features.security), ['/login', '/register']);
+  assert.deepEqual(paths(features.dashboard), ['/', '/dashboard']);
+  assert.deepEqual(paths(features.tasks), ['/tasks']);
+  assert.deepEqual(paths(features.profile), ['/profile']);
+  assert.deepEqual(paths(features.comparison), ['/comparison']);
 });
