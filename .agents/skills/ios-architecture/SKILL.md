@@ -5,7 +5,7 @@ description: iOS (SwiftUI + UIKit navigation) clean-architecture rules (SPM layo
 
 # iOS Clean Architecture Rules (SwiftUI + UIKit)
 
-Extend the [shared rules](../clean-architecture/SKILL.md). Inside a feature: Presentation → Domain ← Data. iOS 17+, Swift 6 language mode, strict concurrency complete. Cite these sections as ios §n; keep numbers stable.
+Extend the [shared rules](../clean-architecture/SKILL.md). Inside a feature: Presentation → Domain ← Data. Deployment target iOS 17.0, built with Xcode 26.3 / iOS 26 SDK, Swift 6.2 language mode, strict concurrency complete (toolchain and API rules in §10). Cite these sections as ios §n; keep numbers stable.
 
 ## 1. Packages, Targets and Access Control
 
@@ -35,8 +35,8 @@ ios/
 
 1. No `@unchecked Sendable`, `nonisolated(unsafe)` or `@preconcurrency import`. Fix the type instead.
 2. Models, DTOs and ViewState are `struct`/`enum` with Sendable members. Use cases, repositories and HTTP clients are `struct`s with only `let` Sendable properties; create `JSONDecoder`/`JSONEncoder` per call rather than storing them.
-3. Mutable shared state (token cache, in-flight refresh, session broadcast) is an `actor`. `AsyncStream` has one consumer; fan-out goes through an actor that owns the continuations.
-4. Presentation, `<F>Feature` and AppComposition targets use `defaultIsolation(MainActor.self)`; Domain, Data and Core (except DesignSystem) stay nonisolated so I/O never runs on the main actor.
+3. Mutable shared state (in-flight refresh, session broadcast) is an `actor`. Small synchronous state (an in-memory token cache) may use `OSAllocatedUnfairLock` from `os` (iOS 16+, Sendable) instead; `Mutex` needs iOS 18 and is not used. `AsyncStream` has one consumer; fan-out goes through an actor that owns the continuations.
+4. Presentation, `<F>Feature`, AppComposition and DesignSystem targets use `.defaultIsolation(MainActor.self)` (Swift 6.2). Domain, Data and the other Core targets keep nonisolated defaults and do not enable `NonisolatedNonsendingByDefault`, so their async work leaves the main actor; if that feature is ever enabled there, mark decoding and other heavy Data work `@concurrent`.
 5. Closures crossing isolation are `@Sendable` or `@MainActor`. Screens start work with `.task {}` so it is cancelled on disappear.
 
 ## 3. Domain
@@ -67,7 +67,7 @@ ios/
 1. Navigation is UIKit; every screen is hosted in a `UIHostingController`. SwiftUI screens never touch UIKit or routers directly; ViewModels call routing protocols.
 2. Each feature owns a coordinator in `<F>Presentation/Navigation/` that implements its internal routing protocol (internal) and its inbound `public protocol <F>Flow` with `handle(_ route: <F>Route)`.
 3. Outbound needs are `public protocol <F>ExternalRouting: AnyObject` in the feature's own vocabulary. AppComposition implements them and maps types between features.
-4. AppCoordinator owns the window: splash while restoring the session, then root swap between the Auth flow and `MainCoordinator` (tab bar of feature flows) driven by `SessionRepository.sessionChanges`. Deep links are out of scope.
+4. AppCoordinator owns the window: splash while restoring the session, then root swap between the Auth flow and `MainCoordinator` (a `UITabBarController` with `viewControllers` and `UITabBarItem`s, one tab per feature flow; the iOS 18 `UITab` API is not used) driven by `SessionRepository.sessionChanges`. Deep links are out of scope.
 5. ViewModels and coordinators hold routers `weak`. Sheets that change data take an `onSaved` callback so the presenting screen refetches.
 
 ## 7. Dependency Injection (shared §11)
@@ -87,6 +87,14 @@ ios/
 
 ## 9. Verification
 
-- `xcodebuild build test` for the app scheme and `swift test` for each package, plus `git diff --check` at the repository root.
+- `xcodebuild build test` for the app scheme and `xcodebuild test` for each changed package scheme, on the latest simulator (iPhone 17, iOS 26.3) and before a PR also on the minimum (iPhone 15, iOS 17.5), plus `git diff --check` at the repository root. Packages are iOS-only, so plain `swift test` on macOS is not used.
 - Tests use Swift Testing: ViewModels with stubbed use cases, presentation mappers, data mappers and error translation.
 - The dependency rule is enforced by SPM target dependencies; never add a target dependency that §1 forbids. Manual review: ViewState vs entity rendering, `public` surface limited to shared §10, no `@unchecked`, error translation, tri-state patches.
+
+## 10. Toolchain and Platform APIs
+
+1. Toolchain: Xcode 26.3, Swift 6.2 (`// swift-tools-version: 6.2`, `.swiftLanguageMode(.v6)`), iOS 26 SDK. Every package declares `platforms: [.iOS(.v17)]`; the app target's deployment target is iOS 17.0.
+2. Freely usable (iOS 17 and earlier): `@Observable`, typed throws, `OSAllocatedUnfairLock`, `UITabBarController.viewControllers`, `@Entry` environment values (back-deployed macro), `.task`, `.refreshable`, `UISheetPresentationController` detents, `#Preview`. Not used: iOS 18 APIs such as `Mutex`, `UITab` and `@Previewable`; previews pass ViewState fixtures instead.
+3. iOS 26-only APIs (`glassEffect`, `Task.immediate`, `UIHostingController` scene bridging, automatic UIKit observation tracking) are used only behind `if #available(iOS 26, *)` with an iOS 17 fallback (likewise any iOS 18 API, behind `#available(iOS 18, *)`), and only inside `Core/DesignSystem` or AppComposition, never in feature code.
+4. Building with the iOS 26 SDK adopts Liquid Glass for system bars on iOS 26. Do not opt out (`UIDesignRequiresCompatibility`) and do not force opaque bar appearances; DesignSystem tokens style content, not system chrome.
+5. Raise the deployment target only together with this section, `ios/AGENTS.md` and `plans/RULES.md`, and delete the `#available` fallbacks it makes dead.

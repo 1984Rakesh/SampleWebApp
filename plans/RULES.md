@@ -5,7 +5,7 @@ Applies to every plan in `plans/`. The Manager (Claude) owns this file; Devin re
 ## Stack
 - **client/** — React 19, Vite 8, TypeScript 6, Tailwind CSS v4, vendored shadcn/ui (radix-ui, lucide-react), TanStack Query, Axios, Zod, React Router 7. Lint: oxlint. Tests: Node test runner + Vite SSR (`client/tests/*.test.mjs`).
 - **server/** — Express 5, better-sqlite3, bcrypt, jsonwebtoken, Zod, TypeScript 7 (no JS compiler API). Tests: tsx + Node test runner (`server/tests/*.test.ts`), compiled startup smoke test.
-- **ios/** — SwiftUI (iOS 17+, Swift 6) with UIKit navigation, local SPM packages, FactoryKit DI, Swift Testing.
+- **ios/** — SwiftUI (deployment target iOS 17.0, Xcode 26.3 / iOS 26 SDK, Swift 6.2) with UIKit navigation, local SPM packages, FactoryKit DI, Swift Testing.
 - No root package.json. Each side installs and verifies on its own.
 
 ## Architecture

@@ -10,9 +10,18 @@ The app talks to the existing server API in `../server`; run it locally for Debu
 
 ## Verification
 
+Requires Xcode 26.3 (Swift 6.2, iOS 26 SDK). Deployment target is iOS 17.0.
+
+Latest OS (every change):
+
 ```bash
-cd ios
-xcodebuild -scheme TasksApp -destination 'platform=iOS Simulator,name=iPhone 17' build test
+xcodebuild -scheme TasksApp -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.3' build test
 ```
 
-Also run `swift test` in each package you change, then `git diff --check` at the repository root.
+Minimum OS (before opening a PR):
+
+```bash
+xcodebuild -scheme TasksApp -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' build test
+```
+
+Also run `xcodebuild test -scheme <Package> -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.3'` for each package you change, then `git diff --check` at the repository root.
