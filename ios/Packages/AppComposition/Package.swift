@@ -15,18 +15,21 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../Core"),
+        .package(path: "../Features/Auth"),
     ],
     targets: [
         .target(
             name: "AppComposition",
             dependencies: [
                 .product(name: "DesignSystem", package: "Core"),
+                .product(name: "Networking", package: "Core"),
+                .product(name: "AuthFeature", package: "Auth"),
             ],
             swiftSettings: mainActorByDefault
         ),
         .testTarget(
             name: "AppCompositionTests",
-            dependencies: ["AppComposition"],
+            dependencies: ["AppComposition", .product(name: "AuthFeature", package: "Auth")],
             swiftSettings: mainActorByDefault
         ),
     ],

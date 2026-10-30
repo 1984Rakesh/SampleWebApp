@@ -45,6 +45,9 @@ public struct URLSessionHTTPClient: HTTPClient {
         var request = URLRequest(url: resolved)
         request.httpMethod = endpoint.method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        for (name, value) in endpoint.headers {
+            request.setValue(value, forHTTPHeaderField: name)
+        }
         if let body = endpoint.body {
             request.httpBody = body
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")

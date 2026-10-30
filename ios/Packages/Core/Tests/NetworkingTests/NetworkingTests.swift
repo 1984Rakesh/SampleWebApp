@@ -34,6 +34,15 @@ import SharedDomain
         #expect(json.contains(#""dueDate":"2026-10-30T12:00:00.000Z""#))
     }
 
+    @Test func sendsEndpointHeaders() async throws {
+        let seen = OSAllocatedUnfairLock<URLRequest?>(initialState: nil)
+        let sut = client(stub: .init(body: Data("{}".utf8))) { request in seen.withLock { $0 = request } }
+
+        _ = try await sut.send(Endpoint(method: .get, path: "/users/me", headers: ["Authorization": "Bearer abc"]))
+
+        #expect(seen.withLock { $0 }?.value(forHTTPHeaderField: "Authorization") == "Bearer abc")
+    }
+
     @Test func appendsQueryItems() async throws {
         let seen = OSAllocatedUnfairLock<URLRequest?>(initialState: nil)
         let sut = client(stub: .init(body: Data("[]".utf8))) { request in seen.withLock { $0 = request } }

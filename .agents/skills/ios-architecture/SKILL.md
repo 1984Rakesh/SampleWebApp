@@ -28,7 +28,7 @@ ios/
 | `AppComposition` | `<F>Feature` products, Core | Any feature's Domain/Data/Presentation internals |
 
 - The module is `Core`, never `Foundation` (Apple's framework name). The task model is `TaskItem` (Swift Concurrency owns `Task`).
-- Each feature package exports one library product: its `<F>Feature` target, which re-exports the public contracts. Concrete types are `package` or `internal`; only shared §10 contracts are `public`. Tests use `@testable import`.
+- Each feature package exports one library product: its `<F>Feature` target, which re-exports the public contracts with `@_exported import <F>Domain` / `<F>Presentation`. Concrete types are `package` or `internal`; only shared §10 contracts are `public`. Tests use `@testable import`.
 - A feature has only the layers it needs (Dashboard has no Data target).
 
 ## 2. Concurrency
@@ -57,7 +57,7 @@ ios/
 ## 5. Presentation
 
 1. Each screen folder holds `<S>ViewState`, `<S>ViewModel`, `<S>Screen`, `<S>Container`. Screens render ViewState only, never domain types; mappers own domain → ViewState and `DomainError` → message.
-2. ViewModels are `@MainActor @Observable final class` with `private(set) var state` and one `func send(_ action: Action) async`; `Action` is an `Equatable` enum. Screens receive `state` and a `send` closure; Containers own the ViewModel and call `.task { await viewModel.send(.onAppear) }`.
+2. ViewModels are `@MainActor @Observable final class` with `private(set) var state` and one `@discardableResult func send(_ action: Action) -> Task<Void, Never>?`; `Action` is an `Equatable` enum. `send` updates state synchronously, so text-field bindings never lag a keystroke; async work runs in a task the ViewModel starts and returns, which tests `await`. Screens receive `state` and a `(Action) -> Void` closure; Containers own the ViewModel.
 3. Async content uses `Loadable<Value>` (`idle / loading / loaded / failed(message)`); `.cancelled` is ignored silently.
 4. Form errors appear on first submit, then update live.
 5. Previews use ViewState fixtures, not ViewModels.
@@ -73,8 +73,8 @@ ios/
 ## 7. Dependency Injection (shared §11)
 
 1. Factory (hmlongco/Factory 2.4.x, module `Factory`; tests use `FactoryTesting`) is the DI container. Each feature defines `package final class <F>Container: SharedContainer` with `@TaskLocal package static var shared = <F>Container()` and its own `manager`; no feature registers in `Container.shared` or another feature's container.
-2. ViewModels, factories and coordinators resolve with `@Injected(\<F>Container.key)`; inside `@Observable` classes mark them `@ObservationIgnored`. Routers are passed at construction, never registered.
-3. Cross-feature keys in a feature container have an unregistered default that fails fast; App fills them only through `<F>Assembly.configure(...)`.
+2. The container class and its keys are `nonisolated` and live in `<F>Presentation/DI/`: use-case keys default to the domain `Default…` implementations; repository keys fail fast until `<F>Assembly.configure(...)` registers the Data implementations. Keys for Core types Presentation may not import (e.g. `HTTPClient`) are declared in `<F>Feature`.
+3. ViewModels resolve use cases with `@Injected(\<F>Container.key)` marked `@ObservationIgnored`. `@Injected` resolves when the ViewModel is created, so tests register stubs first. ViewModels and routers are never registered: coordinators construct ViewModels and pass themselves as router.
 4. User-scoped registrations use a custom `.session` scope. On sign-out App calls every `<F>Assembly.resetSession()`.
 5. Each feature's tests declare a trait `ContainerTrait(shared: <F>Container.$shared, container: <F>Container())` and override registrations inside it, so parallel tests each get their own container. `.serialized` is only a fallback for a suite that cannot use the trait.
 
@@ -87,8 +87,9 @@ ios/
 
 ## 9. Verification
 
-- `xcodebuild test` for the `TasksApp` scheme and for each changed package scheme (`Core-Package`, `AppComposition`, `<Feature>-Package`), on the latest simulator (iPhone 17, iOS 26.3.1) and before a PR also on the minimum (iPhone 15, iOS 17.5), plus `git diff --check` at the repository root. Packages are iOS-only, so plain `swift test` on macOS is not used.
+- `xcodebuild test` for the `TasksApp` scheme and for each changed package scheme (a package with several products gets `<Package>-Package`, e.g. `Core-Package`; otherwise the package name, e.g. `Auth`, `AppComposition`; `xcodebuild -list` shows it), on the latest simulator (iPhone 17, iOS 26.3.1) and before a PR also on the minimum (iPhone 15, iOS 17.5), plus `git diff --check` at the repository root. Packages are iOS-only, so plain `swift test` on macOS is not used.
 - Package tests run without a host app, so the Keychain is unavailable there (errSecMissingEntitlement); Keychain-dependent tests skip in packages and run hosted in `TasksAppTests`.
+- Live-server tests are opt-in: start the server (`cd server && DB_PATH=:memory: PORT=3001 npx tsx src/server.ts`) and run the feature scheme with `TEST_RUNNER_LIVE_API_BASE_URL=http://localhost:3001/api`; without it they skip.
 - Tests use Swift Testing: ViewModels with stubbed use cases, presentation mappers, data mappers and error translation.
 - The dependency rule is enforced by SPM target dependencies; never add a target dependency that §1 forbids. Manual review: ViewState vs entity rendering, `public` surface limited to shared §10, no `@unchecked`, error translation, tri-state patches.
 

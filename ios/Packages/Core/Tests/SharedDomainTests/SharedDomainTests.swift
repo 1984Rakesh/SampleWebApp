@@ -29,3 +29,11 @@ import SharedDomain
         #expect(DomainError.cancelled.message == nil)
     }
 }
+
+@Suite struct TextTests {
+    @Test func trimsWhitespaceAndNewlines() {
+        #expect("  Ada \n".trimmedWhitespace == "Ada")
+        #expect(" \t\n ".trimmedWhitespace == "")
+        #expect("a b".trimmedWhitespace == "a b")
+    }
+}
