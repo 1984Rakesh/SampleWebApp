@@ -1,0 +1,4 @@
+// Debug talks to the local server (`cd server && npm run dev`); the simulator reaches the Mac at localhost.
+// `$()` keeps `//` from starting an xcconfig comment.
+API_BASE_URL = http:/$()/localhost:3001/api
+INFOPLIST_FILE = Config/Debug-Info.plist
