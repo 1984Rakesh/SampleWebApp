@@ -20,7 +20,7 @@ let package = Package(
         .target(name: "SharedDomain"),
         .target(name: "Networking", dependencies: ["SharedDomain"]),
         .target(name: "SecureStorage"),
-        .target(name: "DesignSystem", swiftSettings: mainActorByDefault),
+        .target(name: "DesignSystem", dependencies: ["SharedDomain"], swiftSettings: mainActorByDefault),
         .testTarget(name: "SharedDomainTests", dependencies: ["SharedDomain"]),
         .testTarget(name: "NetworkingTests", dependencies: ["Networking", "SharedDomain"]),
         .testTarget(name: "SecureStorageTests", dependencies: ["SecureStorage"]),

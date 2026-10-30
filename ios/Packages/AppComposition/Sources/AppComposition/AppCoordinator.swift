@@ -1,4 +1,5 @@
 import AuthFeature
+import DashboardFeature
 import Networking
 import SwiftUI
 import TasksFeature
@@ -11,6 +12,7 @@ struct AppServices {
     let logout: any LogoutUseCase
     let makeAuthFlow: () -> any AuthFlow
     let makeTasksFlow: () -> any TasksFlow
+    let makeDashboardFlow: (String, any DashboardExternalRouting) -> any DashboardFlow
     /// Drops every feature's user-scoped registrations (ios §7.4).
     let resetUserSessions: () -> Void
 }
@@ -32,6 +34,7 @@ public final class AppCoordinator: Coordinator {
             keychainService: Self.keychainService
         )
         TasksAssembly.configure(client: AuthAssembly.authenticatedClient())
+        DashboardAssembly.configure(taskSource: TasksDashboardSource(getTasks: { TasksAssembly.getTasks() }))
         self.init(
             window: window,
             services: AppServices(
@@ -40,6 +43,7 @@ public final class AppCoordinator: Coordinator {
                 logout: AuthAssembly.logout(),
                 makeAuthFlow: AuthAssembly.makeFlow,
                 makeTasksFlow: TasksAssembly.makeFlow,
+                makeDashboardFlow: { DashboardAssembly.makeFlow(displayName: $0, router: $1) },
                 resetUserSessions: TasksAssembly.resetSession
             )
         )
@@ -75,7 +79,11 @@ public final class AppCoordinator: Coordinator {
         case .signedIn(let account):
             authFlow = nil
             let logout = services.logout
-            let main = MainCoordinator(account: account, tasksFlow: services.makeTasksFlow()) {
+            let main = MainCoordinator(
+                account: account,
+                tasksFlow: services.makeTasksFlow(),
+                makeDashboardFlow: services.makeDashboardFlow
+            ) {
                 Task { await logout.execute() }
             }
             self.main = main

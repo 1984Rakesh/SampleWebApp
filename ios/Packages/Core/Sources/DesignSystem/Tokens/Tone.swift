@@ -19,6 +19,11 @@ struct ToneColors: Sendable {
 }
 
 extension Tone {
+    /// The tone's text color, for content that sits on a neutral surface.
+    public var foregroundColor: Color {
+        colors.foreground
+    }
+
     nonisolated var colors: ToneColors {
         switch self {
         case .neutral:

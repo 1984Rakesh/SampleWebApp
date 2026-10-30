@@ -3,6 +3,8 @@ import SwiftUI
 import Testing
 import UIKit
 import AuthFeature
+import DashboardFeature
+import SharedDomain
 import TasksFeature
 @testable import AppComposition
 
@@ -49,8 +51,13 @@ import TasksFeature
         harness.changes.yield(.signedIn(account))
         try await waitUntil { harness.window.rootViewController is UITabBarController }
         let tabs = try #require(harness.window.rootViewController as? UITabBarController)
-        #expect(tabs.viewControllers?.first === harness.tasksFlow.rootViewController)
-        #expect(tabs.viewControllers?.map { $0.tabBarItem.title } == ["Tasks", "Account"])
+        #expect(tabs.viewControllers?[1] === harness.tasksFlow.rootViewController)
+        #expect(tabs.viewControllers?.map { $0.tabBarItem.title } == ["Dashboard", "Tasks", "Account"])
+        #expect(harness.dashboards.flows.first?.displayName == "Ada")
+
+        harness.dashboards.flows.first?.router?.openTasks(.overdue)
+        #expect(tabs.selectedIndex == 1)
+        #expect(harness.tasksFlow.routes == [.overdue])
     }
 
     @Test func repeatedStateDoesNotRebuildRoot() async throws {
@@ -79,6 +86,7 @@ final class Harness {
     let changes: AsyncStream<SessionState>.Continuation
     let authFlow = StubAuthFlow()
     let tasksFlow = StubTasksFlow()
+    let dashboards = DashboardRecorder()
     let resets = Counter()
     let coordinator: AppCoordinator
 
@@ -86,15 +94,67 @@ final class Harness {
         let (stream, continuation) = AsyncStream.makeStream(of: SessionState.self)
         changes = continuation
         let (authFlow, tasksFlow, resets) = (authFlow, tasksFlow, resets)
+        let dashboards = dashboards
         coordinator = AppCoordinator(window: window, services: AppServices(
             restore: StubRestore(),
             observe: StubObserve(stream: stream),
             logout: StubLogout(),
             makeAuthFlow: { authFlow },
             makeTasksFlow: { tasksFlow },
+            makeDashboardFlow: { name, router in dashboards.make(name, router) },
             resetUserSessions: { resets.count += 1 }
         ))
     }
+}
+
+final class DashboardRecorder {
+    private(set) var flows: [StubDashboardFlow] = []
+
+    func make(_ name: String, _ router: any DashboardExternalRouting) -> StubDashboardFlow {
+        let flow = StubDashboardFlow(displayName: name, router: router)
+        flows.append(flow)
+        return flow
+    }
+}
+
+final class StubDashboardFlow: DashboardFlow {
+    let rootViewController = UIViewController()
+    let displayName: String
+    weak var router: (any DashboardExternalRouting)?
+
+    init(displayName: String, router: any DashboardExternalRouting) {
+        self.displayName = displayName
+        self.router = router
+    }
+}
+
+@Suite struct CrossFeatureAdapterTests {
+    @Test func mapsTasksToDashboardTasks() async throws {
+        let due = Timestamp(secondsSince1970: 100)
+        let task = TaskItem(
+            id: TaskID("1"), title: "a", details: nil, status: .inProgress, priority: .high,
+            dueDate: due, createdAt: due, updatedAt: due
+        )
+        let source = TasksDashboardSource(getTasks: { StubGetTasks(tasks: [task]) })
+
+        #expect(try await source.tasks() == [DashboardTask(status: .inProgress, priority: .high, dueDate: due)])
+    }
+
+    @Test(arguments: [
+        (DashboardTaskFilter.all, TasksRoute.list(status: nil)),
+        (.todo, .list(status: .todo)),
+        (.inProgress, .list(status: .inProgress)),
+        (.completed, .list(status: .completed)),
+        (.overdue, .overdue),
+    ])
+    func mapsDashboardFiltersToTasksRoutes(filter: DashboardTaskFilter, route: TasksRoute) {
+        #expect(TasksRouteBridge.route(for: filter) == route)
+    }
+}
+
+struct StubGetTasks: GetTasksUseCase {
+    let tasks: [TaskItem]
+    func execute(_ filter: TaskFilter) async throws(DomainError) -> [TaskItem] { tasks }
 }
 
 final class Counter {

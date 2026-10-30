@@ -29,7 +29,7 @@ ios/
 
 - The module is `Core`, never `Foundation` (Apple's framework name). The task model is `TaskItem` (Swift Concurrency owns `Task`).
 - Each feature package exports one library product: its `<F>Feature` target, which re-exports the public contracts with `@_exported import <F>Domain` / `<F>Presentation`. Concrete types are `package` or `internal`; only shared §10 contracts are `public`. Tests use `@testable import`.
-- A feature has only the layers it needs (Dashboard has no Data target).
+- A feature has only the layers it needs (Dashboard has no Data target: it reads tasks through its own `DashboardTaskSource`, which AppComposition backs with Tasks' `GetTasksUseCase`).
 
 ## 2. Concurrency
 
@@ -53,7 +53,7 @@ ios/
 2. Request and response DTOs are separate `Codable` structs per feature. Mappers normalize, validate, then build domain values; `Patch` maps to omitted / `null` / value.
 3. Repositories translate `HTTPError` to `DomainError` (shared §4/§5 status mapping, backend message kept), `URLError`/5xx to `.unavailable`, and `CancellationError`/`URLError.cancelled` to `.cancelled`.
 4. Auth owns `TokenStore` (Keychain) and `AuthenticatedHTTPClient`, a decorator that adds the bearer token, coalesces concurrent refreshes in an actor, retries once, and clears the session if refresh fails. Other features receive it only as `any HTTPClient`.
-5. Due dates are calendar days: read `YYYY-MM-DD` (the web client's format, as UTC midnight) or a full ISO timestamp, and write `YYYY-MM-DD`. Presentation keeps the same year/month/day when converting to and from the user's calendar (`DueDay`), and treats a task as overdue once its due day is before today.
+5. Due dates are calendar days: read `YYYY-MM-DD` (the web client's format, as UTC midnight) or a full ISO timestamp, and write `YYYY-MM-DD`. Presentation keeps the same year/month/day when converting to and from the user's calendar (`CalendarDay`), and treats a task as overdue once its due day is before today.
 6. Base URL comes from `.xcconfig` per configuration; Debug allows an ATS exception for localhost only. No caching: screens refetch on appear and on pull-to-refresh.
 
 ## 5. Presentation
@@ -63,13 +63,13 @@ ios/
 3. Async content uses `Loadable<Value>` (`idle / loading / loaded / failed(message)`); `.cancelled` is ignored silently.
 4. Form errors appear on first submit, then update live.
 5. Previews use ViewState fixtures, not ViewModels.
-6. `Loadable` and `ChoiceOption` live in DesignSystem. Presenters that format dates take injectable `now`, `calendar` and `locale`. Lists reload on appear and on pull-to-refresh (awaiting the returned task); a new load cancels the previous one so a stale response never wins; after a first successful load, failures show a banner instead of replacing the content.
+6. `Loadable`, `ChoiceOption` and `CalendarDay` (calendar-day ↔ UTC-midnight conversion) live in DesignSystem. Presenters that format dates take injectable `now`, `calendar` and `locale`. Lists reload on appear and on pull-to-refresh (awaiting the returned task); a new load cancels the previous one so a stale response never wins; after a first successful load, failures show a banner instead of replacing the content.
 
 ## 6. Navigation (shared §9)
 
 1. Navigation is UIKit; every screen is hosted in a `UIHostingController`. SwiftUI screens never touch UIKit or routers directly; ViewModels call routing protocols.
 2. Each feature owns a coordinator in `<F>Presentation/Navigation/` that implements its internal routing protocol (internal) and its inbound `public protocol <F>Flow` with `handle(_ route: <F>Route)`.
-3. Outbound needs are `public protocol <F>ExternalRouting: AnyObject` in the feature's own vocabulary. AppComposition implements them and maps types between features.
+3. Outbound needs are `public protocol <F>ExternalRouting: AnyObject` in the feature's own vocabulary. AppComposition implements them and maps types between features in `CrossFeatureAdapters.swift` (e.g. `DashboardTaskFilter` → `TasksRoute`, `TaskItem` → `DashboardTask`). Adapters resolve the other feature's use case per call, so a sign-out's session reset is honored.
 4. AppCoordinator owns the window: splash while restoring the session, then root swap between the Auth flow and `MainCoordinator` (a `UITabBarController` with `viewControllers` and `UITabBarItem`s, one tab per feature flow; the iOS 18 `UITab` API is not used) driven by `SessionRepository.sessionChanges`. Deep links are out of scope.
 5. ViewModels and coordinators hold routers `weak`. Sheets that change data take an `onSaved` callback so the presenting screen refetches.
 6. Coordinators own UIKit chrome: titles, bar button items and sheet presentation (`UINavigationController` with a Cancel item, `.pageSheet`). Screens stay free of navigation APIs.

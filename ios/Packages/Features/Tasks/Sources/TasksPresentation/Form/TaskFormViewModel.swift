@@ -68,7 +68,7 @@ final class TaskFormViewModel {
             state.priorityID = TaskPresenter.id(task.priority)
             state.statusID = TaskPresenter.id(task.status)
             state.hasDueDate = task.dueDate != nil
-            state.dueDate = task.dueDate.map { DueDay.date(for: $0, calendar: calendar) } ?? .now
+            state.dueDate = task.dueDate.map { CalendarDay.date(for: $0, calendar: calendar) } ?? .now
             state.navigationTitle = "Edit task"
             state.saveTitle = "Save changes"
         }
@@ -122,7 +122,7 @@ final class TaskFormViewModel {
 
     private func persist(_ draft: TaskFormViewState) async throws(DomainError) {
         let priority = TaskPresenter.priority(id: draft.priorityID) ?? .medium
-        let dueDate = draft.hasDueDate ? DueDay.timestamp(for: draft.dueDate, calendar: calendar) : nil
+        let dueDate = draft.hasDueDate ? CalendarDay.timestamp(for: draft.dueDate, calendar: calendar) : nil
         switch mode {
         case .create:
             _ = try await createTask.execute(title: draft.title, details: draft.details, priority: priority, dueDate: dueDate)

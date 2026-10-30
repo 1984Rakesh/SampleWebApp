@@ -17,6 +17,7 @@ let package = Package(
         .package(path: "../Core"),
         .package(path: "../Features/Auth"),
         .package(path: "../Features/Tasks"),
+        .package(path: "../Features/Dashboard"),
     ],
     targets: [
         .target(
@@ -26,6 +27,7 @@ let package = Package(
                 .product(name: "Networking", package: "Core"),
                 .product(name: "AuthFeature", package: "Auth"),
                 .product(name: "TasksFeature", package: "Tasks"),
+                .product(name: "DashboardFeature", package: "Dashboard"),
             ],
             swiftSettings: mainActorByDefault
         ),
@@ -35,6 +37,7 @@ let package = Package(
                 "AppComposition",
                 .product(name: "AuthFeature", package: "Auth"),
                 .product(name: "TasksFeature", package: "Tasks"),
+                .product(name: "DashboardFeature", package: "Dashboard"),
             ],
             swiftSettings: mainActorByDefault
         ),

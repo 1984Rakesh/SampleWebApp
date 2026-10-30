@@ -11,6 +11,8 @@ enum TaskListFilter: String, CaseIterable, Equatable {
     case todo
     case inProgress
     case completed
+    /// Open tasks whose due day has passed; filtered on the device, as the API has no such filter.
+    case overdue
 
     init(status: TaskStatus?) {
         switch status {
@@ -27,11 +29,16 @@ enum TaskListFilter: String, CaseIterable, Equatable {
         case .todo: .todo
         case .inProgress: .inProgress
         case .completed: .completed
+        case .overdue: nil
         }
     }
 
     var label: String {
-        status.map(TaskPresenter.label) ?? "All"
+        switch self {
+        case .all: "All"
+        case .overdue: "Overdue"
+        default: status.map(TaskPresenter.label) ?? "All"
+        }
     }
 
     static let options = allCases.map { ChoiceOption(id: $0.rawValue, label: $0.label) }
@@ -112,7 +119,7 @@ final class TaskListViewModel {
             do throws(DomainError) {
                 let loaded = try await getTasks.execute(filter)
                 guard !Task.isCancelled else { return }
-                tasks = loaded
+                tasks = loaded.filter(matchesFilter)
                 render()
             } catch {
                 guard !Task.isCancelled, let message = error.message else { return }
@@ -154,12 +161,19 @@ final class TaskListViewModel {
 
     /// Keeps an updated task only if it still matches the active filter.
     private func replace(_ updated: TaskItem) {
-        if let status = state.filter.status, updated.status != status {
+        if !matchesFilter(updated) {
             tasks.removeAll { $0.id == updated.id }
         } else if let index = tasks.firstIndex(where: { $0.id == updated.id }) {
             tasks[index] = updated
         }
         render()
+    }
+
+    private func matchesFilter(_ task: TaskItem) -> Bool {
+        switch state.filter {
+        case .overdue: presenter().isOverdue(task)
+        default: state.filter.status.map { task.status == $0 } ?? true
+        }
     }
 
     private func render() {

@@ -6,6 +6,8 @@ import UIKit
 public enum TasksRoute: Equatable, Sendable {
     /// The list, filtered by status (`nil` shows all).
     case list(status: TaskStatus?)
+    /// The list, showing open tasks whose due day has passed.
+    case overdue
 }
 
 /// Tasks' inbound entry: App installs `rootViewController` in a tab and forwards routes.
@@ -43,11 +45,13 @@ package final class TasksCoordinator: TasksFlow, TasksInternalRouting {
     }
 
     package func handle(_ route: TasksRoute) {
+        navigationController.presentedViewController?.dismiss(animated: false)
+        navigationController.popToRootViewController(animated: false)
         switch route {
         case .list(let status):
-            navigationController.presentedViewController?.dismiss(animated: false)
-            navigationController.popToRootViewController(animated: false)
             listViewModel.send(.filterChanged(TaskListFilter(status: status)))
+        case .overdue:
+            listViewModel.send(.filterChanged(.overdue))
         }
     }
 

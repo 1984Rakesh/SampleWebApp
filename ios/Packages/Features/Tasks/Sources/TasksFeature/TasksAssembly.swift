@@ -18,6 +18,11 @@ public enum TasksAssembly {
         TasksCoordinator()
     }
 
+    /// Reads the signed-in user's tasks; App adapts it for features that summarize tasks.
+    nonisolated public static func getTasks() -> any GetTasksUseCase {
+        TasksContainer.shared.getTasks()
+    }
+
     /// Drops user-scoped registrations on sign-out (ios §7.4).
     public static func resetSession() {
         TasksContainer.shared.manager.reset(scope: TasksContainer.sessionScope)

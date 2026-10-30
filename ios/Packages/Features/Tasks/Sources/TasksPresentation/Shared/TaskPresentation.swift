@@ -39,13 +39,13 @@ struct TaskPresenter {
     }
 
     func isOverdue(_ task: TaskItem) -> Bool {
-        task.isOverdue(startOfToday: DueDay.timestamp(for: now, calendar: calendar))
+        task.isOverdue(startOfToday: CalendarDay.timestamp(for: now, calendar: calendar))
     }
 
     func dueText(_ dueDate: Timestamp, overdue: Bool) -> String {
-        let today = DueDay.timestamp(for: now, calendar: calendar)
+        let today = CalendarDay.timestamp(for: now, calendar: calendar)
         let days = Int(((dueDate.secondsSince1970 - today.secondsSince1970) / 86_400).rounded(.down))
-        let date = DueDay.format(dueDate, locale: locale)
+        let date = CalendarDay.format(dueDate, locale: locale)
         if overdue { return "Overdue · \(date)" }
         switch days {
         case 0: return "Due today"
@@ -99,33 +99,4 @@ struct TaskPresenter {
 
     static func priority(id: String) -> TaskPriority? { TaskPriority.allCases.first { self.id($0) == id } }
     static func status(id: String) -> TaskStatus? { TaskStatus.allCases.first { self.id($0) == id } }
-}
-
-/// Due dates are calendar days stored as UTC midnight (see `DueDateCoding` in Data).
-/// The user picks a local day; these helpers keep the same year/month/day across the conversion.
-enum DueDay {
-    private static let utc: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = .gmt
-        return calendar
-    }()
-
-    /// UTC midnight of `date`'s day in `calendar`.
-    static func timestamp(for date: Date, calendar: Calendar) -> Timestamp {
-        let day = calendar.dateComponents([.year, .month, .day], from: date)
-        let midnight = utc.date(from: day) ?? date
-        return Timestamp(secondsSince1970: midnight.timeIntervalSince1970)
-    }
-
-    /// Noon of the stored day in `calendar`, for a date picker.
-    static func date(for timestamp: Timestamp, calendar: Calendar) -> Date {
-        var day = utc.dateComponents([.year, .month, .day], from: Date(timeIntervalSince1970: timestamp.secondsSince1970))
-        day.hour = 12
-        return calendar.date(from: day) ?? Date(timeIntervalSince1970: timestamp.secondsSince1970)
-    }
-
-    static func format(_ timestamp: Timestamp, locale: Locale) -> String {
-        Date(timeIntervalSince1970: timestamp.secondsSince1970)
-            .formatted(Date.FormatStyle(locale: locale, timeZone: .gmt).month(.abbreviated).day())
-    }
 }

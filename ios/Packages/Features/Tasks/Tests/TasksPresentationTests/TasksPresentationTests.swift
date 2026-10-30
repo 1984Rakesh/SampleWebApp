@@ -131,9 +131,9 @@ private func register(_ repository: FakeTaskRepository) {
     @Test func dueDayKeepsCalendarDayAcrossTimeZones() {
         var tokyo = Calendar(identifier: .gregorian)
         tokyo.timeZone = TimeZone(identifier: "Asia/Tokyo")!
-        let picked = DueDay.date(for: Fixtures.today, calendar: tokyo)
+        let picked = CalendarDay.date(for: Fixtures.today, calendar: tokyo)
 
-        #expect(DueDay.timestamp(for: picked, calendar: tokyo) == Fixtures.today)
+        #expect(CalendarDay.timestamp(for: picked, calendar: tokyo) == Fixtures.today)
     }
 }
 
@@ -170,6 +170,23 @@ private func register(_ repository: FakeTaskRepository) {
 
         #expect(sut.state.content.value?.count == 1)
         #expect(sut.state.banner == "Offline")
+    }
+
+    @Test func overdueFilterShowsOnlyOpenPastDueTasks() async {
+        register(FakeTaskRepository([
+            Fixtures.task("late", dueInDays: -1),
+            Fixtures.task("done", status: .completed, dueInDays: -1),
+            Fixtures.task("soon", dueInDays: 1),
+            Fixtures.task("none"),
+        ]))
+        let sut = TaskListViewModel(router: SpyRouter(), presenter: presenter)
+
+        await sut.send(.filterChanged(.overdue))?.value
+        #expect(sut.state.content.value?.map(\.id) == ["late"])
+
+        await sut.send(.toggle(id: "late"))?.value
+        #expect(sut.state.content.value?.isEmpty == true)
+        #expect(sut.state.emptyMessage == "No overdue tasks.")
     }
 
     @Test func toggleOutsideFilterRemovesRow() async {
@@ -283,7 +300,7 @@ private func register(_ repository: FakeTaskRepository) {
         #expect(sut.state.titleError == nil)
         sut.send(.priorityChanged("High"))
         sut.send(.dueDateToggled(true))
-        sut.send(.dueDateChanged(DueDay.date(for: Fixtures.today, calendar: utcCalendar)))
+        sut.send(.dueDateChanged(CalendarDay.date(for: Fixtures.today, calendar: utcCalendar)))
         await sut.send(.save)?.value
 
         let created = await repository.created
