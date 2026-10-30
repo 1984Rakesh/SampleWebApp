@@ -35,7 +35,7 @@ Extend the [shared rules](../clean-architecture/SKILL.md). Inside a feature: Pre
 1. APIs take and return DTOs only. Request and response DTOs/schemas live in `<feature>/data/dtos`.
 2. Mappers normalize (aliases, nulls, timestamps), validate the transport shape, then build domain objects. Axios/backend and schema failures are translated through `shared/data` before they reach ViewModels.
 3. React Query keys, mutations, invalidation and cache updates stay in data repositories, scoped by authenticated identity. Query functions execute use cases. Presentation sees semantic data/loading/error, never TanStack types.
-4. App composition binds repositories to use cases; App providers supply presentation-owned contexts; consumers never import `app/`. Presentation contracts may carry domain values to ViewModels, not to screens/components.
+4. (Legacy until the shared §8 migration; new code follows shared §10–§11.) App composition binds repositories to use cases; App providers supply presentation-owned contexts; consumers never import `app/`. Presentation contracts may carry domain values to ViewModels, not to screens/components.
 5. Provider order: QueryClient → ErrorBoundary → theme → auth/session → feature capabilities. Providers and hook/context definitions live in separate files (Fast Refresh). `App.tsx` and `main.tsx` stay thin.
 
 ## 4. Presentation and Shared UI
@@ -43,7 +43,7 @@ Extend the [shared rules](../clean-architecture/SKILL.md). Inside a feature: Pre
 1. Screens/components render ViewState, primitives and `SelectOption`s, never domain entities/enums; editing uses IDs or ViewState. ViewModels own form state, validation feedback, loading and actions; presentation mappers use domain methods for domain decisions.
 2. Derived display data (greetings, counts, lists) is computed in ViewModels/presentation mappers, not inline in screens. Cross-feature display data arrives through the consuming feature's App-injected context.
 3. Feature-specific UI stays in `<feature>/presentation/components` even when several routes use it; shared `components/` stays feature-neutral.
-4. Shared layout (navbar, shell) is prop-driven; App owns its state and callbacks and renders feature-owned dialogs. Never drive global navigation from a feature form ViewModel.
+4. Shared layout (navbar, shell) is prop-driven; App owns its state and callbacks and renders feature-owned dialogs. Never drive global navigation from a feature form ViewModel. Target model: features own internal routes and App only links features (shared §9); current App-owned routing is a known violation (shared §8).
 5. Split distinct render regions into controlled subcomponents; keep internals out of public barrels.
 6. `SelectOption` belongs to `components/ui`; shared primitives never depend on feature types.
 7. Feature `presentation/screens|components`, `components/layout|feedback`, `src/app/` and `App.tsx` use shadcn/ui directly: they import primitives and `cn` from the `components/ui` barrel (never `components/ui/<file>.tsx`), icons from lucide-react and toasts from sonner, and compose Tailwind token utilities. Primitives are generated into `components/ui` and styled there per the Tasks App DS in `client/docs/design-system/`. radix-ui, cva, clsx and tailwind-merge stay private to `components/ui` and `components/app`. ViewModels, presentation models, hooks, contexts, domain, data, foundation and shared stay UI-library free.

@@ -55,6 +55,6 @@ Features that share a table own separate ports and adapters; App gives both adap
 
 ## 6. App and Verification
 
-- Only `app/config.ts` reads `process.env` and rejects missing/default production JWT secrets; `dotenv` only in `server.ts` and `app/`. Only `app/container.ts` constructs adapters, use cases, controllers and routers; `app/createApp.ts` mounts middleware and routes; `server.ts` configures, migrates, awaits the seed, then listens.
+- Only `app/config.ts` reads `process.env` and rejects missing/default production JWT secrets; `dotenv` only in `server.ts` and `app/`. Only `app/container.ts` constructs adapters, use cases, controllers and routers (legacy until the shared §8 migration to per-feature assemblies, shared §10); `app/createApp.ts` mounts middleware and routes; `server.ts` configures, migrates, awaits the seed, then listens.
 - `src` uses only packages in `dependencies`, never devDependencies; every import resolves.
 - Run `npm run build`, `npm test`, `npm run test:startup`, `npm run check:architecture` and `git diff --check`. Test safety rules are in [server/AGENTS.md](../../../server/AGENTS.md).
