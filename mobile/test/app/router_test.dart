@@ -4,8 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tasks_mobile/app/app.dart';
 import 'package:tasks_mobile/app/router.dart';
 import 'package:tasks_mobile/features/auth/presentation/providers/auth_use_case_providers.dart';
+import 'package:tasks_mobile/features/tasks/presentation/providers/task_use_case_providers.dart';
 
 import '../features/auth/auth_fakes.dart';
+import '../features/tasks/tasks_fakes.dart';
 
 void main() {
   group('authRedirect', () {
@@ -56,6 +58,7 @@ void main() {
             FakeGetCurrentUserUseCase(demoUser),
           ),
           logoutUseCaseProvider.overrideWithValue(logout),
+          getTasksUseCaseProvider.overrideWithValue(FakeGetTasksUseCase()),
         ],
         child: const TasksApp(),
       ),
@@ -82,6 +85,7 @@ void main() {
             FakeGetCurrentUserUseCase(),
           ),
           loginUseCaseProvider.overrideWithValue(login),
+          getTasksUseCaseProvider.overrideWithValue(FakeGetTasksUseCase()),
         ],
         child: const TasksApp(),
       ),
