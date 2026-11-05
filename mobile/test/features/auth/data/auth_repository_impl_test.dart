@@ -154,6 +154,15 @@ void main() {
     );
   });
 
+  test('an empty login body becomes UnknownFailure, not a crash', () async {
+    server.answer = (_) => (200, null);
+
+    await expectLater(
+      repository.login(email: 'demo@example.com', password: 'pw'),
+      throwsA(isA<UnknownFailure>()),
+    );
+  });
+
   test('logout forgets the tokens without calling the server', () async {
     tokens.accessToken = 'abc';
 

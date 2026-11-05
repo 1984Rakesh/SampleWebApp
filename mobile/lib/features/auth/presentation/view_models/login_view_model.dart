@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tasks_mobile/features/auth/domain/use_cases/login_use_case.dart';
-import 'package:tasks_mobile/features/auth/presentation/providers/auth_use_case_providers.dart';
-import 'package:tasks_mobile/core/failures/app_failure.dart';
 
+import '../../../../core/failures/app_failure.dart';
+import '../../domain/use_cases/login_use_case.dart';
+import '../providers/auth_use_case_providers.dart';
+import '../session/auth_session.dart';
 import '../view_state/login_view_state.dart';
 
 class LoginViewModel extends Notifier<LoginViewState> {
@@ -23,9 +24,12 @@ class LoginViewModel extends Notifier<LoginViewState> {
 
     final login = ref.read(loginUseCaseProvider);
     try {
-      await login(LoginParams(email: state.email, password: state.password));
+      final user = await login(
+        LoginParams(email: state.email, password: state.password),
+      );
       if (!ref.mounted) return;
-      state = state.copyWith(isSubmitting: false, isSignedIn: true);
+      state = state.copyWith(isSubmitting: false);
+      ref.read(authSessionProvider.notifier).signedIn(user);
     } on AppFailure catch (e) {
       if (!ref.mounted) return;
       state = state.copyWith(
@@ -36,6 +40,8 @@ class LoginViewModel extends Notifier<LoginViewState> {
   }
 }
 
-final loginViewModelProvider = NotifierProvider<LoginViewModel, LoginViewState>(
-  LoginViewModel.new,
-);
+/// autoDispose so the form resets after sign-out.
+final loginViewModelProvider =
+    NotifierProvider.autoDispose<LoginViewModel, LoginViewState>(
+      LoginViewModel.new,
+    );

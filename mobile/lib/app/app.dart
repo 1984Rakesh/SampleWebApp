@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:tasks_mobile/features/auth/presentation/screens/login_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TasksApp extends StatelessWidget {
+import 'router.dart';
+
+class TasksApp extends ConsumerWidget {
   const TasksApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    return MaterialApp.router(
       title: 'Tasks App',
       theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
-      home: const LoginScreen(),
+      routerConfig: ref.watch(routerProvider),
     );
   }
 }

@@ -44,16 +44,11 @@ class LoginScreen extends ConsumerWidget {
                   ),
                 ],
                 const SizedBox(height: 24),
-                if (state.isSignedIn)
-                  const Text('Signed in ✓', textAlign: TextAlign.center)
-                else
-                  LoadingButton(
-                    label: 'Sign in',
-                    isLoading: state.isSubmitting,
-                    onPressed: state.canSubmit
-                        ? () => viewModel.submit()
-                        : null,
-                  ),
+                LoadingButton(
+                  label: 'Sign in',
+                  isLoading: state.isSubmitting,
+                  onPressed: state.canSubmit ? viewModel.submit : null,
+                ),
               ],
             ),
           ),

@@ -15,7 +15,7 @@ class AuthRemoteDataSource {
       '/auth/login',
       data: {'email': email, 'password': password},
     );
-    return LoginResponseDto.fromJson(response.data!);
+    return LoginResponseDto.fromJson(response.data ?? const {});
   }
 
   Future<UserDto> fetchCurrentUser() async {

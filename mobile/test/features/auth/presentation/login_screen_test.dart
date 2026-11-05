@@ -5,7 +5,7 @@ import 'package:tasks_mobile/features/auth/presentation/screens/login_screen.dar
 import 'package:tasks_mobile/core/failures/app_failure.dart';
 import 'package:tasks_mobile/features/auth/presentation/providers/auth_use_case_providers.dart';
 
-import 'login_view_model_test.dart' show FakeLoginUseCase;
+import '../auth_fakes.dart';
 
 void main() {
   testWidgets('typing and tapping Sign in shows the server error', (
