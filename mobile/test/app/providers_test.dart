@@ -2,9 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tasks_mobile/app/providers.dart';
 import 'package:tasks_mobile/core/network/api_client.dart';
-import 'package:tasks_mobile/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:tasks_mobile/features/auth/domain/use_cases/login_use_case.dart';
 import 'package:tasks_mobile/features/auth/presentation/providers/auth_use_case_providers.dart';
+import 'package:tasks_mobile/features/tasks/domain/use_cases/get_tasks_use_case.dart';
+import 'package:tasks_mobile/features/tasks/domain/use_cases/toggle_task_status_use_case.dart';
+import 'package:tasks_mobile/features/tasks/presentation/providers/task_use_case_providers.dart';
 
 import '../core/network/api_client_test.dart' show FakeTokenStorage;
 
@@ -22,15 +24,25 @@ void main() {
     expect(dio.interceptors.whereType<AuthInterceptor>(), hasLength(1));
   });
 
-  test('appOverrides bind the auth use cases to the real classes', () {
-    final container = ProviderContainer.test(
-      overrides: [
-        ...appOverrides,
-        tokenStorageProvider.overrideWithValue(FakeTokenStorage()),
-      ],
-    );
+  test(
+    'appOverrides bind the auth and tasks use cases to the real classes',
+    () {
+      final container = ProviderContainer.test(
+        overrides: [
+          ...appOverrides,
+          tokenStorageProvider.overrideWithValue(FakeTokenStorage()),
+        ],
+      );
 
-    expect(container.read(authRepositoryProvider), isA<AuthRepositoryImpl>());
-    expect(container.read(loginUseCaseProvider), isA<LoginUseCaseImpl>());
-  });
+      expect(container.read(loginUseCaseProvider), isA<LoginUseCaseImpl>());
+      expect(
+        container.read(getTasksUseCaseProvider),
+        isA<GetTasksUseCaseImpl>(),
+      );
+      expect(
+        container.read(toggleTaskStatusUseCaseProvider),
+        isA<ToggleTaskStatusUseCaseImpl>(),
+      );
+    },
+  );
 }
