@@ -1,0 +1,65 @@
+name: iOS
+
+on:
+  pull_request:
+    paths:
+      - 'ios/**'
+      - '.github/workflows/ios.yml'
+  push:
+    branches:
+      - main
+      - 'feat/**'
+    paths:
+      - 'ios/**'
+      - '.github/workflows/ios.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Toolchain pinned by ios/AGENTS.md and ios rules §10.
+  XCODE_APP: /Applications/Xcode_26.3.app
+  DESTINATION: platform=iOS Simulator,name=iPhone 17
+
+jobs:
+  ios:
+    name: ios
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Select Xcode 26.3
+        run: |
+          sudo xcode-select -s "$XCODE_APP"
+          xcodebuild -version
+          xcrun simctl list devices available | grep "iPhone 17 (" || { echo "iPhone 17 simulator missing"; exit 1; }
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+          key: spm-${{ runner.os }}-${{ hashFiles('ios/**/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      # Each package is tested on its own scheme, then the app with its hosted tests (ios §9).
+      # The minimum-OS run (iPhone 15, iOS 17.5) stays a local pre-PR check: hosted runners lack that runtime.
+      - name: Test packages and app
+        working-directory: ios
+        run: |
+          set -o pipefail
+          run() {
+            echo "::group::$2"
+            (cd "$1" && xcodebuild test -scheme "$2" -destination "$DESTINATION" -skipPackagePluginValidation)
+            echo "::endgroup::"
+          }
+          run Packages/Core Core-Package
+          run Packages/Features/Auth Auth
+          run Packages/Features/Tasks Tasks
+          run Packages/Features/Dashboard Dashboard
+          run Packages/Features/Profile Profile
+          run Packages/AppComposition AppComposition
+          run . TasksApp

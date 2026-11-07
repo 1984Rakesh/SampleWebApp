@@ -1,0 +1,3 @@
+// Placeholder until a deployed API exists; `.invalid` never resolves, so a misconfigured release fails visibly.
+API_BASE_URL = https:/$()/api.example.invalid/api
+INFOPLIST_FILE = Config/Info.plist
